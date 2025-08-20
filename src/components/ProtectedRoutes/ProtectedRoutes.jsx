@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 export default function ProtectedRoute({
   children,
@@ -14,12 +14,14 @@ export default function ProtectedRoute({
   useEffect(() => {
     // 🔒 Agar authRequired hai aur user login nahi hai
     if (authRequired && !isAuthenticated) {
-      router.replace("/login");
+      // router.replace("/login");
+      redirect("/login");
     }
 
     // 🔒 Agar role diya gaya hai aur user role mismatch hai
     else if (role && user?.role !== role) {
-      router.replace("/not-authorized");
+      // router.replace("/not-authorized");
+      redirect("/not-authorized");
     }
   }, [isAuthenticated, user, role, authRequired, router]);
 
