@@ -1,7 +1,11 @@
-import React from "react";
+import WelcomePage from "../../components/DashboardComponents/WelcomePage";
 
-const DashboardPage = () => {
-  return <div className=""></div>;
+const AdminDashboard = () => {
+  return (
+    <div className="bg-[url(/dashboard-bg/bg-1.webp)] bg-cover bg-center ">
+      <WelcomePage />
+    </div>
+  );
 };
 
-export default DashboardPage;
+export default AdminDashboard;

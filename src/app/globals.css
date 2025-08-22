@@ -13,3 +13,19 @@ html, body {
   font-weight: 500; */
   font-style: normal;
   letter-spacing: 0.7px !important;}
+
+
+  @keyframes zoom-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-zoom-in {
+  animation: zoom-in 0.3s ease-out;
+}

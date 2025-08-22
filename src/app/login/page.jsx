@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/redux/reducers/auth-reducers";
 
 import toast from "react-hot-toast";
+import { staticApi } from "@/redux/api/staticApi";
 
 // 🔹 Zod Schemas
 const loginSchema = z.object({
@@ -96,7 +97,9 @@ export default function LoginRegisterPage() {
       console.log("Register success:", res);
       dispatch(setCredentials(res));
       toast.success(`Signup successfully`);
-      // router.push("/dashboard");
+
+      // Dashboard mein data automatic update karne keliye
+      dispatch(staticApi.util.invalidateTags(["Statics"]));
     } catch (err) {
       console.log("Register error:", err);
       alert(err.data?.message || "Register failed");

@@ -14,6 +14,7 @@ import { logout } from "../redux/reducers/auth-reducers";
 import { useRouter } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import toast from "react-hot-toast";
+import ClientWrapper from "./ClientWrapper";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,14 +57,16 @@ export default function Navbar() {
           >
             About
           </Link>
-          {user?.role === "admin" && (
-            <Link
-              href="/dashboard"
-              className="text-gray-700 font-medium hover:text-yellow-600"
-            >
-              Dashboard
-            </Link>
-          )}
+          <ClientWrapper>
+            {user?.role === "admin" && (
+              <Link
+                href="/dashboard"
+                className="text-gray-700 font-medium hover:text-yellow-600"
+              >
+                Dashboard
+              </Link>
+            )}
+          </ClientWrapper>
           <Link
             href="/contact"
             className="text-gray-700 font-medium hover:text-yellow-600"
@@ -107,47 +110,49 @@ export default function Navbar() {
               onMouseLeave={() => setIsOpenSubMenu(false)} // hover chhodne pe band
               className="flex text-sm items-center gap-2 px-5 py-1.5 bg-yellow-500 rounded-md hover:bg-yellow-600 text-white transition"
             >
-              {user ? (
-                <span className="font-medium text-white">
-                  Hi, <span className="capitalize">{user?.name}</span>
-                </span>
-              ) : (
-                <Link href={"/login"}>Login</Link>
-              )}
-              {user && <ChevronDown className="w-4 h-4 text-white" />}
-              {/* Dropdown Menu */}
-              {user && isOpenSubMenu && (
-                <div className=" absolute right-0 top-6 mt-2  !z-[1000] ">
-                  <div className="w-40 bg-white border border-gray-300 my-0.5 rounded-md shadow-lg">
-                    <ul className=" text-sm text-gray-700">
-                      <li>
-                        <Link
-                          href="/my-orders"
-                          className="px-4 py-2 hover:bg-gray-100 flex justify-center items-center gap-3"
-                        >
-                          <span className="">
-                            <ListOrdered size={18} />
-                          </span>
-                          My Orders
-                        </Link>
-                      </li>
-                      {/* <hr className="text-gray-300" /> */}
-                      <li>
-                        <div
-                          onClick={handleLogout}
-                          disabled={isLoading}
-                          className="px-4 py-2 w-full hover:bg-gray-100 cursor-pointer flex justify-center items-center gap-3"
-                        >
-                          <span className="">
-                            <LogOut size={18} />
-                          </span>
-                          {isLoading ? "Logging out..." : "Logout"}
-                        </div>
-                      </li>
-                    </ul>
+              <ClientWrapper>
+                {user ? (
+                  <span className="font-medium text-white">
+                    Hi, <span className="capitalize">{user?.name}</span>
+                  </span>
+                ) : (
+                  <Link href={"/login"}>Login</Link>
+                )}
+                {user && <ChevronDown className="w-4 h-4 text-white" />}
+                {/* Dropdown Menu */}
+                {user && isOpenSubMenu && (
+                  <div className=" absolute right-0 top-6 mt-2  !z-[1000] ">
+                    <div className="w-40 bg-white border border-gray-300 my-0.5 rounded-md shadow-lg">
+                      <ul className=" text-sm text-gray-700">
+                        <li>
+                          <Link
+                            href="/my-orders"
+                            className="px-4 py-2 hover:bg-gray-100 flex justify-center items-center gap-3"
+                          >
+                            <span className="">
+                              <ListOrdered size={18} />
+                            </span>
+                            My Orders
+                          </Link>
+                        </li>
+                        {/* <hr className="text-gray-300" /> */}
+                        <li>
+                          <div
+                            onClick={handleLogout}
+                            disabled={isLoading}
+                            className="px-4 py-2 w-full hover:bg-gray-100 cursor-pointer flex justify-center items-center gap-3"
+                          >
+                            <span className="">
+                              <LogOut size={18} />
+                            </span>
+                            {isLoading ? "Logging out..." : "Logout"}
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </ClientWrapper>
             </div>
           </div>
         </div>
@@ -171,19 +176,20 @@ export default function Navbar() {
           </div>
 
           {/* Auth Mobile */}
-          {user ? (
-            <div className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800">
-              Logout
-            </div>
-          ) : (
-            <div
-              className="p-2 rounded-lg hover:bg-gray-100 text-gray-800"
-              aria-label="Login"
-            >
-              <LogIn className="w-6 h-6" />
-            </div>
-          )}
-
+          <ClientWrapper>
+            {user ? (
+              <div className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800">
+                Logout
+              </div>
+            ) : (
+              <div
+                className="p-2 rounded-lg hover:bg-gray-100 text-gray-800"
+                aria-label="Login"
+              >
+                <LogIn className="w-6 h-6" />
+              </div>
+            )}
+          </ClientWrapper>
           {/* Mobile Menu Button */}
           <div
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-800"

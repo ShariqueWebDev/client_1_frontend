@@ -1,9 +1,10 @@
 import React from "react";
+import AdminOrderTable from "../../../components/DashboardComponents/OrderTable";
 
 const OrdersPage = () => {
   return (
-    <div className="h-[500px] w-full flex justify-center items-center">
-      Order Page
+    <div className="mt-6 w-full flex justify-center items-center">
+      <AdminOrderTable />
     </div>
   );
 };

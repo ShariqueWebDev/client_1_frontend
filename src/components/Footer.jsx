@@ -1,6 +1,14 @@
 "use client";
 import Link from "next/link";
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
+import ClientOnly from "./ClientWrapper";
+
+export const getCurrentYear = () => {
+  if (typeof window !== "undefined") {
+    return new Date().getFullYear();
+  }
+  return ""; // SSR ke liye blank ya safe default
+};
 
 export default function Footer() {
   return (
@@ -99,9 +107,11 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="mt-10 border-t border-gray-700 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 max-w-screen-xl mx-auto px-4">
-        <p className="text-sm text-gray-400">
-          © {new Date().getFullYear()} Refilley | All Rights Reserved
-        </p>
+        <ClientOnly>
+          <p className="text-sm text-gray-400">
+            © {getCurrentYear()} Refilley | All Rights Reserved
+          </p>
+        </ClientOnly>
         <div className="flex gap-4 text-gray-400">
           <Link href="#">
             <FaFacebookF className="hover:text-yellow-400 cursor-pointer" />

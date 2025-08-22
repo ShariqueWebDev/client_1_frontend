@@ -6,17 +6,21 @@ import Link from "next/link";
 import { useLogoutUserMutation } from "../../redux/api/userApi";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/reducers/auth-reducers";
+import { usePathname, useRouter } from "next/navigation"; // ✅ import
+import { toast } from "react-hot-toast"; // agar toast use kar rahe ho
 
 const Sidebar = () => {
   const [logoutUser, { isLoading }] = useLogoutUserMutation();
   const dispatch = useDispatch();
+  const pathname = usePathname(); // ✅ current route
+  const router = useRouter();
 
   const dashboardLogoutHandler = async () => {
     try {
       await logoutUser().unwrap();
       dispatch(logout());
       router.push("/login");
-      toast.success(`${user.name} logged out`);
+      toast.success(`Logged out successfully`);
     } catch (error) {
       console.log("logout failed");
     }
@@ -27,10 +31,19 @@ const Sidebar = () => {
       {/* Top Menu */}
       <ul className="h-full">
         {DashboardData?.map((item, index) => {
+          const isActive = pathname === item?.link; // ✅ check active
+
           return (
             <Link href={item?.link} key={index}>
-              <li>
-                <div className="flex items-center gap-4 mb-5">
+              <li
+                className={`px-5 py-2 mb-3 rounded-sm transition-colors duration-200 
+                ${
+                  isActive
+                    ? "bg-yellow-500 text-white" // ✅ active tab style
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                <div className="flex items-center gap-4">
                   <div className="w-fit">
                     <Image
                       src={item?.imgPath}
@@ -50,9 +63,9 @@ const Sidebar = () => {
 
       {/* Bottom Menu */}
       <ul className="border-t border-gray-300 pt-4">
-        <li>
+        <li className="hover:bg-gray-300 bg-gray-200 px-5 py-2 mb-3 rounded-sm">
           <Link href={"/contact"}>
-            <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center gap-4">
               <div className="w-fit">
                 <Image
                   src={"/assets/dashboard/support.png"}
@@ -66,9 +79,11 @@ const Sidebar = () => {
             </div>
           </Link>
         </li>
-        <li className="cursor-pointer">
+
+        {/* Logout Button */}
+        <li className="hover:bg-gray-300 bg-gray-200 px-5 py-2 mb-3 rounded-sm cursor-pointer">
           <div
-            className="flex items-center gap-4 mb-5"
+            className="flex items-center gap-4"
             onClick={dashboardLogoutHandler}
           >
             <div className="w-fit">
@@ -77,7 +92,7 @@ const Sidebar = () => {
                 width={50}
                 height={50}
                 alt="Logout"
-                className="w-5 h-5 object-contain object-center"
+                className="w-4.5 object-contain object-center"
               />
             </div>
             <p className="text-sm">Logout</p>

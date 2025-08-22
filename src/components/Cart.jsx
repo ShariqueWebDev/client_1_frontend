@@ -15,7 +15,7 @@ const Cart = ({ product, isSlider }) => {
       <div className="w-full lg:h-[350px]  relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2">
         <Image
           src={"/assets/anime.png"}
-          alt={""}
+          alt={"Animie Tshirt"}
           width={500}
           height={700}
           className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-300"

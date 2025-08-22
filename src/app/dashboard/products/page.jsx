@@ -1,11 +1,12 @@
+import ProductTable from "../../../components/DashboardComponents/ProductTable";
 import React from "react";
 
-const DashboardProductsPage = () => {
+const ProductTablePage = () => {
   return (
-    <div className="h-[500px] w-full flex justify-center items-center">
-      Products Page
+    <div>
+      <ProductTable />
     </div>
   );
 };
 
-export default DashboardProductsPage;
+export default ProductTablePage;

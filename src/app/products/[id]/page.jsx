@@ -13,7 +13,7 @@ const ProductDetailsPage = () => {
             <div className="w-full border border-gray-200 rounded-md">
               <Image
                 src={"/assets/anime.png"}
-                alt={""}
+                alt={"Anime Tshirt"}
                 width={500}
                 height={500}
                 className=""
