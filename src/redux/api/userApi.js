@@ -31,6 +31,21 @@ export const userAPI = createApi({
         credentials: "include",
       }),
     }),
+
+    sendOtp: builder.mutation({
+      query: (body) => ({
+        url: "/send-otp",
+        method: "POST",
+        body,
+      }),
+    }),
+    resetPassword: builder.mutation({
+      query: (body) => ({
+        url: "/reset-password",
+        method: "POST",
+        body,
+      }),
+    }),
     // getProfile: builder.query({
     //   query: () => "/me",
     // }),
@@ -43,5 +58,7 @@ export const {
   useLoginUserMutation,
   useRegisterUserMutation,
   useLogoutUserMutation,
-  useGetProfileQuery,
+  useSendOtpMutation,
+  useResetPasswordMutation,
+  // useGetProfileQuery,
 } = userAPI;

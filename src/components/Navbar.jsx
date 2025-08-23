@@ -15,12 +15,18 @@ import { useRouter } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import toast from "react-hot-toast";
 import ClientWrapper from "./ClientWrapper";
+import {
+  toggleMenu,
+  openMenu,
+  closeMenu,
+} from "../redux/reducers/menu-reducers";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
   const [isOpenSubMenu, setIsOpenSubMenu] = useState(false);
   // const {} = userAPI();
   const dispatch = useDispatch();
+  const isOpen = useSelector((state) => state.menu.isOpen);
   const auth = useSelector((state) => state.auth) || { user: null };
   const { user } = auth;
 
@@ -38,7 +44,6 @@ export default function Navbar() {
       console.log("logout failed");
     }
   };
-  let openLogin;
 
   return (
     <nav className="w-full bg-white border-b border-gray-200  z-50 h-[70px] ">
@@ -176,7 +181,7 @@ export default function Navbar() {
           </div>
 
           {/* Auth Mobile */}
-          <ClientWrapper>
+          {/* <ClientWrapper>
             {user ? (
               <div className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800">
                 Logout
@@ -189,11 +194,11 @@ export default function Navbar() {
                 <LogIn className="w-6 h-6" />
               </div>
             )}
-          </ClientWrapper>
+          </ClientWrapper> */}
           {/* Mobile Menu Button */}
           <div
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-800"
-            onClick={() => setIsOpen(true)}
+            onClick={() => dispatch(toggleMenu())}
             aria-label="Open menu"
           >
             <svg
@@ -214,7 +219,14 @@ export default function Navbar() {
         </div>
       </div>
 
-      <MobileMenu isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
+      <MobileMenu
+        // isOpen={isOpen}
+        // setIsOpen={(val) =>
+        //   val ? dispatch(openMenu()) : dispatch(closeMenu())
+        // }
+        user={user}
+        handleLogout={handleLogout}
+      />
     </nav>
   );
 }

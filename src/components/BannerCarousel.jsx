@@ -13,7 +13,6 @@ const banners = [
 export default function Banner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { user, isAthenticated } = useSelector((state) => state.auth);
-  console.log(user, "redux store user..........", isAthenticated);
 
   useEffect(() => {
     const interval = setInterval(() => {

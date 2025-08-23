@@ -7,6 +7,8 @@ import * as z from "zod";
 import {
   useLoginUserMutation,
   useRegisterUserMutation,
+  useSendOtpMutation,
+  useResetPasswordMutation,
 } from "../../redux/api/userApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/redux/reducers/auth-reducers";
@@ -31,24 +33,38 @@ const registerSchema = z.object({
   photo: z.string().url("Invalid photo URL"),
 });
 
+const forgotSchema = z.object({
+  email: z.string().email("Invalid email"),
+});
+
+const otpSchema = z.object({
+  email: z.string().email("Invalid email"),
+  resetOtp: z.string().min(4, "OTP must be at least 4 digits"), // changed from "otp"
+  newPassword: z.string().min(6, "Password too short"), // changed from "password"
+});
+
 export default function LoginRegisterPage() {
-  const [view, setView] = useState("login");
+  const [view, setView] = useState("login"); // login | register | forgot | verification
+  // const [email, setEmail] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
 
   // 🔹 Redux RTK Query Mutations
   const [loginUser, { isLoading: loginLoading }] = useLoginUserMutation();
   const [registerUser, { isLoading: regLoading }] = useRegisterUserMutation();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const [sendOtp, { isLoading: sendOtpLoading }] = useSendOtpMutation();
+  const [resetPassword, { isLoading: resetPassLoading }] =
+    useResetPasswordMutation();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     if (user) {
       if (user.role === "admin") {
-        router.push("/dashboard"); // admin redirect
+        router.push("/dashboard");
       } else if (user.role === "user") {
-        router.push("/"); // normal user redirect
+        router.push("/");
       } else {
-        router.push("/login"); // fallback, agar role unexpected ho
+        router.push("/login");
       }
     }
   }, [user, router]);
@@ -67,43 +83,81 @@ export default function LoginRegisterPage() {
     formState: { errors: regErrors },
   } = useForm({ resolver: zodResolver(registerSchema) });
 
-  // Login Handler
+  // Forgot Form
+  const {
+    register: forgotRegister,
+    handleSubmit: handleForgotSubmit,
+    formState: { errors: forgotErrors },
+  } = useForm({ resolver: zodResolver(forgotSchema) });
+
+  // OTP Form
+  const {
+    register: otpRegister,
+    handleSubmit: handleOtpSubmit,
+    formState: { errors: otpErrors },
+  } = useForm({ resolver: zodResolver(otpSchema) });
+
+  // Handlers
   const onLogin = async (data) => {
     try {
-      const res = await loginUser(data).unwrap(); // unwrap -> direct response
+      const res = await loginUser(data).unwrap();
       dispatch(setCredentials(res));
       toast.success("Login success");
-      console.log("Login success:", res);
     } catch (err) {
-      toast.error("Login failed");
+      toast.error(err?.data?.message || "Login failed");
     }
   };
 
-  // Register Handler
   const onRegister = async (data) => {
     const payload = {
-      name: data.name, // 👈 username mat bhejna, "name" bhejna
+      name: data.name,
       email: data.email,
       password: data.password,
-      photo: data.photo || "https://i.pravatar.cc/150", // agar tum file upload nahi kar rahe ho
-      gender: data.gender, // sirf "male" ya "female" hona chahiye
-      dob: new Date(data.dob).toISOString(), // 👈 Date ko ISO string me convert karke bhejna
+      photo: data.photo || "https://i.pravatar.cc/150",
+      gender: data.gender,
+      dob: new Date(data.dob).toISOString(),
     };
-
-    console.log("Register payload:", payload);
 
     try {
       const res = await registerUser(payload).unwrap();
-      console.log("Register success:", res);
       dispatch(setCredentials(res));
-      toast.success(`Signup successfully`);
-
-      // Dashboard mein data automatic update karne keliye
+      toast.success("Signup successfully");
       dispatch(staticApi.util.invalidateTags(["Statics"]));
     } catch (err) {
-      console.log("Register error:", err);
-      alert(err.data?.message || "Register failed");
+      toast.error(err?.data?.message || "Register failed");
     }
+  };
+
+  const onForgot = async (data) => {
+    try {
+      const res = await sendOtp({ email: data.email }).unwrap();
+      if (res.success) {
+        // setEmail(data.email);
+        setView("verification");
+      } else {
+        alert(res.message);
+      }
+    } catch (error) {
+      alert(error.data?.message || "Something went wrong");
+    }
+  };
+
+  const onVerifyOtp = async (data) => {
+    console.log(data, "OTP Modal data.......");
+
+    try {
+      const res = await resetPassword(data).unwrap();
+      if (res.success) {
+        console.log("Entered OTP:", data.otp);
+        toast.success("OTP verified");
+      } else {
+        toast.success(res.error);
+      }
+      setView("login"); // ya password reset page pe bhejo
+    } catch (error) {
+      console.log("OTP verification failed!");
+    }
+    // 🔹 Yahan backend se OTP verify karna hai
   };
 
   return (
@@ -119,7 +173,7 @@ export default function LoginRegisterPage() {
                   type="email"
                   placeholder="Email"
                   {...loginRegister("email")}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none "
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
                 />
                 {loginErrors.email && (
                   <p className="text-red-500 text-sm">
@@ -133,7 +187,7 @@ export default function LoginRegisterPage() {
                   type="password"
                   placeholder="Password"
                   {...loginRegister("password")}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
                 />
                 {loginErrors.password && (
                   <p className="text-red-500 text-sm">
@@ -142,17 +196,17 @@ export default function LoginRegisterPage() {
                 )}
               </div>
 
+              <div
+                className="text-xs cursor-pointer text-gray-900 hover:text-yellow-600"
+                onClick={() => setView("forgot")}
+              >
+                Forgot password?
+              </div>
+
               <button
                 type="submit"
                 disabled={loginLoading}
                 className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600 cursor-pointer"
-                onClick={() => {
-                  if (user.role === "user") {
-                    router.push("/");
-                  } else if (!user.role === "admin") {
-                    router.push("/dashboard");
-                  }
-                }}
               >
                 {loginLoading ? "Logging in..." : "Login"}
               </button>
@@ -161,7 +215,7 @@ export default function LoginRegisterPage() {
             <p className="text-sm text-center mt-3">
               Don’t have an account?{" "}
               <button
-                className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                className=" hover:text-yellow-600 underline cursor-pointer"
                 onClick={() => setView("register")}
               >
                 Register
@@ -182,7 +236,7 @@ export default function LoginRegisterPage() {
                 type="text"
                 placeholder="Username"
                 {...regRegister("name")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
               {regErrors.name && (
                 <p className="text-red-500 text-sm">{regErrors.name.message}</p>
@@ -192,7 +246,7 @@ export default function LoginRegisterPage() {
                 type="email"
                 placeholder="Email"
                 {...regRegister("email")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
               {regErrors.email && (
                 <p className="text-red-500 text-sm">
@@ -204,7 +258,7 @@ export default function LoginRegisterPage() {
                 type="password"
                 placeholder="Password"
                 {...regRegister("password")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
               {regErrors.password && (
                 <p className="text-red-500 text-sm">
@@ -215,7 +269,7 @@ export default function LoginRegisterPage() {
               <input
                 type="date"
                 {...regRegister("dob")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
               {regErrors.dob && (
                 <p className="text-red-500 text-sm">{regErrors.dob.message}</p>
@@ -223,7 +277,7 @@ export default function LoginRegisterPage() {
 
               <select
                 {...regRegister("gender")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
@@ -240,7 +294,7 @@ export default function LoginRegisterPage() {
                 type="url"
                 placeholder="Photo URL"
                 {...regRegister("photo")}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
               {regErrors.photo && (
                 <p className="text-red-500 text-sm">
@@ -251,7 +305,7 @@ export default function LoginRegisterPage() {
               <button
                 type="submit"
                 disabled={regLoading}
-                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600 cursor-pointer"
+                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600"
               >
                 {regLoading ? "Creating..." : "Register"}
               </button>
@@ -260,10 +314,106 @@ export default function LoginRegisterPage() {
             <p className="text-sm text-center mt-3">
               Already have an account?{" "}
               <button
-                className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                className="text-blue-600 underline"
                 onClick={() => setView("login")}
               >
                 Login
+              </button>
+            </p>
+          </>
+        )}
+
+        {/* ---------------- FORGOT PASSWORD ---------------- */}
+        {view === "forgot" && (
+          <>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Forgot Password
+            </h2>
+            <form onSubmit={handleForgotSubmit(onForgot)} className="space-y-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                {...forgotRegister("email")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
+              />
+              {forgotErrors.email && (
+                <p className="text-red-500 text-sm">
+                  {forgotErrors.email.message}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600 cursor-pointer"
+              >
+                Send OTP
+              </button>
+            </form>
+
+            <p className="text-sm text-center mt-3">
+              Back to{" "}
+              <button
+                className="hover:text-yellow-600 underline cursor-pointer"
+                onClick={() => setView("login")}
+              >
+                Login
+              </button>
+            </p>
+          </>
+        )}
+
+        {/* ---------------- OTP VERIFICATION ---------------- */}
+        {view === "verification" && (
+          <>
+            <h2 className="text-xl font-bold mb-4 text-center">Verify OTP</h2>
+            <form onSubmit={handleOtpSubmit(onVerifyOtp)} className="space-y-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                {...otpRegister("email")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
+              />
+              {otpErrors.email && (
+                <p className="text-red-500 text-sm">
+                  {otpErrors.email.message}
+                </p>
+              )}
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                {...otpRegister("resetOtp")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
+              />
+              {otpErrors.otp && (
+                <p className="text-red-500 text-sm">{otpErrors.otp.message}</p>
+              )}
+              <input
+                type="password"
+                placeholder="Enter your password"
+                {...otpRegister("newPassword")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
+              />
+              {otpErrors.password && (
+                <p className="text-red-500 text-sm">
+                  {otpErrors.password.message}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600"
+              >
+                Verify
+              </button>
+            </form>
+
+            <p className="text-sm text-center mt-3">
+              Didn’t get OTP?{" "}
+              <button
+                className="text-blue-600 underline"
+                onClick={() => setView("forgot")}
+              >
+                Resend
               </button>
             </p>
           </>

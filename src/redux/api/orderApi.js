@@ -10,15 +10,24 @@ export const orderApi = createApi({
   tagTypes: ["Order", "AdminOrders"],
   endpoints: (builder) => ({
     getAdminOrder: builder.query({
-      query: ({ isAdmin }) => `/all-orders?_id=${isAdmin}`,
+      query: ({ isAdmin, page, limit, search }) =>
+        `/all-orders?_id=${isAdmin}&page=${page}&limit=${limit}&search=${
+          search || ""
+        }`,
     }),
+
     getSingleOrder: builder.query({
       query: ({ orderId, isAdmin }) =>
         `/single-order/${orderId}?_id=${isAdmin}`,
     }),
-    getProcessOrder: builder.query({
-      query: ({ orderId, isAdmin }) => `/process/${orderId}?_id=${isAdmin}`,
+    processOrder: builder.mutation({
+      query: ({ orderId, isAdmin }) => ({
+        url: `/process/${orderId}?_id=${isAdmin}`,
+        method: "GET", // backend me GET hai, even then mutation use karo
+      }),
+      invalidatesTags: ["Orders"], // table refetch ho jaaye status update ke baad
     }),
+
     deleteOrder: builder.mutation({
       query: ({ orderId, isAdmin }) => ({
         url: `delete/${orderId}?_id=${isAdmin}`,
@@ -31,6 +40,6 @@ export const orderApi = createApi({
 export const {
   useGetAdminOrderQuery,
   useGetSingleOrderQuery,
-  useGetProcessOrderQuery,
+  useProcessOrderMutation,
   useDeleteOrderMutation,
 } = orderApi;

@@ -11,6 +11,7 @@ import { staticApi } from "../../redux/api/staticApi";
 import { useGetAdminOrderQuery } from "../../redux/api/orderApi";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import CTA from "./CTA/CTA";
+import { useDebounce } from "./OrderTable";
 
 export default function AdminProductsTable() {
   const [page, setPage] = useState(1);
@@ -19,9 +20,11 @@ export default function AdminProductsTable() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
 
-  const { data, isLoading, refetch } = useGetAdminProductsQuery({
+  const debounceSearch = useDebounce(search, 500);
+
+  const { data, isLoading, isError } = useGetAdminProductsQuery({
     page,
-    search,
+    search: debounceSearch,
     isAdmin: "68a44c1328528a8fcc6ac845",
   });
 
@@ -50,122 +53,153 @@ export default function AdminProductsTable() {
   return (
     <div className="p-6">
       {/* Search */}
-      <div className="flex justify-between mb-4">
+      <div className="flex justify-between mb-4 gap-5">
         <input
           type="text"
           placeholder="Search products..."
-          className="border border-gray-300 text-sm px-3 py-2 rounded-lg w-64"
+          className="border border-gray-300 focus:outline-none text-xs px-3 py-2 rounded-lg max-w-64 w-full"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <div className="max-w-[150px] w-full">
+          <CTA btnLable={"Add New Product"} table={true} />
+        </div>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto w-full">
-        <table className="min-w-full border-gray-200 rounded-lg text-xs">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                Name
-              </th>
-              <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                Category
-              </th>
-              <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                Price
-              </th>
-              <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                Stock
-              </th>
-              <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products?.map((p) => (
-              <tr key={p._id} className="hover:bg-gray-50">
-                <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                  {p.name}
-                </td>
-                <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                  {p.category}
-                </td>
-                <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                  ₹{p.price}
-                </td>
-                <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                  {p.stock}
-                </td>
-                <td className=" py-2 px-1 max-sm:min-w-[135px] border border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
-                  <div className="">
-                    <CTA btnLable={"Add product"} table={true} />
-                  </div>
-                  <button
-                    onClick={() => {
-                      setEditingProduct(p);
-                      setIsModalOpen(true);
-                    }}
-                    className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(p?._id)}
-                    className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded cursor-pointer"
-                  >
-                    Delete
-                  </button>
-                </td>
+        {isError ? (
+          <>
+            <table className="w-full text-xs">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Name
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Category
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Price
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Stock
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+            </table>
+            <div className="lg:border border-gray-300 text-center text-sm py-20">
+              Search not found!
+            </div>
+          </>
+        ) : (
+          <table className="min-w-full border-gray-200 rounded-lg text-xs">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Name
+                </th>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Category
+                </th>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Price
+                </th>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Stock
+                </th>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products?.map((p) => (
+                <tr key={p._id} className="hover:bg-gray-50">
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.name}
+                  </td>
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.category}
+                  </td>
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    ₹{p.price}
+                  </td>
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.stock}
+                  </td>
+                  <td className=" py-2 px-1 max-sm:min-w-[135px] border border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
+                    <button
+                      onClick={() => {
+                        setEditingProduct(p);
+                        setIsModalOpen(true);
+                      }}
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p?._id)}
+                      className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded cursor-pointer"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-center gap-2 mt-4">
-        {/* Previous Button */}
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
-          className={`px-3 py-1 rounded  text-sm ${
-            page === 1
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "text-white bg-yellow-500 hover:bg-yellow-600 cursor-pointer "
-          }`}
-        >
-          Previous
-        </button>
-
-        {/* Page Numbers */}
-        {Array.from({ length: totalPages }, (_, i) => (
+      {!isError && (
+        <div className="flex justify-center gap-2 mt-4 text-xs">
+          {/* Previous Button */}
           <button
-            key={i}
-            className={`px-3 py-1 rounded cursor-pointer  ${
-              page === i + 1
-                ? "bg-yellow-500 text-white hover:bg-yellow-600 "
-                : "bg-gray-200"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className={`px-3 py-1 rounded ${
+              page === 1
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "text-white bg-yellow-500 hover:bg-yellow-600 cursor-pointer "
             }`}
-            onClick={() => setPage(i + 1)}
           >
-            {i + 1}
+            Previous
           </button>
-        ))}
 
-        {/* Next Button */}
-        <button
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
-          className={`px-3 py-1 rounded text-sm  ${
-            page === totalPages
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed "
-              : "bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600"
-          }`}
-        >
-          Next
-        </button>
-      </div>
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={`px-3 py-1 rounded cursor-pointer  ${
+                page === i + 1
+                  ? "bg-yellow-500 text-white hover:bg-yellow-600 "
+                  : "bg-gray-200"
+              }`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          {/* Next Button */}
+          <button
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            className={`px-3 py-1 rounded ${
+              page === totalPages
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed "
+                : "bg-yellow-500 cursor-pointer text-white hover:bg-yellow-600"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Update Modal */}
       {isModalOpen && editingProduct && (

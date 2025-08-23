@@ -80,7 +80,7 @@ const WelcomePage = () => {
         </div>
       </div>
       {/* add product button */}
-      <div className="mt-16 h-10">
+      <div className="mt-16">
         <h3 className="text-center text-3xl font-semibold mb-7">
           Quick Action
         </h3>
@@ -89,14 +89,14 @@ const WelcomePage = () => {
           <CTA btnLable={"Add new product"} />
           <Link
             href={"/dashboard/order"}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-5 py-2 rounded-sm cursor-pointer"
+            className="bg-yellow-500 max-sm:w-full hover:bg-yellow-600 text-white text-sm px-5 py-2 rounded-sm cursor-pointer text-center"
           >
             {" "}
             View orders
           </Link>
           <Link
             href={"/dashboard/customer"}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-5 py-2 rounded-sm cursor-pointer"
+            className="bg-yellow-500 max-sm:w-full hover:bg-yellow-600 text-white text-sm px-5 py-2 rounded-sm cursor-pointer text-center"
           >
             Manage users
           </Link>

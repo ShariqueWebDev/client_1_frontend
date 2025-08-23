@@ -105,25 +105,77 @@ export default function UpdateProductForm({ product, onClose }) {
         <p className="text-red-500 text-sm">{errors.stock.message}</p>
       )}
 
-      <input
-        type="text"
-        placeholder="Category"
-        {...register("category")}
-        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none placeholder:text-gray-300 "
-      />
-      {errors.category && (
-        <p className="text-red-500 text-sm">{errors.category.message}</p>
-      )}
+      <div>
+        <select
+          {...register("category")}
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+        >
+          <option className=" hover:!bg-yellow-500" value="">
+            Select Category
+          </option>
+          <option className=" hover:!bg-yellow-500" value="anime-prints">
+            Anime Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="aesthetic-prints">
+            Aesthetic Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="minimal-prints">
+            Minimal Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="character-Prints">
+            Character Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="quotes">
+            Quotes
+          </option>
+          <option className=" hover:!bg-yellow-500" value="quirky-prints">
+            Quirky Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="pop-culture">
+            Pop Culture
+          </option>
+          <option className=" hover:!bg-yellow-500" value="movies-webseries">
+            Movies & Webseries
+          </option>
+          <option className=" hover:!bg-yellow-500" value="funny-prints">
+            Funny Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="wunderlust-prints">
+            Wunderlust Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="jersey-prints">
+            Jersey Prints
+          </option>
+          <option className=" hover:!bg-yellow-500" value="cartoon-prints">
+            Cartoon Prints
+          </option>
+        </select>
+        {errors.category && (
+          <p className="text-red-500 text-sm">{errors.category.message}</p>
+        )}
+      </div>
 
-      <input
-        type="text"
-        placeholder="Sub-category"
-        {...register("subCategory")}
-        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none placeholder:text-gray-300 "
-      />
-      {errors.subCategory && (
-        <p className="text-red-500 text-sm">{errors.subCategory.message}</p>
-      )}
+      {/* Sub Category */}
+      <div>
+        <select
+          {...register("subCategory")}
+          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+        >
+          <option className=" hover:!bg-yellow-500" value="">
+            Select Category
+          </option>
+
+          <option className=" hover:!bg-yellow-500" value="oversize-fit">
+            Oversize Fit
+          </option>
+          <option className=" hover:!bg-yellow-500" value="regular-fit">
+            Regular Fit
+          </option>
+        </select>
+        {errors.subCategory && (
+          <p className="text-red-500 text-sm">{errors.subCategory.message}</p>
+        )}
+      </div>
 
       <input
         type="file"

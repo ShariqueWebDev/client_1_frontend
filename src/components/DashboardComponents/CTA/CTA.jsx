@@ -80,7 +80,7 @@ const AddProductModal = ({ btnLable, table }) => {
       <div
         onClick={() => setOpen(true)}
         className={`bg-yellow-500 hover:bg-yellow-600 text-white text-sm px-5 py-2 rounded-sm cursor-pointer text-center ${
-          table ? "text-xs" : "text-sm"
+          table ? "text-xs" : " max-sm:w-full text-sm"
         }`}
       >
         {btnLable}

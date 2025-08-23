@@ -20,7 +20,7 @@ const eslintConfig = [
       "no-console": "off",
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      "react/no-unsafe-ssr": "warn",
+      // "react/no-unsafe-ssr": "warn",
       // Agar aur bhi rules hain to add kar sakte ho
     },
   },
