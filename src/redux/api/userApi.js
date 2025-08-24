@@ -46,6 +46,7 @@ export const userAPI = createApi({
         body,
       }),
     }),
+
     // getProfile: builder.query({
     //   query: () => "/me",
     // }),
@@ -60,5 +61,7 @@ export const {
   useLogoutUserMutation,
   useSendOtpMutation,
   useResetPasswordMutation,
+  useGetAdminUserQuery,
+  useDeleteUserMutation,
   // useGetProfileQuery,
 } = userAPI;

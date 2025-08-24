@@ -5,9 +5,19 @@ export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.NEXT_PUBLIC_SERVER}/api/v1/product`,
-    credentials: "include",
+    // credentials: "include",
+    prepareHeaders: (headers, { getState }) => {
+      // state all over api method, state aur unka respose provide karta hai
+      const state = getState(); // temporary any
+      console.log("Redux state in prepareHeaders:", state);
+      const token = state.auth?.token;
+      console.log("token prepareHeaders:.....", token);
+
+      if (token) headers.set("Authorization", `Bearer ${token}`);
+      return headers;
+    },
   }),
-  tagTypes: ["Product", "AdminProducts"],
+  tagTypes: ["Product", "AdminProducts", "Products"],
   endpoints: (builder) => ({
     addNewProduct: builder.mutation({
       query: ({ formData, adminId }) => ({
@@ -15,7 +25,7 @@ export const productApi = createApi({
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Statics"],
+      invalidatesTags: ["Statics", "Products"],
     }),
     getAdminProducts: builder.query({
       query: ({ page, search, isAdmin }) =>
@@ -34,7 +44,7 @@ export const productApi = createApi({
         url: `/${id}?_id=${isAdmin}`,
         method: "DELETE",
       }),
-      invalidatesTags: [{ type: "AdminProducts", id: "LIST" }],
+      invalidatesTags: [{ type: "AdminProducts", id: "LIST" }, "Products"],
     }),
 
     updateProduct: builder.mutation({
@@ -46,7 +56,13 @@ export const productApi = createApi({
       invalidatesTags: (result, error, arg) => [
         { type: "Product", id: arg.id },
         { type: "AdminProducts", id: "LIST" },
+        "Products",
       ],
+    }),
+    getLowStockProducts: builder.query({
+      query: ({ isAdmin, threshold = 5, page = 1, limit = 10, search = "" }) =>
+        `/low-stock?_id=${isAdmin}&threshold=${threshold}&page=${page}&limit=${limit}&search=${search}`,
+      providesTags: ["Products", "Product"], // cache invalidation
     }),
   }),
 });
@@ -56,4 +72,5 @@ export const {
   useUpdateProductMutation,
   useDeleteProductMutation,
   useGetAdminProductsQuery,
+  useGetLowStockProductsQuery,
 } = productApi;

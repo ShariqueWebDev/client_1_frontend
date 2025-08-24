@@ -34,7 +34,7 @@ export default function AdminOrderTable() {
 
   // Backend call with pagination + debounced search
   const { data, isLoading, refetch, isError } = useGetAdminOrderQuery({
-    isAdmin: "68a44c1328528a8fcc6ac845",
+    isAdmin: "68ab4eb97bc039b01d4e8d23",
     page,
     limit,
     search: debouncedSearch,
@@ -48,7 +48,7 @@ export default function AdminOrderTable() {
     try {
       await processOrder({
         orderId,
-        isAdmin: "68a44c1328528a8fcc6ac845",
+        isAdmin: "68ab4eb97bc039b01d4e8d23",
       }).unwrap();
       toast.success("Order status updated!");
       refetch();
@@ -60,13 +60,12 @@ export default function AdminOrderTable() {
       }
     }
   };
-  console.log(data);
 
   const handleDelete = async (orderId) => {
     try {
       await deleteOrder({
         orderId,
-        isAdmin: "68a44c1328528a8fcc6ac845",
+        isAdmin: "68ab4eb97bc039b01d4e8d23",
       }).unwrap();
       toast.success("Order deleted successfully!");
       dispatch(staticApi.util.invalidateTags(["Statics"]));
@@ -190,7 +189,19 @@ export default function AdminOrderTable() {
                     <td className="px-2 py-2 border border-gray-300">
                       {p.shippingInfo?.phoneNo}
                     </td>
-                    <td className="px-2 py-2 border border-gray-300">
+                    <td
+                      className={` ${
+                        p.status === "Delivered"
+                          ? "text-green-500"
+                          : p.status === "Pending"
+                          ? "text-red-500"
+                          : p.status === "Processing"
+                          ? "text-blue-600"
+                          : p.status === "Shipped"
+                          ? "text-indigo-600"
+                          : "text-pink-700"
+                      } px-2 py-2 border border-gray-300`}
+                    >
                       {p.status}
                     </td>
                     <td className="px-2 py-2 border border-gray-300">

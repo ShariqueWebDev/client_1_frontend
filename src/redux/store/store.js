@@ -5,6 +5,7 @@ import { staticApi } from "../api/staticApi";
 import authReducer from "../reducers/auth-reducers";
 import menuReducer from "../reducers/menu-reducers";
 import { orderApi } from "../api/orderApi";
+import { dashboardUserApi } from "../api/dashboardUserApi";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     [staticApi.reducerPath]: staticApi.reducer,
     [productApi.reducerPath]: productApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [dashboardUserApi.reducerPath]: dashboardUserApi.reducer,
     auth: authReducer,
     menu: menuReducer,
   },
@@ -20,6 +22,7 @@ export const store = configureStore({
       userAPI.middleware,
       staticApi.middleware,
       productApi.middleware,
-      orderApi.middleware
+      orderApi.middleware,
+      dashboardUserApi.middleware
     ),
 });

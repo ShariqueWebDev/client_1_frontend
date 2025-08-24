@@ -4,6 +4,8 @@ import { toast } from "react-hot-toast";
 import {
   useGetAdminProductsQuery,
   useDeleteProductMutation,
+  useGetLowStockProductsQuery,
+  productApi,
 } from "../../redux/api/productApi";
 import UpdateFormModal from "../DashboardComponents/CTA/UpdateFormModal";
 import { useDispatch } from "react-redux";
@@ -13,7 +15,7 @@ import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import CTA from "./CTA/CTA";
 import { useDebounce } from "./OrderTable";
 
-export default function AdminProductsTable() {
+export default function LowStockTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
@@ -22,13 +24,16 @@ export default function AdminProductsTable() {
 
   const debounceSearch = useDebounce(search, 500);
 
-  const { data, isLoading, isError } = useGetAdminProductsQuery({
-    page,
-    search: debounceSearch,
+  const { data, isLoading, isError } = useGetLowStockProductsQuery({
     isAdmin: "68ab4eb97bc039b01d4e8d23",
+    threshold: 5,
+    page, // 👈 yaha state ka value dena hai
+    limit: 10,
+    search: debounceSearch,
   });
 
-  console.log(data);
+  console.log(data, "low stock product......");
+  console.log(search, debounceSearch, isError, "search vlaue product......");
 
   const [deleteProduct] = useDeleteProductMutation();
 
@@ -37,6 +42,8 @@ export default function AdminProductsTable() {
       await deleteProduct({ id, isAdmin: "68ab4eb97bc039b01d4e8d23" }).unwrap();
       toast.success("Product deleted successfully!");
       dispatch(staticApi.util.invalidateTags(["Statics"]));
+      dispatch(productApi.util.invalidateTags(["Product"]));
+      dispatch(productApi.util.invalidateTags(["Products"]));
     } catch (err) {
       toast.error("Delete failed");
     }
@@ -69,8 +76,12 @@ export default function AdminProductsTable() {
       </div>
 
       {/* Table */}
+      {/* Table */}
       <div className="overflow-x-auto w-full">
         {isError ? (
+          <div className="text-center py-20 text-sm">Something went wrong!</div>
+        ) : products?.length === 0 && debounceSearch ? (
+          // 🔹 Search ke liye
           <>
             <table className="w-full text-xs">
               <thead className="bg-gray-100">
@@ -97,7 +108,36 @@ export default function AdminProductsTable() {
               Search not found!
             </div>
           </>
+        ) : products?.length === 0 ? (
+          // 🔹 Normal empty state
+          <>
+            <table className="w-full text-xs">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Name
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Category
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Price
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Stock
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+            </table>
+            <div className="lg:border border-gray-300 text-center text-sm py-20">
+              No Product Available
+            </div>
+          </>
         ) : (
+          // 🔹 Products table
           <table className="min-w-full border-gray-200 rounded-lg text-xs">
             <thead className="bg-gray-100">
               <tr>
@@ -121,23 +161,23 @@ export default function AdminProductsTable() {
             <tbody>
               {products?.map((p) => (
                 <tr key={p._id} className="hover:bg-gray-50">
-                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
                     {p.name}
                   </td>
-                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
                     {p.category}
                   </td>
-                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
                     ₹{p.price}
                   </td>
                   <td
-                    className={` ${
+                    className={`${
                       p.stock <= 5 ? "text-red-500 font-semibold" : "text-black"
-                    } px-2 max-sm:min-w-[150px]  py- border border-gray-300`}
+                    } px-2 max-sm:min-w-[150px] py- border border-gray-300`}
                   >
                     {p.stock} {p.stock <= 5 ? "(Low Stock)" : ""}
                   </td>
-                  <td className=" py-2 px-3 max-sm:min-w-[135px] border border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
+                  <td className="py-2 px-3 max-sm:min-w-[135px] border border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
                     <button
                       onClick={() => {
                         setEditingProduct(p);

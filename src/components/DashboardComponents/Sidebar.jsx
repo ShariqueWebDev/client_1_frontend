@@ -43,7 +43,7 @@ const Sidebar = () => {
                     : "bg-gray-200 hover:bg-gray-300"
                 }`}
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center pl-3 gap-4">
                   <div className="w-fit">
                     <Image
                       src={item?.imgPath}

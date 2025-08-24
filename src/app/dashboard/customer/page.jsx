@@ -1,9 +1,9 @@
 import React from "react";
-
+import UserTable from "../../../components/DashboardComponents/UserTable";
 const CustomerPage = () => {
   return (
-    <div className="h-[500px] w-full flex justify-center items-center">
-      Customer Page
+    <div className=" w-full flex justify-center items-center mt-6">
+      <UserTable />
     </div>
   );
 };

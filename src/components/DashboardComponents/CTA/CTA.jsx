@@ -55,7 +55,7 @@ const AddProductModal = ({ btnLable, table }) => {
 
       const res = await addNewProduct({
         formData,
-        adminId: "68a44c1328528a8fcc6ac845",
+        adminId: "68ab4eb97bc039b01d4e8d23",
       }).unwrap();
 
       dispatch(staticApi.util.invalidateTags(["Statics"]));

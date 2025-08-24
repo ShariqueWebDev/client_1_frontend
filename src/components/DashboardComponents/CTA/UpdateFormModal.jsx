@@ -59,7 +59,7 @@ export default function UpdateProductForm({ product, onClose }) {
       await updateProduct({
         id: product?._id,
         formData,
-        isAdmin: "68a44c1328528a8fcc6ac845",
+        isAdmin: "68ab4eb97bc039b01d4e8d23",
       }).unwrap();
       toast.success("Product updated successfully!");
       onClose();

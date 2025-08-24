@@ -15,6 +15,11 @@ export const DashboardData = [
     imgPath: "/assets/dashboard/customer.png",
   },
   {
+    lable: "Low Stocks",
+    link: "/dashboard/low-stocks",
+    imgPath: "/assets/dashboard/customer.png",
+  },
+  {
     lable: "Statics",
     link: "/dashboard/static",
     imgPath: "/assets/dashboard/static.png",
