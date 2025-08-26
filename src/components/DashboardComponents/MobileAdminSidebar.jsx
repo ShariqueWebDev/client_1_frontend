@@ -71,7 +71,7 @@ const MobileAdminSidebar = () => {
                   onClick={() => setIsOpenSidebar(false)}
                 >
                   <li
-                    className={`px-5 py-2 mb-3 rounded-sm transition-colors duration-200 ${
+                    className={`px-5 py-2 pl-16 mb-3 rounded-sm transition-colors duration-200 ${
                       isActive
                         ? "bg-yellow-500 text-white"
                         : "bg-gray-200 hover:bg-gray-300"
@@ -98,7 +98,7 @@ const MobileAdminSidebar = () => {
               onClick={() => setIsOpenSidebar(false)}
             >
               <Link href={"/contact"}>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 pl-12">
                   <div className="w-fit">
                     <Image
                       src={"/assets/dashboard/support.png"}
@@ -108,7 +108,7 @@ const MobileAdminSidebar = () => {
                       className="w-5 h-5 object-contain object-center"
                     />
                   </div>
-                  <p className="text-sm">Support</p>
+                  <p className="text-sm ">Support</p>
                 </div>
               </Link>
             </li>
@@ -121,7 +121,7 @@ const MobileAdminSidebar = () => {
                 dashboardLogoutHandler();
               }}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 pl-12">
                 <div className="w-fit">
                   <Image
                     src={"/assets/dashboard/logout.png"}

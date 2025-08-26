@@ -7,6 +7,7 @@ import {
   productApi,
   useAddNewProductMutation,
 } from "../../../redux/api/productApi";
+import { useGetAllCategoriesQuery } from "../../../redux/api/CategoryApi";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { staticApi } from "@/redux/api/staticApi";
@@ -30,6 +31,18 @@ const AddProductModal = ({ btnLable, table }) => {
   const [open, setOpen] = useState(false);
   const [addNewProduct, { isLoading, isError, isSuccess }] =
     useAddNewProductMutation();
+
+  const { data, isLoading: catIsLoading } = useGetAllCategoriesQuery({
+    page: 1,
+    search: "",
+    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
+  });
+
+  console.log(
+    data?.categories[0]?.name,
+    catIsLoading,
+    "Category simple data........."
+  );
 
   const dispatch = useDispatch();
 
@@ -55,7 +68,7 @@ const AddProductModal = ({ btnLable, table }) => {
 
       const res = await addNewProduct({
         formData,
-        adminId: "68ab4eb97bc039b01d4e8d23",
+        adminId: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
 
       dispatch(staticApi.util.invalidateTags(["Statics"]));
@@ -153,77 +166,22 @@ const AddProductModal = ({ btnLable, table }) => {
                 <select
                   {...register("category")}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+                  disabled={catIsLoading}
                 >
-                  <option className=" hover:!bg-yellow-500" value="">
-                    Select Category
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="anime-prints"
-                  >
-                    Anime Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="aesthetic-prints"
-                  >
-                    Aesthetic Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="minimal-prints"
-                  >
-                    Minimal Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="character-Prints"
-                  >
-                    Character Prints
-                  </option>
-                  <option className=" hover:!bg-yellow-500" value="quotes">
-                    Quotes
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="quirky-prints"
-                  >
-                    Quirky Prints
-                  </option>
-                  <option className=" hover:!bg-yellow-500" value="pop-culture">
-                    Pop Culture
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="movies-webseries"
-                  >
-                    Movies & Webseries
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="funny-prints"
-                  >
-                    Funny Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="wunderlust-prints"
-                  >
-                    Wunderlust Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="jersey-prints"
-                  >
-                    Jersey Prints
-                  </option>
-                  <option
-                    className=" hover:!bg-yellow-500"
-                    value="cartoon-prints"
-                  >
-                    Cartoon Prints
-                  </option>
+                  <option value="">Select Category</option>
+
+                  {catIsLoading && (
+                    <option disabled>Loading categories...</option>
+                  )}
+
+                  {data?.categories?.length > 0 &&
+                    data.categories.map((cat) => (
+                      <option key={cat._id} value={cat.link}>
+                        {cat.name}
+                      </option>
+                    ))}
                 </select>
+
                 {errors.category && (
                   <p className="text-red-500 text-sm">
                     {errors.category.message}
@@ -285,7 +243,7 @@ const AddProductModal = ({ btnLable, table }) => {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm cursor-pointer"
               >
                 Submit
               </button>

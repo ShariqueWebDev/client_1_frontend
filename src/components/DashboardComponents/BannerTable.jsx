@@ -2,20 +2,20 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import {
-  useGetAdminProductsQuery,
-  useDeleteProductMutation,
-  useGetLowStockProductsQuery,
-  productApi,
-} from "../../redux/api/productApi";
-import UpdateFormModal from "../DashboardComponents/CTA/UpdateFormModal";
+  useGetAllBannerQuery,
+  useDeleteBannerMutation,
+  useUpdateBannerMutation,
+} from "../../redux/api/bannerApi";
+import AddBannerModal from "./CTA/BannerModal";
 import { useDispatch } from "react-redux";
-import { staticApi } from "../../redux/api/staticApi";
-import { useGetAdminOrderQuery } from "../../redux/api/orderApi";
+// import { staticApi } from "../../redux/api/staticApi";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import CTA from "./CTA/CTA";
 import { useDebounce } from "./OrderTable";
+import UpdateBannerForm from "./CTA/UpdateBannerModal";
+import Image from "next/image";
 
-export default function LowStockTable() {
+export default function BannerTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [editingProduct, setEditingProduct] = useState(null);
@@ -24,29 +24,24 @@ export default function LowStockTable() {
 
   const debounceSearch = useDebounce(search, 500);
 
-  const { data, isLoading, isError } = useGetLowStockProductsQuery({
-    isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
-    threshold: 5,
-    page, // 👈 yaha state ka value dena hai
-    limit: 10,
+  const { data, isLoading, isError } = useGetAllBannerQuery({
+    page,
     search: debounceSearch,
+    isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
   });
 
-  console.log(data, "low stock product......");
-  console.log(search, debounceSearch, isError, "search vlaue product......");
+  console.log(data);
 
-  const [deleteProduct] = useDeleteProductMutation();
+  const [deleteBanner] = useDeleteBannerMutation();
 
   const handleDelete = async (id) => {
     try {
-      await deleteProduct({
+      await deleteBanner({
         id,
         isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
-      toast.success("Product deleted successfully!");
-      dispatch(staticApi.util.invalidateTags(["Statics"]));
-      dispatch(productApi.util.invalidateTags(["Product"]));
-      dispatch(productApi.util.invalidateTags(["Products"]));
+      toast.success("Banner deleted successfully!");
+      //   dispatch(staticApi.util.invalidateTags(["Statics"]));
     } catch (err) {
       toast.error("Delete failed");
     }
@@ -55,12 +50,14 @@ export default function LowStockTable() {
   if (isLoading)
     return (
       <div>
-        <LoaderComponent status="Low stock products loading..." />
+        <LoaderComponent status="Banners loading..." />
       </div>
     );
 
-  const products = data?.products;
-  const totalPages = data?.totalPages;
+  console.log(editingProduct, "updateing banner product.............");
+
+  const banners = data?.banners;
+  const totalPages = data?.pagination?.pages;
 
   return (
     <div className="p-6">
@@ -68,23 +65,19 @@ export default function LowStockTable() {
       <div className="flex justify-between mb-4 gap-5">
         <input
           type="text"
-          placeholder="Search products..."
+          placeholder="Search Banners..."
           className="border border-gray-300 focus:outline-none text-xs px-3 py-2 rounded-lg max-w-64 w-full"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="max-w-[150px] w-full">
-          <CTA btnLable={"Add New Product"} table={true} />
+          <AddBannerModal btnLable={"Add New Banner"} table={true} />
         </div>
       </div>
 
       {/* Table */}
-      {/* Table */}
       <div className="overflow-x-auto w-full">
         {isError ? (
-          <div className="text-center py-20 text-sm">Something went wrong!</div>
-        ) : products?.length === 0 && debounceSearch ? (
-          // 🔹 Search ke liye
           <>
             <table className="w-full text-xs">
               <thead className="bg-gray-100">
@@ -108,39 +101,10 @@ export default function LowStockTable() {
               </thead>
             </table>
             <div className="lg:border border-gray-300 text-center text-sm py-20">
-              Search not found!
-            </div>
-          </>
-        ) : products?.length === 0 ? (
-          // 🔹 Normal empty state
-          <>
-            <table className="w-full text-xs">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                    Name
-                  </th>
-                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                    Category
-                  </th>
-                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                    Price
-                  </th>
-                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                    Stock
-                  </th>
-                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-            </table>
-            <div className="lg:border border-gray-300 text-center text-sm py-20">
-              No Product Available
+              Banner not found!
             </div>
           </>
         ) : (
-          // 🔹 Products table
           <table className="min-w-full border-gray-200 rounded-lg text-xs">
             <thead className="bg-gray-100">
               <tr>
@@ -148,39 +112,45 @@ export default function LowStockTable() {
                   Name
                 </th>
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                  Category
+                  Priority
                 </th>
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                  Price
+                  Banner
                 </th>
-                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
-                  Stock
-                </th>
+
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              {products?.map((p) => (
+              {banners?.map((p) => (
                 <tr key={p._id} className="hover:bg-gray-50">
-                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
                     {p.name}
                   </td>
-                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
-                    {p.category}
+                  {/* <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.isActive === true ? "Active" : "Deactive"}
+                  </td> */}
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.priority}
                   </td>
-                  <td className="px-2 max-sm:min-w-[150px] py- border border-gray-300">
-                    ₹{p.price}
+                  <td className="px-2 py-2 border border-gray-300">
+                    <div className="flex items-center gap-2 ">
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_SERVER}/uploads/${p?.photo}`}
+                        width={300}
+                        height={300}
+                        alt={p.name}
+                        className="w-20 h-20 object-cover rounded-md border"
+                      />
+                      <span>
+                        {p.stock} {p.stock <= 5 ? "(Low Stock)" : ""}
+                      </span>
+                    </div>
                   </td>
-                  <td
-                    className={`${
-                      p.stock <= 5 ? "text-red-500 font-semibold" : "text-black"
-                    } px-2 max-sm:min-w-[150px] py- border border-gray-300`}
-                  >
-                    {p.stock} {p.stock <= 5 ? "(Low Stock)" : ""}
-                  </td>
-                  <td className="py-2 px-3 max-sm:min-w-[135px] border border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
+
+                  <td className="px-3 max-sm:min-w-[135px] border py-10 border-gray-300 flex gap-2 justify-center md:flex-row flex-col">
                     <button
                       onClick={() => {
                         setEditingProduct(p);
@@ -266,7 +236,7 @@ export default function LowStockTable() {
             </div>
 
             <div className="">
-              <UpdateFormModal
+              <UpdateBannerForm
                 product={editingProduct}
                 onClose={() => setIsModalOpen(false)}
               />

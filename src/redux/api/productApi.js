@@ -9,9 +9,9 @@ export const productApi = createApi({
     prepareHeaders: (headers, { getState }) => {
       // state all over api method, state aur unka respose provide karta hai
       const state = getState(); // temporary any
-      console.log("Redux state in prepareHeaders:", state);
+      // console.log("Redux state in prepareHeaders:", state);
       const token = state.auth?.token;
-      console.log("token prepareHeaders:.....", token);
+      // console.log("token prepareHeaders:.....", token);
 
       if (token) headers.set("Authorization", `Bearer ${token}`);
       return headers;

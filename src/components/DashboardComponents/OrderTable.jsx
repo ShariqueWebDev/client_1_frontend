@@ -34,7 +34,7 @@ export default function AdminOrderTable() {
 
   // Backend call with pagination + debounced search
   const { data, isLoading, refetch, isError } = useGetAdminOrderQuery({
-    isAdmin: "68ab4eb97bc039b01d4e8d23",
+    isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
     page,
     limit,
     search: debouncedSearch,
@@ -48,7 +48,7 @@ export default function AdminOrderTable() {
     try {
       await processOrder({
         orderId,
-        isAdmin: "68ab4eb97bc039b01d4e8d23",
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
       toast.success("Order status updated!");
       refetch();
@@ -65,7 +65,7 @@ export default function AdminOrderTable() {
     try {
       await deleteOrder({
         orderId,
-        isAdmin: "68ab4eb97bc039b01d4e8d23",
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
       toast.success("Order deleted successfully!");
       dispatch(staticApi.util.invalidateTags(["Statics"]));

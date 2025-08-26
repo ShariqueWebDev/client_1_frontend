@@ -13,14 +13,19 @@ export const dashboardUserApi = createApi({
         url: `/get-all-user?_id=${isAdmin}&page=${page}&limit=${limit}&search=${search}`,
         method: "GET",
       }),
-      providesTags: ["Statics"],
+      // yahan har unique query args ke hisaab se cache tag do
+      providesTags: (result, error, { page, search }) => [
+        { type: "Statics", id: `PAGE-${page}-SEARCH-${search}` },
+      ],
     }),
     deleteUser: builder.mutation({
       query: ({ isAdmin, userId }) => ({
         url: `/${userId}?_id=${isAdmin}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Statics"],
+      invalidatesTags: (result, error, { page, search }) => [
+        { type: "Statics", id: `PAGE-${page}-SEARCH-${search}` },
+      ],
     }),
   }),
 });

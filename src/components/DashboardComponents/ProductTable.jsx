@@ -8,7 +8,6 @@ import {
 import UpdateFormModal from "../DashboardComponents/CTA/UpdateFormModal";
 import { useDispatch } from "react-redux";
 import { staticApi } from "../../redux/api/staticApi";
-import { useGetAdminOrderQuery } from "../../redux/api/orderApi";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import CTA from "./CTA/CTA";
 import { useDebounce } from "./OrderTable";
@@ -25,7 +24,7 @@ export default function AdminProductsTable() {
   const { data, isLoading, isError } = useGetAdminProductsQuery({
     page,
     search: debounceSearch,
-    isAdmin: "68ab4eb97bc039b01d4e8d23",
+    isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
   });
 
   console.log(data);
@@ -34,7 +33,10 @@ export default function AdminProductsTable() {
 
   const handleDelete = async (id) => {
     try {
-      await deleteProduct({ id, isAdmin: "68ab4eb97bc039b01d4e8d23" }).unwrap();
+      await deleteProduct({
+        id,
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
+      }).unwrap();
       toast.success("Product deleted successfully!");
       dispatch(staticApi.util.invalidateTags(["Statics"]));
     } catch (err) {

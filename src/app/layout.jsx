@@ -25,6 +25,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   console.log(process.env.NEXT_PUBLIC_SERVER);
+  console.log(process.env.NEXT_PUBLIC_ADMIN_ID);
 
   return (
     <html lang="en">

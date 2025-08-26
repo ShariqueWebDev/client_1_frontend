@@ -5,6 +5,16 @@ export const DashboardData = [
     imgPath: "/assets/dashboard/product.png",
   },
   {
+    lable: "Banners",
+    link: "/dashboard/banners",
+    imgPath: "/assets/dashboard/banner.png",
+  },
+  {
+    lable: "Categories",
+    link: "/dashboard/categories",
+    imgPath: "/assets/dashboard/categories.png",
+  },
+  {
     lable: "Orders",
     link: "/dashboard/order",
     imgPath: "/assets/dashboard/order.png",
@@ -17,7 +27,7 @@ export const DashboardData = [
   {
     lable: "Low Stocks",
     link: "/dashboard/low-stocks",
-    imgPath: "/assets/dashboard/customer.png",
+    imgPath: "/assets/dashboard/low-stock.png",
   },
   {
     lable: "Statics",

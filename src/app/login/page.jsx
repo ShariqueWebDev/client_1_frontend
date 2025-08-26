@@ -305,7 +305,7 @@ export default function LoginRegisterPage() {
               <button
                 type="submit"
                 disabled={regLoading}
-                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600"
+                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600 cursor-pointer"
               >
                 {regLoading ? "Creating..." : "Register"}
               </button>
@@ -314,7 +314,7 @@ export default function LoginRegisterPage() {
             <p className="text-sm text-center mt-3">
               Already have an account?{" "}
               <button
-                className="text-blue-600 underline"
+                className="hover:text-yellow-600 cursor-pointer  underline"
                 onClick={() => setView("login")}
               >
                 Login
@@ -401,7 +401,7 @@ export default function LoginRegisterPage() {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600"
+                className="w-full bg-yellow-500 text-white py-2.5 text-sm rounded-lg hover:bg-yellow-600 cursor-pointer"
               >
                 Verify
               </button>

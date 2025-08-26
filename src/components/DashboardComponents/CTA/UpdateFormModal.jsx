@@ -6,6 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { useUpdateProductMutation } from "../../../redux/api/productApi";
+import { useGetAllCategoriesQuery } from "../../../redux/api/CategoryApi";
+
 import Image from "next/image";
 
 // Zod schema
@@ -25,6 +27,12 @@ const productSchema = z.object({
 export default function UpdateProductForm({ product, onClose }) {
   const [updateProduct] = useUpdateProductMutation();
   const [filePreview, setFilePreview] = useState(product?.photo || null);
+
+  const { data, isLoading: catIsLoading } = useGetAllCategoriesQuery({
+    page: 1,
+    search: "",
+    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
+  });
 
   console.log(filePreview, "file preview...");
 
@@ -59,7 +67,7 @@ export default function UpdateProductForm({ product, onClose }) {
       await updateProduct({
         id: product?._id,
         formData,
-        isAdmin: "68ab4eb97bc039b01d4e8d23",
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
       toast.success("Product updated successfully!");
       onClose();
@@ -109,47 +117,20 @@ export default function UpdateProductForm({ product, onClose }) {
         <select
           {...register("category")}
           className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+          disabled={catIsLoading}
         >
-          <option className=" hover:!bg-yellow-500" value="">
-            Select Category
-          </option>
-          <option className=" hover:!bg-yellow-500" value="anime-prints">
-            Anime Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="aesthetic-prints">
-            Aesthetic Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="minimal-prints">
-            Minimal Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="character-Prints">
-            Character Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="quotes">
-            Quotes
-          </option>
-          <option className=" hover:!bg-yellow-500" value="quirky-prints">
-            Quirky Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="pop-culture">
-            Pop Culture
-          </option>
-          <option className=" hover:!bg-yellow-500" value="movies-webseries">
-            Movies & Webseries
-          </option>
-          <option className=" hover:!bg-yellow-500" value="funny-prints">
-            Funny Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="wunderlust-prints">
-            Wunderlust Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="jersey-prints">
-            Jersey Prints
-          </option>
-          <option className=" hover:!bg-yellow-500" value="cartoon-prints">
-            Cartoon Prints
-          </option>
+          <option value="">Select Category</option>
+
+          {catIsLoading && <option disabled>Loading categories...</option>}
+
+          {data?.categories?.length > 0 &&
+            data.categories.map((cat) => (
+              <option key={cat._id} value={cat.link}>
+                {cat.name}
+              </option>
+            ))}
         </select>
+
         {errors.category && (
           <p className="text-red-500 text-sm">{errors.category.message}</p>
         )}

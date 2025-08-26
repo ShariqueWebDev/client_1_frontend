@@ -11,7 +11,9 @@ import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { formatDate } from "../../utils/features";
 import { useDebounce } from "./OrderTable";
 import Alert from "../Alert";
+import { userAPI } from "@/redux/api/userApi";
 
+console.log(process.env.NEXT_PUBLIC_ADMIN_ID, "Admin ID");
 export default function AllUserTable() {
   const [page, setPage] = useState(1);
   const [showAlert, setShowAlert] = useState(false);
@@ -24,7 +26,7 @@ export default function AllUserTable() {
 
   // Backend call with pagination + debounced search
   const { data, isLoading, refetch, isError } = useGetAdminUserQuery({
-    isAdmin: "68ab4eb97bc039b01d4e8d23",
+    isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
     page,
     limit,
     search: debouncedSearch,
@@ -32,18 +34,19 @@ export default function AllUserTable() {
 
   const [deleteUser] = useDeleteUserMutation();
 
-  console.log(data, "user data ...............");
+  // console.log(data, "user data ...............");
 
   const handleDelete = async (userId) => {
-    console.log(userId?.id, "userId for delete.......");
+    // console.log(userId?.id, "userId for delete.......");
 
     try {
       await deleteUser({
-        isAdmin: "68ab4eb97bc039b01d4e8d23",
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
         userId: userId?.id,
       }).unwrap();
-      toast.success("Order deleted successfully!");
+      toast.success("User deleted successfully!");
       dispatch(staticApi.util.invalidateTags(["Statics"]));
+      // dispatch(userAPI.util.invalidateTags(["Statics"]));
       refetch();
     } catch (err) {
       toast.error("Delete failed");
@@ -154,7 +157,7 @@ export default function AllUserTable() {
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       <button
-                        // disabled={user?.role === "admin"}
+                        disabled={user?.role === "admin"}
                         onClick={() => {
                           handleDelete({
                             id: user._id,
@@ -165,6 +168,11 @@ export default function AllUserTable() {
                             ? "bg-red-300 cursor-not-allowed"
                             : "bg-red-500  cursor-pointer hover:bg-red-600"
                         } text-white rounded  `}
+                        title={`${
+                          user.role === "admin"
+                            ? "You cannot delete admin access from the app dashboard, you will have to do it directly from the database."
+                            : ""
+                        }`}
                       >
                         Delete
                       </button>
