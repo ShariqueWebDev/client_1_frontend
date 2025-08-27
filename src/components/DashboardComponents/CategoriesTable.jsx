@@ -28,8 +28,6 @@ export default function CategoryTable() {
     isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
   });
 
-  console.log(data, search, "laoding.....search.......");
-
   const [deleteCategory] = useDeleteCategoryMutation();
 
   const handleDelete = async (id) => {
@@ -51,8 +49,6 @@ export default function CategoryTable() {
         <LoaderComponent status="Category loading..." />
       </div>
     );
-
-  console.log(editingProduct, "updateing category product.............");
 
   const banners = data?.categories;
   const totalPages = data?.pagination?.pages;
@@ -132,7 +128,7 @@ export default function CategoryTable() {
                   <td className="px-2 py-2 border border-gray-300">
                     <div className="flex items-center gap-2 ">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_SERVER}/${p?.photo}`}
+                        src={`${p?.photo}`}
                         width={300}
                         height={300}
                         alt={p.name}

@@ -25,7 +25,7 @@ const productSchema = z.object({
 });
 
 export default function UpdateProductForm({ product, onClose }) {
-  const [updateProduct] = useUpdateProductMutation();
+  const [updateProduct, { isLoading }] = useUpdateProductMutation();
   const [filePreview, setFilePreview] = useState(product?.photo || null);
 
   const { data, isLoading: catIsLoading } = useGetAllCategoriesQuery({
@@ -34,7 +34,7 @@ export default function UpdateProductForm({ product, onClose }) {
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
   });
 
-  console.log(filePreview, "file preview...");
+  console.log(product.photo);
 
   const {
     register,
@@ -168,7 +168,7 @@ export default function UpdateProductForm({ product, onClose }) {
       />
       {filePreview && (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SERVER}/${filePreview}`}
+          src={filePreview}
           width={250}
           height={250}
           alt="Preview"
@@ -188,7 +188,7 @@ export default function UpdateProductForm({ product, onClose }) {
           type="submit"
           className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded cursor-pointer"
         >
-          Update
+          {isLoading ? "Updating..." : "Update"}
         </button>
       </div>
     </form>

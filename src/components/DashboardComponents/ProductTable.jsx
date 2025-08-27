@@ -27,8 +27,6 @@ export default function AdminProductsTable() {
     isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
   });
 
-  console.log(data);
-
   const [deleteProduct] = useDeleteProductMutation();
 
   const handleDelete = async (id) => {

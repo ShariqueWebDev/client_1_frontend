@@ -127,7 +127,7 @@ const AddCategoryModal = ({ btnLable, table }) => {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm cursor-pointer"
               >
                 Submit
               </button>

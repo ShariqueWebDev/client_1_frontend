@@ -33,7 +33,7 @@ const MobileAdminSidebar = () => {
   console.log(isOpenSidebar, "sidebar status");
 
   return (
-    <div className="max-sm:block hidden ">
+    <div className="block lg:hidden ">
       {/* Overlay */}
       {isOpenSidebar && (
         <div
@@ -56,7 +56,10 @@ const MobileAdminSidebar = () => {
           >
             Refilly
           </Link>
-          <div className="" onClick={() => setIsOpenSidebar(false)}>
+          <div
+            className="cursor-pointer"
+            onClick={() => setIsOpenSidebar(false)}
+          >
             <X size={18} />
           </div>
         </div>

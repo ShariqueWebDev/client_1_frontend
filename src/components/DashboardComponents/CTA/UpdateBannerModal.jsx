@@ -105,7 +105,7 @@ export default function UpdateBannerForm({ product, onClose }) {
       />
       {filePreview && (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SERVER}/uploads/${filePreview}`}
+          src={product?.photo}
           width={250}
           height={250}
           alt="Preview"

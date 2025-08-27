@@ -13,7 +13,6 @@ import { useDebounce } from "./OrderTable";
 import Alert from "../Alert";
 import { userAPI } from "@/redux/api/userApi";
 
-console.log(process.env.NEXT_PUBLIC_ADMIN_ID, "Admin ID");
 export default function AllUserTable() {
   const [page, setPage] = useState(1);
   const [showAlert, setShowAlert] = useState(false);
@@ -34,11 +33,7 @@ export default function AllUserTable() {
 
   const [deleteUser] = useDeleteUserMutation();
 
-  // console.log(data, "user data ...............");
-
   const handleDelete = async (userId) => {
-    // console.log(userId?.id, "userId for delete.......");
-
     try {
       await deleteUser({
         isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
@@ -60,16 +55,15 @@ export default function AllUserTable() {
       </div>
     );
 
-  const handleAlert = (role) => {
-    console.log(role, "Alert role check");
+  // const handleAlert = (role) => {
 
-    if (role === "admin") {
-      setShowAlert(true);
-      setTimeout(() => {
-        setShowAlert(false);
-      }, 5000);
-    }
-  };
+  //   if (role === "admin") {
+  //     setShowAlert(true);
+  //     setTimeout(() => {
+  //       setShowAlert(false);
+  //     }, 5000);
+  //   }
+  // };
 
   return (
     <div className="px-6 w-full mb-5">

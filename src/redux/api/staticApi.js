@@ -16,7 +16,6 @@ export const staticApi = createApi({
       async onQueryStarted(_, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          //   console.log(data?.stats, "Api Query Resquest......");
           // user data localStorage mein save
           localStorage.setItem("statics", JSON.stringify(data?.stats ?? null));
         } catch (err) {

@@ -32,9 +32,6 @@ export default function LowStockTable() {
     search: debounceSearch,
   });
 
-  console.log(data, "low stock product......");
-  console.log(search, debounceSearch, isError, "search vlaue product......");
-
   const [deleteProduct] = useDeleteProductMutation();
 
   const handleDelete = async (id) => {

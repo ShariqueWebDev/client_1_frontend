@@ -143,12 +143,9 @@ export default function LoginRegisterPage() {
   };
 
   const onVerifyOtp = async (data) => {
-    console.log(data, "OTP Modal data.......");
-
     try {
       const res = await resetPassword(data).unwrap();
       if (res.success) {
-        console.log("Entered OTP:", data.otp);
         toast.success("OTP verified");
       } else {
         toast.success(res.error);

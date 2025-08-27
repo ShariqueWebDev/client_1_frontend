@@ -38,12 +38,6 @@ const AddProductModal = ({ btnLable, table }) => {
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
   });
 
-  console.log(
-    data?.categories[0]?.name,
-    catIsLoading,
-    "Category simple data........."
-  );
-
   const dispatch = useDispatch();
 
   const {
@@ -73,7 +67,6 @@ const AddProductModal = ({ btnLable, table }) => {
 
       dispatch(staticApi.util.invalidateTags(["Statics"]));
       dispatch(productApi.util.invalidateTags(["AdminProducts"]));
-      console.log(res, "create product result...........");
 
       if (res) {
         toast.success("Product created successfully!");
@@ -245,7 +238,7 @@ const AddProductModal = ({ btnLable, table }) => {
                 type="submit"
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm cursor-pointer"
               >
-                Submit
+                {isLoading ? "Submitting..." : "Submit"}
               </button>
             </form>
           </div>

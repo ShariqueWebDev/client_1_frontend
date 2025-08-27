@@ -1,6 +1,4 @@
 export const registerUser = async (formData) => {
-  console.log(NEXT_PUBLIC_SERVER);
-
   const res = await fetch(`${"http://localhost:4000"}/api/v1/auth/signup`, {
     method: "POST",
     credentials: "include", // cookie set hogi

@@ -32,6 +32,8 @@ const AddBannerModal = ({ btnLable, table }) => {
     resolver: zodResolver(bannerSchema), // ✅ fixed
   });
 
+  console.log(process.env.NEXT_PUBLIC_ADMIN_ID, "admin id............");
+
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -44,7 +46,7 @@ const AddBannerModal = ({ btnLable, table }) => {
 
       const res = await addNewBanner({
         formData,
-        adminId: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
+        isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       });
 
       if (res) {
@@ -141,7 +143,7 @@ const AddBannerModal = ({ btnLable, table }) => {
 
               <button
                 type="submit"
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm cursor-pointer"
               >
                 Submit
               </button>

@@ -32,7 +32,6 @@ export default function UpdateCategoryForm({ product, onClose }) {
   });
 
   const onSubmit = async (data) => {
-    console.log(data, "submit Data");
     try {
       const formData = new FormData();
       formData.append("name", data?.name);
@@ -91,7 +90,7 @@ export default function UpdateCategoryForm({ product, onClose }) {
       />
       {filePreview && (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SERVER}/${filePreview}`}
+          src={product.photo}
           width={250}
           height={250}
           alt="Preview"

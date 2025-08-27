@@ -30,8 +30,6 @@ export default function BannerTable() {
     isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
   });
 
-  console.log(data);
-
   const [deleteBanner] = useDeleteBannerMutation();
 
   const handleDelete = async (id) => {
@@ -53,8 +51,6 @@ export default function BannerTable() {
         <LoaderComponent status="Banners loading..." />
       </div>
     );
-
-  console.log(editingProduct, "updateing banner product.............");
 
   const banners = data?.banners;
   const totalPages = data?.pagination?.pages;
@@ -138,7 +134,7 @@ export default function BannerTable() {
                   <td className="px-2 py-2 border border-gray-300">
                     <div className="flex items-center gap-2 ">
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_SERVER}/uploads/${p?.photo}`}
+                        src={`${p?.photo}`}
                         width={300}
                         height={300}
                         alt={p.name}

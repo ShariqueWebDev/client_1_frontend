@@ -85,8 +85,6 @@ export default function AdminOrderTable() {
   const orders = data?.all_Orders || [];
   const totalPages = data?.totalPages || 1;
 
-  console.log(isError);
-
   return (
     <div className="px-6 w-full mb-5">
       {/* Search with debounce */}
