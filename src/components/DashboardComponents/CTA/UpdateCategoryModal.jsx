@@ -15,7 +15,7 @@ const categorySchema = z.object({
 });
 
 export default function UpdateCategoryForm({ product, onClose }) {
-  const [updateCategory] = useUpdateCategoryMutation();
+  const [updateCategory, { isLoading }] = useUpdateCategoryMutation();
   const [filePreview, setFilePreview] = useState(product?.photo || null);
 
   const {
@@ -110,7 +110,7 @@ export default function UpdateCategoryForm({ product, onClose }) {
           type="submit"
           className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded cursor-pointer"
         >
-          Update
+          {isLoading ? "Updating..." : "Update"}
         </button>
       </div>
     </form>

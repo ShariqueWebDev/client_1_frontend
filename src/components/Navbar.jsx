@@ -15,18 +15,16 @@ import { useRouter } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import toast from "react-hot-toast";
 import ClientWrapper from "./ClientWrapper";
-import {
-  toggleMenu,
-  openMenu,
-  closeMenu,
-} from "../redux/reducers/menu-reducers";
+import { toggleMenu } from "../redux/reducers/menu-reducers";
+import { toggleCart } from "../redux/reducers/cart-reducer";
+import Image from "next/image";
 
 export default function Navbar() {
   // const [isOpen, setIsOpen] = useState(false);
   const [isOpenSubMenu, setIsOpenSubMenu] = useState(false);
   // const {} = userAPI();
   const dispatch = useDispatch();
-  const isOpen = useSelector((state) => state.menu.isOpen);
+  // const isOpen = useSelector((state) => state.menu.isOpen);
   const auth = useSelector((state) => state.auth) || { user: null };
   const { user } = auth;
 
@@ -47,7 +45,7 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-white border-b border-gray-200  z-50 h-[70px] ">
-      <div className="max-w-screen-xl mx-auto p-4 flex items-center justify-between">
+      <div className="max-w-screen-xl mx-auto p-4 flex items-center justify-between relative">
         {/* Left Menu (Desktop Only) */}
         <div className="hidden md:flex items-center space-x-8">
           <Link
@@ -81,18 +79,29 @@ export default function Navbar() {
         </div>
 
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center text-2xl md:text-3xl font-extrabold text-gray-600"
-        >
-          Refilly
-        </Link>
+        <div className="flex items-center gap-1 md:absolute md:left-1/2 md:-translate-x-1/2">
+          <div className="w-10">
+            <Image
+              src={"/logo/refilly.webp"}
+              width={300}
+              height={300}
+              alt="Logo"
+            />
+          </div>
+          <Link
+            href="/"
+            className="flex items-center text-2xl md:text-3xl font-extrabold text-gray-600"
+          >
+            Refilly
+          </Link>
+        </div>
 
         {/* Right Menu (Desktop Only) */}
         <div className="hidden md:flex items-center space-x-6">
           {/* Cart Icon */}
-          <Link
-            href={"/cart"}
+          <div
+            onClick={() => dispatch(toggleCart())}
+            // href={"/cart"}
             className="relative p-2 rounded-full cursor-pointer hover:bg-gray-100"
           >
             <ShoppingCart className="w-5 text-gray-700" />
@@ -104,7 +113,7 @@ export default function Navbar() {
             <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
               5
             </span>
-          </Link>
+          </div>
 
           {/* User Auth */}
           <div className="relative">

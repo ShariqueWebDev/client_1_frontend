@@ -20,7 +20,7 @@ const bannerSchema = z.object({
 
 const AddBannerModal = ({ btnLable, table }) => {
   const [open, setOpen] = useState(false);
-  const [addNewBanner] = useAddNewBannerMutation();
+  const [addNewBanner, { isLoading }] = useAddNewBannerMutation();
   const dispatch = useDispatch();
 
   const {
@@ -145,7 +145,7 @@ const AddBannerModal = ({ btnLable, table }) => {
                 type="submit"
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded text-sm cursor-pointer"
               >
-                Submit
+                {isLoading ? "Submitting..." : "Submit"}
               </button>
             </form>
           </div>

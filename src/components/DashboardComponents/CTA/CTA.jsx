@@ -15,6 +15,7 @@ import { staticApi } from "@/redux/api/staticApi";
 // Zod schema
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
+  description: z.string().min(2, "Description is required"),
   price: z
     .string()
     .refine((val) => !isNaN(val) && Number(val) > 0, "Enter valid price"),
@@ -53,6 +54,7 @@ const AddProductModal = ({ btnLable, table }) => {
     try {
       const formData = new FormData();
       formData.append("name", data?.name);
+      formData.append("description", data?.description);
       formData.append("price", data?.price);
       formData.append("stock", data?.stock);
       formData.append("category", data?.category);
@@ -124,6 +126,19 @@ const AddProductModal = ({ btnLable, table }) => {
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm">{errors.name.message}</p>
+                )}
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Product Description"
+                  {...register("description")}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                />
+                {errors.description && (
+                  <p className="text-red-500 text-sm">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
 

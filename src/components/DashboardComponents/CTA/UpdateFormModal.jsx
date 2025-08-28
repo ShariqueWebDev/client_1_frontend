@@ -13,6 +13,7 @@ import Image from "next/image";
 // Zod schema
 const productSchema = z.object({
   name: z.string().min(2, "Name is required"),
+  description: z.string().min(10, "Description is required"),
   price: z.coerce
     .number()
     .refine((val) => val > 0, { message: "Enter valid price" }),
@@ -44,6 +45,7 @@ export default function UpdateProductForm({ product, onClose }) {
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: product?.name,
+      description: product?.description,
       price: product?.price,
       stock: product?.stock,
       category: product?.category,
@@ -56,6 +58,7 @@ export default function UpdateProductForm({ product, onClose }) {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("description", data.description);
       formData.append("price", data.price);
       formData.append("stock", data.stock);
       formData.append("category", data.category);
@@ -91,6 +94,15 @@ export default function UpdateProductForm({ product, onClose }) {
       />
       {errors.name && (
         <p className="text-red-500 text-sm">{errors.name.message}</p>
+      )}
+      <input
+        type="text"
+        placeholder="Description"
+        {...register("description")}
+        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none placeholder:text-gray-300 "
+      />
+      {errors.description && (
+        <p className="text-red-500 text-sm">{errors.description.message}</p>
       )}
 
       <input

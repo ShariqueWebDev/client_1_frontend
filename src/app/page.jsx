@@ -1,11 +1,13 @@
 import BannerCarousel from "@/components/BannerCarousel";
 import Products from "@/components/Products";
 import Service from "@/components/Service";
+import CategoriesCarousel from "../components/CategoriesCarousel";
 
 import Categories from "../components/Categories";
 
 // ✅ Import categoriesData
 import { categoriesData } from "../lib/categoriesData";
+import Instagram from "../components/Instagram";
 
 export default function Home() {
   return (
@@ -14,10 +16,11 @@ export default function Home() {
         {/* 🖼 Banner Carousel */}
         <BannerCarousel />
 
-        {/* ⭐ Featured Products */}
+        <CategoriesCarousel />
+        {/* ⭐ Featured Products
         <section className="lg:my-16 ">
           <Products />
-        </section>
+        </section> */}
 
         {/* ===================== Categories ===================== */}
         <section className="space-y-20">
@@ -101,6 +104,7 @@ export default function Home() {
             isSlider={true}
           />
         </section>
+        <Instagram />
 
         {/* 🛠 Services Section */}
         <section className="my-20">

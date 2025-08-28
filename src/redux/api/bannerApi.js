@@ -1,6 +1,6 @@
 "use client";
-
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { setBanner } from "../reducers/banner-reducers";
 
 export const bannerApi = createApi({
   reducerPath: "bannerApi",
@@ -21,6 +21,17 @@ export const bannerApi = createApi({
       query: ({ page, search, isAdmin }) =>
         `/all-banners?_id=${isAdmin}&page=${page}&search=${search}`,
       providesTags: ["Banner"],
+
+      // yahan data aane ke baad slice mein save karenge
+      // async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     dispatch(setBanner(data || []));
+      //     console.log(data, "api banner data........");
+      //   } catch (error) {
+      //     console.log("Error saving banner to slice:", err);
+      //   }
+      // },
     }),
     updateBanner: builder.mutation({
       query: ({ id, formData, isAdmin }) => ({
