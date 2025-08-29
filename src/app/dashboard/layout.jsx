@@ -9,7 +9,7 @@ export default function Layout({ children }) {
       <ProtectedRoute role="admin" authRequired={true}>
         <div>
           <div className="flex">
-            <div className="w-[15%] lg:block hidden min-h-screen px-7 py-5 border-r border-gray-300">
+            <div className="w-[18%] lg:block hidden min-h-screen px-7 py-5 border-r border-gray-300">
               <h1 className="text-lg font-semibold">Admin Dashboard</h1>
               <div className="mt-5">
                 <Sidebar />

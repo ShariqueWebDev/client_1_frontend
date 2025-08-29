@@ -9,7 +9,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "../components/Footer";
 import ReduxWrapper from "../components/ReduxWrapper/ReduxWrapper";
 import ProtectedRoutes from "@/components/ProtectedRoutes/ProtectedRoutes";
-import Loader from "@/components/LoaderComponent/LoaderComponent";
+import AosWrapper from "../components/AosWrapper";
+// import Loader from "@/components/LoaderComponent/LoaderComponent";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -32,6 +33,7 @@ export default function RootLayout({ children }) {
         {/* <AuthProvider> */}
         {/* <ProductProvider> */}
         <ReduxWrapper>
+          <AosWrapper />
           <Navbar />
           {children}
           <Footer />

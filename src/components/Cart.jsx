@@ -17,7 +17,7 @@ const Cart = ({ product, isSlider }) => {
       <div className="w-full lg:h-[350px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
         {/* Product Image */}
         <Image
-          src={product.image}
+          src={product.image || product.photo}
           alt={product.name}
           width={500}
           height={700}
@@ -26,8 +26,10 @@ const Cart = ({ product, isSlider }) => {
       </div>
 
       {/* Product Info */}
-      <h3 className="mt-3 font-medium text-xl text-gray-800">{product.name}</h3>
-      <p className="text-gray-600 lg:text-sm text-xs">
+      <h3 className="mt-3 lg:font-medium lg:text-lg  text-sm font-semibold text-gray-800 lg:h-[60px] h-[40px]">
+        {product.name}
+      </h3>
+      <p className="text-gray-600 lg:text-sm text-xs line-clamp-2">
         {product.description ||
           "Stylish and comfortable tee for all occasions."}
       </p>
@@ -41,11 +43,11 @@ const Cart = ({ product, isSlider }) => {
       </div>
 
       {/* View More (smaller button) */}
-      <div className="flex justify-between">
-        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-gray-800 cursor-pointer hover:bg-yellow-600 transition text-sm font-medium">
+      <div className="flex lg:flex-row flex-col justify-between">
+        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
           View More
         </button>
-        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-gray-800 cursor-pointer hover:bg-yellow-600 transition text-sm font-medium">
+        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
           Add to cart
         </button>
       </div>

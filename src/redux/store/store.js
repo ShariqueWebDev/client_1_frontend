@@ -6,6 +6,7 @@ import authReducer from "../reducers/auth-reducers";
 import menuReducer from "../reducers/menu-reducers";
 import cartReducer from "../reducers/cart-reducer";
 import bannerReducer from "../reducers/banner-reducers";
+import categoriesReducer from "../reducers/categories-reducers";
 import { orderApi } from "../api/orderApi";
 import { dashboardUserApi } from "../api/dashboardUserApi";
 import { bannerApi } from "../api/bannerApi";
@@ -24,6 +25,7 @@ export const store = configureStore({
     menu: menuReducer,
     cart: cartReducer,
     banner: bannerReducer,
+    category: categoriesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

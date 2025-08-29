@@ -94,7 +94,7 @@ export default function AdminProductsTable() {
               </thead>
             </table>
             <div className="lg:border border-gray-300 text-center text-sm py-20">
-              Search not found!
+              Product not found!
             </div>
           </>
         ) : (

@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
 import { useGetAllBannerQuery } from "../redux/api/bannerApi";
+import EmblaCarousel from "./Embla/EmblaCarousel";
 
 export default function Banner() {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  // const [currentIndex, setCurrentIndex] = useState(0);
 
   const { user, isAthenticated } = useSelector((state) => state.auth);
 
@@ -16,24 +17,30 @@ export default function Banner() {
     search: "",
   });
 
-  const data = useSelector((state) => state.banner.banners);
+  const data = useSelector((state) => state.banner.banners) || { banners: [] };
 
-  console.log(data.banners, "banner data .......");
+  // console.log(data.banners, "banner data .......");
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === data?.banners.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 3000); // change every 3s
-    return () => clearInterval(interval);
-  }, []);
+  const OPTIONS = {};
+  const SLIDE_COUNT = 5;
+  const SLIDES = Array.from(Array(SLIDE_COUNT).keys());
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentIndex((prevIndex) =>
+  //       prevIndex === data?.banners.length - 1 ? 0 : prevIndex + 1
+  //     );
+  //   }, 3000); // change every 3s
+  //   return () => clearInterval(interval);
+  // }, []);
 
   return (
     <div className="relative w-full">
       {/* Banner Box */}
-      <div className="relative w-full lg:h-screen h-[300px] max-sm:-mt-8 overflow-hidden ">
-        {data?.banners?.map((banner, index) => (
+      <div
+        className="relative w-full lg:h-screen overflow-hidden "
+        data-aos="fade-in"
+      >
+        {/* {data?.banners?.map((banner, index) => (
           <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
@@ -50,7 +57,8 @@ export default function Banner() {
               priority={index === 0}
             />
           </div>
-        ))}
+        ))} */}
+        <EmblaCarousel slides={data?.banners} />
       </div>
     </div>
   );

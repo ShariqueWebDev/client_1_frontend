@@ -1,10 +1,12 @@
 "use client";
-import React, { useEffect } from "react";
 import Cart from "./Cart";
 import { featuredProducts } from "@/lib/featuredProducts";
-import AOS from "aos";
 import "aos/dist/aos.css";
 import { motion } from "framer-motion";
+import { useGetAllCategoriesQuery } from "../redux/api/CategoryApi";
+import { useSelector } from "react-redux";
+import Image from "next/image";
+import Link from "next/link";
 
 // Example category data (replace with your real images & links)
 const categories = [
@@ -19,9 +21,17 @@ const categories = [
 ];
 
 export default function Products() {
-  useEffect(() => {
-    AOS.init({ duration: 1000, easing: "ease-in-out", once: true });
-  }, []);
+  useGetAllCategoriesQuery({
+    page: 1,
+    search: "",
+    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
+  });
+
+  const categoriesData = useSelector((state) => state.category.categories) || {
+    categories: [],
+  };
+
+  console.log(categoriesData?.categories, "Categories data ................");
 
   return (
     <section className="relative py-16 overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-100">
@@ -29,45 +39,53 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-6 mb-12">
         {/* Mobile Horizontal Scroll */}
         <div className="flex gap-4 overflow-x-auto no-scrollbar md:hidden py-3">
-          {categories.map((cat, index) => (
-            <motion.div
-              key={cat.id}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="flex-shrink-0 w-28 h-32 flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer"
-              data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
-            >
-              <img
-                src={cat.image}
-                alt={cat.name}
-                className="w-16 h-16 object-contain rounded-md"
-              />
-              <span className="mt-2 text-xs font-semibold text-gray-700 text-center">
-                {cat.name}
-              </span>
-            </motion.div>
+          {categoriesData?.categories?.map((cat, index) => (
+            <Link href={`/category-class/${cat.link}`}>
+              <motion.div
+                key={cat.id}
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="flex-shrink-0 w-28 h-32 flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer"
+                data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
+              >
+                <Image
+                  width={300}
+                  height={500}
+                  src={cat.photo}
+                  alt={cat.name}
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+                <span className="mt-2 text-xs font-semibold text-gray-700 text-center">
+                  {cat.name}
+                </span>
+              </motion.div>
+            </Link>
           ))}
         </div>
 
         {/* Desktop Grid */}
         <div className="hidden md:grid grid-cols-4 lg:grid-cols-8 gap-4">
-          {categories.map((cat, index) => (
-            <motion.div
-              key={cat.id}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer"
-              data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
-            >
-              <img
-                src={cat.image}
-                alt={cat.name}
-                className="w-16 h-16 object-contain rounded-md"
-              />
-              <span className="mt-2 text-sm font-semibold text-gray-700 text-center">
-                {cat.name}
-              </span>
-            </motion.div>
+          {categoriesData?.categories?.map((cat, index) => (
+            <Link href={`/category-class/${cat.link}`}>
+              <div
+                key={cat.id}
+                // whileHover={{ scale: 1.05 }}
+                // transition={{ type: "spring", stiffness: 200 }}
+                className="flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer hover:scale-105 transition-transform duration-300"
+                data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
+              >
+                <Image
+                  width={500}
+                  height={700}
+                  src={cat.photo}
+                  alt={cat.name}
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+                <span className="mt-2 text-sm font-semibold text-gray-700 text-center">
+                  {cat.name}
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -75,39 +93,34 @@ export default function Products() {
       {/* Featured Products Section */}
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-12">
-          <motion.h1
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+          <h1
             className="heading-all text-3xl md:text-5xl font-extrabold text-gray-900"
+            data-aos="fade-up"
           >
             Featured <span className="text-indigo-600">Products</span>
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 1 }}
+          </h1>
+          <p
             className="text-gray-700 content-all text-sm md:text-lg mt-4"
+            data-aos="fade-up"
+            s
           >
             Discover our premium collection, with style & energy.
-          </motion.p>
+          </p>
 
           {/* ✅ Buttons Section (right after <p>) */}
           <div className="flex justify-center gap-6 mt-6">
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-md hover:bg-indigo-700 transition-all"
+            <div
+              data-aos="fade-right"
+              className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-md hover:bg-indigo-700 transition-all hover:scale-105 !duration-300 cursor-pointer"
             >
               Regular Fit
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold shadow-md hover:bg-gray-800 transition-all"
+            </div>
+            <div
+              data-aos="fade-left"
+              className="px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold shadow-md hover:bg-gray-800 transition-all hover:scale-105 !duration-300 cursor-pointer"
             >
               Oversize Fit
-            </motion.button>
+            </div>
           </div>
         </div>
 

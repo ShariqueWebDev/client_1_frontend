@@ -36,14 +36,14 @@ const Sidebar = () => {
           return (
             <Link href={item?.link} key={index}>
               <li
-                className={`px-5 py-2 mb-3 rounded-sm transition-colors duration-200 
+                className={`pl-8 py-2 mb-3 rounded-sm transition-colors duration-200 text-center max-w-[200px] w-full
                 ${
                   isActive
                     ? "bg-yellow-500 text-white" // ✅ active tab style
                     : "bg-gray-200 hover:bg-gray-300"
                 }`}
               >
-                <div className="flex items-center pl-3 gap-4">
+                <div className="flex items-center gap-4 text-center">
                   <div className="w-fit">
                     <Image
                       src={item?.imgPath}
@@ -63,7 +63,7 @@ const Sidebar = () => {
 
       {/* Bottom Menu */}
       <ul className="border-t border-gray-300 pt-4">
-        <li className="hover:bg-gray-300 bg-gray-200 px-5 py-2 mb-3 rounded-sm">
+        <li className="hover:bg-gray-300 bg-gray-200 pl-8 py-2 mb-3 rounded-sm max-w-[200px] w-full">
           <Link href={"/contact"}>
             <div className="flex items-center gap-4">
               <div className="w-fit">
@@ -81,7 +81,7 @@ const Sidebar = () => {
         </li>
 
         {/* Logout Button */}
-        <li className="hover:bg-gray-300 bg-gray-200 px-5 py-2 mb-3 rounded-sm cursor-pointer">
+        <li className="hover:bg-gray-300 bg-gray-200 pl-8 py-2 mb-3 rounded-sm cursor-pointer max-w-[200px] w-full">
           <div
             className="flex items-center gap-4"
             onClick={dashboardLogoutHandler}

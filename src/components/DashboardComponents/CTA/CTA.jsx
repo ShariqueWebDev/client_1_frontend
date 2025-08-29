@@ -204,7 +204,7 @@ const AddProductModal = ({ btnLable, table }) => {
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
                 >
                   <option className=" hover:!bg-yellow-500" value="">
-                    Select Category
+                    Select Sub Category
                   </option>
 
                   <option

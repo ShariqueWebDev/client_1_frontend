@@ -64,6 +64,17 @@ export const productApi = createApi({
         `/low-stock?_id=${isAdmin}&threshold=${threshold}&page=${page}&limit=${limit}&search=${search}`,
       providesTags: ["Products", "Product"], // cache invalidation
     }),
+    getAllProductWithFilter: builder.query({
+      query: ({
+        isAdmin,
+        userQuery,
+        filterQuery,
+        priceRange,
+        subcategory,
+        search,
+      }) =>
+        `/all?_id=${isAdmin}&${filterQuery}=${userQuery}&price=${priceRange}&subCategory=${subcategory}&search=${search}`, // ✅ arrow function implicit return
+    }),
   }),
 });
 
@@ -73,4 +84,5 @@ export const {
   useDeleteProductMutation,
   useGetAdminProductsQuery,
   useGetLowStockProductsQuery,
+  useGetAllProductWithFilterQuery,
 } = productApi;
