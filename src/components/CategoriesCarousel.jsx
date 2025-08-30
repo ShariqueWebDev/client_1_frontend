@@ -4,34 +4,40 @@ import { featuredProducts } from "@/lib/featuredProducts";
 import "aos/dist/aos.css";
 import { motion } from "framer-motion";
 import { useGetAllCategoriesQuery } from "../redux/api/CategoryApi";
+import { useGetRelatedProductQuery } from "../redux/api/productApi";
 import { useSelector } from "react-redux";
 import Image from "next/image";
 import Link from "next/link";
-
-// Example category data (replace with your real images & links)
-const categories = [
-  { id: 1, name: "Basic Tees", image: "/assets/tshirt1.png" },
-  { id: 2, name: "Anime Prints", image: "/assets/anime.png" },
-  { id: 3, name: "Aesthetic Prints", image: "/assets/aesthetic.png" },
-  { id: 4, name: "Minimal Prints", image: "/assets/minimal.png" },
-  { id: 5, name: "Quotes Tees", image: "/assets/quotes.png" },
-  { id: 6, name: "Wonderlust", image: "/assets/tshirt4.png" },
-  { id: 7, name: "Cartoon Prints", image: "/assets/cartoon.png" },
-  { id: 8, name: "Marvel Prints", image: "/assets/tshirt3.png" },
-];
+import { useEffect, useState } from "react";
 
 export default function Products() {
+  const [query, setQuery] = useState("regular-fit");
+  const [data, setData] = useState(null);
   useGetAllCategoriesQuery({
     page: 1,
     search: "",
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
   });
 
+  const { data: subCatData } = useGetRelatedProductQuery({
+    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
+    filterQuery: "subCategory",
+    userQuery: query,
+  });
+
+  useEffect(() => {
+    if (subCatData) {
+      setData(subCatData);
+    }
+  }, [subCatData]);
+
+  console.log(data, query, "subcategory product");
+
   const categoriesData = useSelector((state) => state.category.categories) || {
     categories: [],
   };
 
-  console.log(categoriesData?.categories, "Categories data ................");
+  // console.log(categoriesData?.categories, "Categories data ................");
 
   return (
     <section className="relative py-16 overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-100">
@@ -110,12 +116,14 @@ export default function Products() {
           {/* ✅ Buttons Section (right after <p>) */}
           <div className="flex justify-center gap-6 mt-6">
             <div
+              onClick={() => setQuery("regular-fit")}
               data-aos="fade-right"
               className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold shadow-md hover:bg-indigo-700 transition-all hover:scale-105 !duration-300 cursor-pointer"
             >
               Regular Fit
             </div>
             <div
+              onClick={() => setQuery("oversize-fit")}
               data-aos="fade-left"
               className="px-6 py-3 rounded-xl bg-gray-900 text-white font-semibold shadow-md hover:bg-gray-800 transition-all hover:scale-105 !duration-300 cursor-pointer"
             >
@@ -126,7 +134,7 @@ export default function Products() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {featuredProducts.map((product, index) => (
+          {data?.products?.map?.((product, index) => (
             <motion.div
               key={product.id}
               data-aos={index % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
@@ -135,7 +143,9 @@ export default function Products() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="hover:shadow-2xl rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm"
             >
-              <Cart product={product} />
+              <Link href={`/products/${product._id}`}>
+                <Cart product={product} />
+              </Link>
             </motion.div>
           ))}
         </div>

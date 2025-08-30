@@ -2,16 +2,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { calculatePercentage, formatePrice } from "../utils/features";
 
-const Cart = ({ product, isSlider }) => {
+const Cart = ({ product, isSlider, id }) => {
   if (!product) return null; // safety check
 
+  console.log();
+
   return (
-    <Link
-      href={`/products/${product.id}`}
+    <div
+      // href={`/products/${id}`}
       className={`${
         isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
-      } w-full block group`}
+      } block group max-w-[300px] w-full max-sm:max-w-[200px]`}
     >
       {/* Product Card */}
       <div className="w-full lg:h-[350px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
@@ -35,11 +38,16 @@ const Cart = ({ product, isSlider }) => {
       </p>
 
       {/* ✅ Price + Cut Price (Fixed 999) */}
-      <div className="flex items-center gap-2 mt-1">
+      <div className="flex items-center gap-5 mt-1">
         <span className="font-semibold text-lg text-primary-500">
-          {product.price}
+          {formatePrice(product.price)}
         </span>
-        <span className="text-sm text-gray-500 line-through">₹999</span>
+        <span className="text-sm text-gray-500 line-through">
+          {formatePrice(product.mrpPrice)}
+        </span>
+        <span className="text-sm text-green-500  ">
+          {calculatePercentage(product.mrpPrice, product.price)}% off
+        </span>
       </div>
 
       {/* View More (smaller button) */}
@@ -51,7 +59,7 @@ const Cart = ({ product, isSlider }) => {
           Add to cart
         </button>
       </div>
-    </Link>
+    </div>
   );
 };
 

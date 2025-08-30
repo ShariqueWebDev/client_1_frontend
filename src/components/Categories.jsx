@@ -4,6 +4,7 @@ import Cart from "./Cart";
 import { motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Link from "next/link";
 
 const Categories = ({
   tagLine,
@@ -23,11 +24,6 @@ const Categories = ({
     scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   };
 
-  const eight =
-    products.length >= 8
-      ? products.slice(0, 8)
-      : Array.from({ length: 8 }, (_, i) => products[i % products.length]);
-
   useEffect(() => {
     AOS.init({ duration: 1000, easing: "ease-in-out", once: true });
   }, []);
@@ -35,7 +31,7 @@ const Categories = ({
   return (
     <section className="relative overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-100">
       {/* Decorative blurred background shapes */}
-      <motion.div
+      {/* <motion.div
         animate={{ y: [0, 20, 0] }}
         transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
         className="absolute -top-10 -left-10 w-72 h-72 bg-blue-200 opacity-30 rounded-full blur-3xl"
@@ -51,7 +47,7 @@ const Categories = ({
         animate={{ x: [0, 30, 0] }}
         transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
         className="absolute bottom-10 left-1/3 w-64 h-64 bg-indigo-200 opacity-40 rounded-full blur-2xl"
-      ></motion.div>
+      ></motion.div> */}
 
       <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         {/* Header */}
@@ -87,15 +83,21 @@ const Categories = ({
           className="w-full overflow-x-auto pb-6 scrollbar-hide"
         >
           <div className="flex gap-6 min-w-max">
-            {eight.map((product, idx) => (
-              <motion.div
-                key={product?.id ?? idx}
-                data-aos={idx % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
-                className="rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm shadow-md"
-              >
-                <Cart product={product} isSlider={isSlider} />
-              </motion.div>
-            ))}
+            {products?.map((product, idx) => {
+              console.log(product, "slider data details.....");
+
+              return (
+                <motion.div
+                  key={product?.id ?? idx}
+                  data-aos={idx % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
+                  className="rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm shadow-md"
+                >
+                  <Link href={`/products/${product._id}`}>
+                    <Cart product={product} isSlider={isSlider} />
+                  </Link>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 

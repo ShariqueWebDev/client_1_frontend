@@ -2,11 +2,9 @@
 import CategoryClass from "../../../components/CategoryClass/CategoryClass";
 
 export default async function CategoryPage({ params }) {
-  const slugParam = await params?.slug; // ✅ await params before destructuring
-  const slug = slugParam;
-
+  const { slug } = await params;
   return (
-    <div className=" w-full flex justify-center items-center">
+    <div>
       <CategoryClass slug={slug} />
     </div>
   );

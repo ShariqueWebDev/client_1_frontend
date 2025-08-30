@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useGetAllProductWithFilterQuery } from "../../redux/api/productApi";
-import Image from "next/image";
-import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import Cart from "../Cart";
+import Link from "next/link";
 
 const CategoryClass = ({ slug }) => {
   // Filters states
@@ -44,6 +43,8 @@ const CategoryClass = ({ slug }) => {
     page,
     limit: 12, // items per page
   });
+
+  console.log(data, "filter data.....");
 
   const title = String(slug).split("-").join(" ").toUpperCase();
 
@@ -108,17 +109,24 @@ const CategoryClass = ({ slug }) => {
           ) : (
             <>
               {/* Products Grid */}
-              <h2 className="text-lg lg:text-3xl font-semibold text-center mb-5">
+              <h2 className="text-lg lg:text-3xl font-semibold text-center lg:mb-10 mb-5">
                 {title}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:px-10 px-3">
                 {data?.products?.map((product) => (
-                  <Cart key={product._id} product={product} isSlider={false} />
+                  <Link href={`/products/${product._id}`}>
+                    <Cart
+                      key={product._id}
+                      product={product}
+                      isSlider={false}
+                      id={product?._id}
+                    />
+                  </Link>
                 ))}
               </div>
 
               {/* Pagination */}
-              <div className="flex justify-center items-center gap-2 text-sm mt-6">
+              <div className="flex justify-center items-center gap-2 text-sm mt-16">
                 <button
                   onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                   disabled={page === 1}

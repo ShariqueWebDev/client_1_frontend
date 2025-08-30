@@ -30,3 +30,8 @@ export function formatePrice(amount, currency = "INR") {
     minimumFractionDigits: 0,
   }).format(amount);
 }
+
+export function calculatePercentage(mrp, sp) {
+  const discount = ((mrp - sp) / mrp) * 100;
+  return discount.toFixed(2);
+}
