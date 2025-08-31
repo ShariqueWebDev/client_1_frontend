@@ -19,6 +19,9 @@ const productSchema = z.object({
   price: z
     .string()
     .refine((val) => !isNaN(val) && Number(val) > 0, "Enter valid price"),
+  mrpPrice: z
+    .string()
+    .refine((val) => !isNaN(val) && Number(val) > 0, "Enter valid MRP price"),
   stock: z
     .string()
     .refine((val) => !isNaN(val) && Number(val) >= 0, "Enter valid stock"),
@@ -56,6 +59,7 @@ const AddProductModal = ({ btnLable, table }) => {
       formData.append("name", data?.name);
       formData.append("description", data?.description);
       formData.append("price", data?.price);
+      formData.append("mrpPrice", data?.mrpPrice);
       formData.append("stock", data?.stock);
       formData.append("category", data?.category);
       formData.append("subCategory", data?.subCategory);
@@ -152,6 +156,21 @@ const AddProductModal = ({ btnLable, table }) => {
                 />
                 {errors.price && (
                   <p className="text-red-500 text-sm">{errors.price.message}</p>
+                )}
+              </div>
+
+              {/* {mrpPrice} */}
+              <div>
+                <input
+                  type="number"
+                  placeholder="Mrp Price"
+                  {...register("mrpPrice")}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                />
+                {errors.mrpPrice && (
+                  <p className="text-red-500 text-sm">
+                    {errors.mrpPrice.message}
+                  </p>
                 )}
               </div>
 

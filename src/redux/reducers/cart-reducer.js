@@ -20,19 +20,26 @@ const cartSlice = createSlice({
       const existing = state.items.find((i) => i._id === item._id);
 
       if (existing) {
-        // ✅ stock check karo
-        if (existing.quantity < item.stock) {
-          existing.quantity += 1;
-        } else {
-          alert("Sorry! Maximum stock reached 😞");
-        }
+        // agar product already cart me hai, to kuch mat karo
+        // sirf ek notification ya alert dikhado
+        alert("Product already in cart 🙂. You can change quantity in cart.");
       } else {
+        // sirf ek product add hoga with quantity 1
         state.items.push({ ...item, quantity: 1 });
       }
     },
-    removeFromCart: (state, action) => {
-      state.items = state.items.filter((i) => i._id !== action.payload);
+
+    increaseQuantity: (state, action) => {
+      const item = state.items.find((i) => i._id === action.payload);
+      if (item) {
+        if (item.quantity < item.stock) {
+          item.quantity += 1;
+        } else {
+          alert("Sorry! Maximum stock reached 😞");
+        }
+      }
     },
+
     decreaseQuantity: (state, action) => {
       const item = state.items.find((i) => i._id === action.payload);
       if (item) {
@@ -44,6 +51,11 @@ const cartSlice = createSlice({
         }
       }
     },
+
+    removeFromCart: (state, action) => {
+      state.items = state.items.filter((i) => i._id !== action.payload);
+    },
+
     clearCart: (state) => {
       state.items = [];
     },

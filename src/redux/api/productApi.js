@@ -72,8 +72,9 @@ export const productApi = createApi({
         priceRange,
         subcategory,
         search,
+        page,
       }) =>
-        `/all?_id=${isAdmin}&${filterQuery}=${userQuery}&price=${priceRange}&subCategory=${subcategory}&search=${search}`, // ✅ arrow function implicit return
+        `/all?_id=${isAdmin}&${filterQuery}=${userQuery}&price=${priceRange}&subCategory=${subcategory}&search=${search}&page=${page}`, // ✅ arrow function implicit return
     }),
     getRelatedProduct: builder.query({
       query: ({ isAdmin, userQuery, filterQuery }) =>

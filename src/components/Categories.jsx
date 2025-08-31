@@ -5,15 +5,29 @@ import { motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Link from "next/link";
+import { useGetRelatedProductQuery } from "@/redux/api/productApi";
 
 const Categories = ({
   tagLine,
   mainTitle,
   mainDesc,
-  products = [],
+  // products = [],
   slug,
   isSlider,
+  hrefLink,
+  category,
+  relatedCarousel,
 }) => {
+  const { data } = useGetRelatedProductQuery({
+    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
+    userQuery: category,
+    filterQuery: "category",
+  });
+
+  const products = data?.products || [];
+
+  console.log(products, category, ".............................");
+
   const scrollRef = useRef(null);
 
   const scrollLeft = () => {
@@ -58,23 +72,28 @@ const Categories = ({
             transition={{ duration: 0.8 }}
             className="lg:w-[30%] w-full"
           >
-            <p className="bg-secondary w-fit text-primary-500 text-xs pb-2 font-medium rounded-sm">
+            <p className="bg-secondary max-sm:text-center  max-sm:w-full w-fit text-primary-500 text-xs pb-2 font-medium rounded-sm">
               {tagLine}
             </p>
             <h1 className="heading-all text-3xl font-extrabold text-gray-900">
               {mainTitle}
             </h1>
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:w-[40%] w-full"
-          >
-            <p className="text-gray-700 content-all text-sm md:text-lg">
-              {mainDesc}
-            </p>
-          </motion.div>
+          {!relatedCarousel && (
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="lg:w-[40%] w-full"
+            >
+              <p className="text-gray-700 content-all text-sm ">{mainDesc}</p>
+              <Link href={String(hrefLink)}>
+                <p className="text-white bg-yellow-500 hover:bg-yellow-600  content-all text-sm  w-fit px-5 py-1.5 rounded-sm mt-5">
+                  {"View More"}
+                </p>
+              </Link>
+            </motion.div>
+          )}
         </div>
 
         {/* Product Row (slider style) */}

@@ -18,17 +18,12 @@ const ProductDetailsPage = ({ slug }) => {
 
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
   const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
-  const { data: relatedData } = useGetRelatedProductQuery({
-    isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
-    userQuery: data?.product?.category,
-    filterQuery: "category",
-  });
 
   const productDetails = data?.product;
 
   //   console.log(data, "single product page data and slug...........");
   console.log(data, "Recommended product data...........");
-  console.log(relatedData, "Related product data...........");
+  // console.log(relatedData, "Related product data...........");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user"); // get from localStorage
@@ -138,11 +133,12 @@ const ProductDetailsPage = ({ slug }) => {
           <div className="mt-10">
             <Categories
               // tagLine=""
+              relatedCarousel={true}
               mainTitle="Related Products"
-              mainDesc="Celebrate your favorite anime heroes and iconic scenes with bold, high-quality prints that bring your fandom to life."
-              slug={slug}
-              products={relatedData?.products}
+              // slug={slug}
+              // products={relatedData?.products}
               isSlider={true}
+              category={data?.product?.category}
             />
           </div>
         </>

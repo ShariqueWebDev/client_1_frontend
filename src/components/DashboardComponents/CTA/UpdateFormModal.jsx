@@ -17,6 +17,9 @@ const productSchema = z.object({
   price: z.coerce
     .number()
     .refine((val) => val > 0, { message: "Enter valid price" }),
+  mrpPrice: z.coerce
+    .number()
+    .refine((val) => val > 0, { message: "Enter valid MRP price" }),
   stock: z.coerce
     .number()
     .refine((val) => val >= 0, { message: "Enter valid stock" }),
@@ -47,6 +50,7 @@ export default function UpdateProductForm({ product, onClose }) {
       name: product?.name,
       description: product?.description,
       price: product?.price,
+      mrpPrice: product?.mrpPrice,
       stock: product?.stock,
       category: product?.category,
       subCategory: product?.subCategory,
@@ -60,6 +64,7 @@ export default function UpdateProductForm({ product, onClose }) {
       formData.append("name", data.name);
       formData.append("description", data.description);
       formData.append("price", data.price);
+      formData.append("mrpPrice", data.mrpPrice);
       formData.append("stock", data.stock);
       formData.append("category", data.category);
       formData.append("subCategory", data.subCategory);
@@ -113,6 +118,16 @@ export default function UpdateProductForm({ product, onClose }) {
       />
       {errors.price && (
         <p className="text-red-500 text-sm">{errors.price.message}</p>
+      )}
+
+      <input
+        type="text"
+        placeholder="MRP Price"
+        {...register("mrpPrice")}
+        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none placeholder:text-gray-300 "
+      />
+      {errors.mrpPrice && (
+        <p className="text-red-500 text-sm">{errors.mrpPrice.message}</p>
       )}
 
       <input

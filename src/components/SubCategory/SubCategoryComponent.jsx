@@ -5,16 +5,16 @@ import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import Cart from "../Cart";
 import Link from "next/link";
 
-const CategoryClass = ({ slug }) => {
+const SubCategoryComponent = ({ slug }) => {
   // Filters states
   const [priceRange, setPriceRange] = useState(""); // slider
-  const [subcategory, setSubcategory] = useState(""); // dropdown
+  // const [subcategory, setSubcategory] = useState(""); // dropdown
   const [search, setSearch] = useState(""); // search input
   const [page, setPage] = useState(1); // pagination
 
   // Debounced states
   const [debouncedPrice, setDebouncedPrice] = useState(priceRange);
-  const [debouncedSubcategory, setDebouncedSubcategory] = useState(subcategory);
+  // const [debouncedSubcategory, setDebouncedSubcategory] = useState(subcategory);
   const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   // Debounce effects
@@ -23,10 +23,10 @@ const CategoryClass = ({ slug }) => {
     return () => clearTimeout(timer);
   }, [priceRange]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSubcategory(subcategory), 500);
-    return () => clearTimeout(timer);
-  }, [subcategory]);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => setDebouncedSubcategory(subcategory), 500);
+  //   return () => clearTimeout(timer);
+  // }, [subcategory]);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 1500);
@@ -37,15 +37,13 @@ const CategoryClass = ({ slug }) => {
   const { data, isLoading, isFetching } = useGetAllProductWithFilterQuery({
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
     userQuery: slug,
-    filterQuery: "category",
+    filterQuery: "subCategory",
     priceRange: debouncedPrice,
-    subcategory: debouncedSubcategory,
+    // subcategory: debouncedSubcategory,
     search: debouncedSearch,
-    page,
+    page: page,
     limit: 8, // items per page
   });
-
-  console.log(data, "filter data.....");
 
   const title = String(slug).split("-").join(" ").toUpperCase();
 
@@ -67,7 +65,7 @@ const CategoryClass = ({ slug }) => {
             onChange={(e) => setSearch(e.target.value)}
             className="border border-gray-300 text-sm p-2 rounded focus:outline-none focus:ring-0 mb-3"
           />
-          <select
+          {/* <select
             value={subcategory}
             onChange={(e) => setSubcategory(e.target.value)}
             className="border border-gray-300 text-gray-500 p-2 rounded text-sm focus:outline-none focus:ring-0 mb-3"
@@ -75,7 +73,7 @@ const CategoryClass = ({ slug }) => {
             <option value="">Select Subcategory</option>
             <option value="oversize-fit">Oversize-Fit</option>
             <option value="regular-fit">Regular-Fit</option>
-          </select>
+          </select> */}
 
           <label className="text-sm font-medium text-gray-600">
             Price Range: ₹{priceRange || 0}
@@ -98,7 +96,7 @@ const CategoryClass = ({ slug }) => {
       {/* Products Grid */}
       {isLoading || isFetching ? (
         <div>
-          <LoaderComponent />
+          <LoaderComponent status="Products Loading..." />
         </div>
       ) : (
         <div className="flex flex-col lg:w-[82%] w-full  justify-between lg:py-10 py-5 border-l border-gray-300">
@@ -156,4 +154,4 @@ const CategoryClass = ({ slug }) => {
   );
 };
 
-export default CategoryClass;
+export default SubCategoryComponent;

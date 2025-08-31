@@ -1,13 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Carrois+Gothic&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Carrois+Gothic&display=swap'); */
 
 @import "tailwindcss";
 
 html, body {
   margin: 0;
   padding: 0;
+  font-family: "Carrois Gothic", sans-serif;
 }
 *{
-  font-family: "Carrois Gothic", sans-serif;
+  /* font-family: "Carrois Gothic", sans-serif; */
   /* font-family: "BentonSans-Book"; */
   /* font-optical-sizing: auto;
   font-weight: 500; */

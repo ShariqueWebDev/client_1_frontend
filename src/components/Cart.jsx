@@ -2,12 +2,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { addToCart } from "../redux/reducers/cart-reducer";
 import { calculatePercentage, formatePrice } from "../utils/features";
+import { useDispatch, useSelector } from "react-redux";
 
 const Cart = ({ product, isSlider, id }) => {
+  const cartItem = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
+
   if (!product) return null; // safety check
 
-  console.log();
+  console.log(cartItem);
 
   return (
     <div
@@ -55,8 +60,15 @@ const Cart = ({ product, isSlider, id }) => {
         <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
           View More
         </button>
-        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
-          Add to cart
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // ✅ bubbling roka
+            e.preventDefault(); // ✅ link navigate bhi block ho gaya
+            dispatch(addToCart(product));
+          }}
+          className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium"
+        >
+          Add to Cart
         </button>
       </div>
     </div>

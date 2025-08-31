@@ -23,6 +23,12 @@ export const categoryApi = createApi({
       }),
       providesTags: ["Category"],
     }),
+    getAllCategoriesForHome: builder.query({
+      query: ({ isAdmin }) => ({
+        url: `/all-categories?_id=${isAdmin}`,
+      }),
+      providesTags: ["Category"],
+    }),
 
     updateCategory: builder.mutation({
       query: ({ formData, id, isAdmin }) => ({
@@ -46,6 +52,7 @@ export const categoryApi = createApi({
 export const {
   useAddNewCategoryMutation,
   useGetAllCategoriesQuery,
+  useGetAllCategoriesForHomeQuery,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } = categoryApi;
