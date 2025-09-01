@@ -1,45 +1,88 @@
 "use client";
-import { useDispatch, useSelector } from "react-redux";
-// import { RootState } from "@/redux/store";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
-  setCartOpen,
+  setCart,
   clearCart,
-  toggleCart,
+  setCartOpen,
 } from "../../redux/reducers/cart-reducer";
-import { cartActions } from "../../redux/actions/cart-actions";
+import {
+  getGuestCart,
+  setGuestCart,
+  clearGuestCart,
+} from "../../utils/addToCart";
+import {
+  useGetCartQuery,
+  useMergeGuestCartMutation,
+} from "../../redux/api/cartApi";
 import Image from "next/image";
-import { useGetCartQuery } from "@/redux/api/cartApi";
 import { formatePrice } from "@/utils/features";
-import { useEffect, useState } from "react";
-import { Delete } from "lucide-react";
+import { cartActions } from "@/redux/actions/cart-actions";
 import { AiOutlineDelete } from "react-icons/ai";
 
 export default function CartDrawer() {
-  // const [userId, setUserId] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const { items: cart, cartOpen } = useSelector((state) => state.cart);
-  const { data, isSuccess, refetch } = useGetCartQuery(undefined, {
-    skip: !user,
-  });
-
   const dispatch = useDispatch();
 
-  console.log(cart, "cart drawer items.......");
+  const { data, refetch, isSuccess } = useGetCartQuery(undefined, {
+    skip: !user,
+  });
+  const [mergeGuestCart] = useMergeGuestCartMutation();
 
+  // Sync API cart to Redux
   useEffect(() => {
-    if (isSuccess && data?.items) {
-      dispatch(setCart(data.items));
-    }
-  }, [isSuccess, data, dispatch]);
+    if (isSuccess && data?.cart) dispatch(setCart(data.cart.items));
+  }, [isSuccess, data]);
 
-  // Logout hone pe cart clear karo
+  // Merge guest cart on login
   useEffect(() => {
-    if (!user) {
-      dispatch(clearCart());
+    if (user) {
+      const guestCart = getGuestCart();
+      if (guestCart.length > 0) {
+        mergeGuestCart({ guestItems: guestCart })
+          .unwrap()
+          .then(async (res) => {
+            // Merge success → Redux update immediately
+            dispatch(setCart(res.cart.items));
+            clearGuestCart();
+
+            // 🔥 Force fresh data from DB
+            const fresh = await refetch();
+            if (fresh?.data?.cart) {
+              dispatch(setCart(fresh.data.cart.items));
+            }
+          });
+      } else {
+        // No guest cart, sirf DB reload karo
+        refetch().then((fresh) => {
+          if (fresh?.data?.cart) {
+            dispatch(setCart(fresh.data.cart.items));
+          }
+        });
+      }
     } else {
-      refetch();
+      // Guest mode
+      const guestCart = getGuestCart();
+      dispatch(setCart(guestCart));
     }
-  }, [user, dispatch, refetch]);
+  }, [user, dispatch, mergeGuestCart, refetch]);
+
+  // Guest add to cart example
+  // const handleAddToCart = (product) => {
+  //   if (!user) {
+  //     let guestCart = getGuestCart();
+  //     const existing = guestCart.find((i) => i.productId === product._id);
+  //     if (existing) existing.quantity += 1;
+  //     else guestCart.push({ productId: product._id, quantity: 1 });
+  //     setGuestCart(guestCart);
+  //     dispatch(setCart(guestCart));
+  //     return;
+  //   }
+
+  //   // Logged-in user
+  //   addToCart({ productId: product._id });
+  // };
 
   // total amount
   const total = cart.reduce(

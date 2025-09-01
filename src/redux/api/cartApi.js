@@ -4,8 +4,7 @@ export const cartApi = createApi({
   reducerPath: "cartApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${process.env.NEXT_PUBLIC_SERVER}/api/v1/cart`,
-    // credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
       if (token) headers.set("Authorization", `Bearer ${token}`);
       return headers;
@@ -13,16 +12,17 @@ export const cartApi = createApi({
   }),
   tagTypes: ["Cart"],
   endpoints: (builder) => ({
-    getCart: builder.query({
-      query: () => "/get-cart",
-    }),
-
+    getCart: builder.query({ query: () => "/get-cart" }),
     addToCart: builder.mutation({
       query: ({ productId }) => ({
         url: "/add-cart",
         method: "POST",
         body: productId,
       }),
+      invalidatesTags: ["Cart"],
+    }),
+    mergeGuestCart: builder.mutation({
+      query: (body) => ({ url: "/merge", method: "POST", body }),
       invalidatesTags: ["Cart"],
     }),
     removeFromCart: builder.mutation({
@@ -50,19 +50,18 @@ export const cartApi = createApi({
       invalidatesTags: ["Cart"],
     }),
     clearCartItem: builder.mutation({
-      query: () => ({
-        url: "/clear",
-        method: "DELETE",
-      }),
+      query: () => ({ url: "/clear", method: "DELETE" }),
+      invalidatesTags: ["Cart"],
     }),
   }),
 });
 
 export const {
   useAddToCartMutation,
-  useIncreaseCartItemMutation,
-  useDecreaseCartItemMutation,
+  useMergeGuestCartMutation,
   useGetCartQuery,
   useRemoveFromCartMutation,
+  useIncreaseCartItemMutation,
+  useDecreaseCartItemMutation,
   useClearCartItemMutation,
 } = cartApi;

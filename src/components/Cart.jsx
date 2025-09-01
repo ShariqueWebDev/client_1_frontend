@@ -4,7 +4,16 @@ import Link from "next/link";
 import React from "react";
 import { calculatePercentage, formatePrice } from "../utils/features";
 import { cartActions } from "../redux/actions/cart-actions";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setCart, clearCart } from "../redux/reducers/cart-reducer";
+import { getGuestCart, setGuestCart, clearGuestCart } from "../utils/addToCart";
+import {
+  useGetCartQuery,
+  useMergeGuestCartMutation,
+  useAddToCartMutation,
+} from "../redux/api/cartApi";
 
 const Cart = ({ product, isSlider }) => {
   const cartItem = useSelector((state) => state.cart.items);
@@ -12,6 +21,27 @@ const Cart = ({ product, isSlider }) => {
   if (!product) return null; // safety check
 
   console.log(cartItem);
+
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const [addToCart] = useAddToCartMutation();
+
+  const handleAddToCart = (product) => {
+    if (!user) {
+      let guestCart = getGuestCart();
+      const existing = guestCart.find((i) => i.productId === product?._id);
+      console.log(guestCart, "existing product....");
+
+      if (existing) existing.quantity += 1;
+      else guestCart.push({ productId: product?._id, quantity: 1 });
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+      return;
+    }
+
+    // Logged-in user
+    cartActions.handleAdd({ productId: product?._id });
+  };
 
   return (
     <div
@@ -63,7 +93,8 @@ const Cart = ({ product, isSlider }) => {
           onClick={(e) => {
             e.stopPropagation(); //  bubbling roka
             e.preventDefault(); // link navigate bhi block ho gaya
-            cartActions.handleAdd({ productId: product?._id });
+            // cartActions.handleAdd({ productId: product?._id });
+            handleAddToCart(product);
           }}
           className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium cursor-pointer"
         >
