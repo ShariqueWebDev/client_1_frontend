@@ -26,7 +26,7 @@ const Categories = ({
 
   const products = data?.products || [];
 
-  console.log(products, category, ".............................");
+  // console.log(products, category, ".............................");
 
   const scrollRef = useRef(null);
 
@@ -103,8 +103,6 @@ const Categories = ({
         >
           <div className="flex gap-6 min-w-max">
             {products?.map((product, idx) => {
-              console.log(product, "slider data details.....");
-
               return (
                 <motion.div
                   key={product?.id ?? idx}

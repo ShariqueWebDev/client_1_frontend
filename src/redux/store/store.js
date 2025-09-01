@@ -11,6 +11,7 @@ import { orderApi } from "../api/orderApi";
 import { dashboardUserApi } from "../api/dashboardUserApi";
 import { bannerApi } from "../api/bannerApi";
 import { categoryApi } from "../api/CategoryApi";
+import { cartApi } from "../api/cartApi";
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
     [dashboardUserApi.reducerPath]: dashboardUserApi.reducer,
     [bannerApi.reducerPath]: bannerApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
+    [cartApi.reducerPath]: cartApi.reducer,
     auth: authReducer,
     menu: menuReducer,
     cart: cartReducer,
@@ -35,6 +37,7 @@ export const store = configureStore({
       orderApi.middleware,
       dashboardUserApi.middleware,
       bannerApi.middleware,
-      categoryApi.middleware
+      categoryApi.middleware,
+      cartApi.middleware
     ),
 });

@@ -40,3 +40,25 @@ html, body {
 .menu.open {
   max-height: 100%; /* ya jitna content ka height */
 }
+
+/* Chrome/Edge/Safari */
+::-webkit-scrollbar {
+  width: 2px;              /* vertical */
+  height: 2px;             /* horizontal */
+}
+::-webkit-scrollbar-thumb {
+  background: #facc15;     /* yellow-400 */
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #eab308;     /* yellow-500 */
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;                    /* similar ~3px */
+  scrollbar-color: gray transparent;     /* thumb, track */
+}

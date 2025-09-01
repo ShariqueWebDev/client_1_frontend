@@ -24,6 +24,7 @@ export default function Navbar() {
   const [isOpenSubMenu, setIsOpenSubMenu] = useState(false);
   // const {} = userAPI();
   const dispatch = useDispatch();
+  const { items: cart, cartOpen } = useSelector((state) => state.cart);
   // const isOpen = useSelector((state) => state.menu.isOpen);
   const auth = useSelector((state) => state.auth) || { user: null };
   const { user } = auth;
@@ -110,9 +111,11 @@ export default function Navbar() {
                 {cart.length}
               </span>
             )} */}
-            <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
-              5
-            </span>
+            {cart.length > 0 && (
+              <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
+                {cart.length}
+              </span>
+            )}
           </div>
 
           {/* User Auth */}

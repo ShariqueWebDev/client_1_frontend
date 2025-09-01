@@ -39,7 +39,7 @@ export default function Products() {
 
   const capitalizeQuery = query.toString().split("-").join(" ");
 
-  console.log(capitalizeQuery, "Capitalize query ................");
+  // console.log(capitalizeQuery, "Capitalize query ................");
 
   return (
     <section className="relative py-16 overflow-hidden bg-gradient-to-r from-gray-50 via-white to-gray-100">
@@ -48,7 +48,7 @@ export default function Products() {
         {/* Mobile Horizontal Scroll */}
         <div className="flex gap-4 overflow-x-auto no-scrollbar md:hidden py-3">
           {categoriesData?.categories?.map((cat, index) => (
-            <Link href={`/category-class/${cat.link}`}>
+            <Link href={`/category-class/${cat.link}`} key={index}>
               <motion.div
                 key={cat.id}
                 whileHover={{ scale: 1.05 }}
@@ -74,7 +74,7 @@ export default function Products() {
         {/* Desktop Grid */}
         <div className="hidden md:grid grid-cols-4 lg:grid-cols-8 gap-4">
           {categoriesData?.categories?.map((cat, index) => (
-            <Link href={`/category-class/${cat.link}`}>
+            <Link href={`/category-class/${cat.link}`} key={index}>
               <div
                 key={cat.id}
                 // whileHover={{ scale: 1.05 }}
@@ -110,7 +110,6 @@ export default function Products() {
           <p
             className="text-gray-700 content-all text-sm md:text-lg mt-4"
             data-aos="fade-up"
-            s
           >
             Discover our premium collection, with style & energy.
           </p>
@@ -138,7 +137,7 @@ export default function Products() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {data?.products?.map?.((product, index) => (
             <motion.div
-              key={product.id}
+              key={product?.id}
               data-aos={index % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

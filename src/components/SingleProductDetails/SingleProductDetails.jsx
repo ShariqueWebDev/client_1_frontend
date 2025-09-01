@@ -11,6 +11,7 @@ import {
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { formatePrice, calculatePercentage } from "../../utils/features";
+import { cartActions } from "@/redux/actions/cart-actions";
 
 const ProductDetailsPage = ({ slug }) => {
   const [user, setUser] = useState(null);
@@ -22,7 +23,6 @@ const ProductDetailsPage = ({ slug }) => {
   const productDetails = data?.product;
 
   //   console.log(data, "single product page data and slug...........");
-  console.log(data, "Recommended product data...........");
   // console.log(relatedData, "Related product data...........");
 
   useEffect(() => {
@@ -75,7 +75,12 @@ const ProductDetailsPage = ({ slug }) => {
                 <p className="text-gray-600 text-sm leading-relaxed mb-8">
                   {productDetails?.description}
                 </p>
-                <div className="flex gap-4">
+                <div
+                  className="flex gap-4"
+                  onClick={() => {
+                    cartActions.handleAdd({ productId: productDetails?._id });
+                  }}
+                >
                   <button className="px-6 py-2 text-white bg-yellow-500 rounded-sm text-sm cursor-pointer  hover:bg-yellow-600 transition">
                     Add to Cart
                   </button>

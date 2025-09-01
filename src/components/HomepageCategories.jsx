@@ -22,6 +22,7 @@ const HomepageCategories = () => {
             category={item?.link}
             isSlider={true}
             hrefLink={`/category-class/${item?.link}`}
+            key={index}
           />
         );
       })}

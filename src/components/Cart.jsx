@@ -2,13 +2,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { addToCart } from "../redux/reducers/cart-reducer";
 import { calculatePercentage, formatePrice } from "../utils/features";
-import { useDispatch, useSelector } from "react-redux";
+import { cartActions } from "../redux/actions/cart-actions";
+import { useSelector } from "react-redux";
 
-const Cart = ({ product, isSlider, id }) => {
+const Cart = ({ product, isSlider }) => {
   const cartItem = useSelector((state) => state.cart.items);
-  const dispatch = useDispatch();
 
   if (!product) return null; // safety check
 
@@ -35,23 +34,23 @@ const Cart = ({ product, isSlider, id }) => {
 
       {/* Product Info */}
       <h3 className="mt-3 lg:font-medium lg:text-lg  text-sm font-semibold text-gray-800 lg:h-[60px] h-[40px]">
-        {product.name}
+        {product?.name}
       </h3>
       <p className="text-gray-600 lg:text-sm text-xs line-clamp-2">
-        {product.description ||
+        {product?.description ||
           "Stylish and comfortable tee for all occasions."}
       </p>
 
       {/* ✅ Price + Cut Price (Fixed 999) */}
       <div className="flex items-center gap-5 mt-1">
         <span className="font-semibold text-lg text-primary-500">
-          {formatePrice(product.price)}
+          {formatePrice(product?.price)}
         </span>
         <span className="text-sm text-gray-500 line-through">
-          {formatePrice(product.mrpPrice)}
+          {formatePrice(product?.mrpPrice)}
         </span>
         <span className="text-sm text-green-500  ">
-          {calculatePercentage(product.mrpPrice, product.price)}% off
+          {calculatePercentage(product?.mrpPrice, product?.price)}% off
         </span>
       </div>
 
@@ -62,11 +61,11 @@ const Cart = ({ product, isSlider, id }) => {
         </button>
         <button
           onClick={(e) => {
-            e.stopPropagation(); // ✅ bubbling roka
-            e.preventDefault(); // ✅ link navigate bhi block ho gaya
-            dispatch(addToCart(product));
+            e.stopPropagation(); //  bubbling roka
+            e.preventDefault(); // link navigate bhi block ho gaya
+            cartActions.handleAdd({ productId: product?._id });
           }}
-          className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium"
+          className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium cursor-pointer"
         >
           Add to Cart
         </button>
