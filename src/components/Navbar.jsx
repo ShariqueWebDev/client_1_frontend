@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLogoutUserMutation } from "@/redux/api/userApi";
 import { logout } from "../redux/reducers/auth-reducers";
 import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import toast from "react-hot-toast";
 import ClientWrapper from "./ClientWrapper";
@@ -30,6 +31,7 @@ export default function Navbar() {
   const { user } = auth;
 
   const router = useRouter();
+  const path = usePathname();
 
   const [logoutUser, { isLoading }] = useLogoutUserMutation();
 
@@ -100,23 +102,25 @@ export default function Navbar() {
         {/* Right Menu (Desktop Only) */}
         <div className="hidden md:flex items-center space-x-6">
           {/* Cart Icon */}
-          <div
-            onClick={() => dispatch(toggleCart())}
-            // href={"/cart"}
-            className="relative p-2 rounded-full cursor-pointer hover:bg-gray-100"
-          >
-            <ShoppingCart className="w-5 text-gray-700" />
-            {/* {cart.length > 0 && (
+          {path !== "/checkout" && (
+            <div
+              onClick={() => dispatch(toggleCart())}
+              // href={"/cart"}
+              className="relative p-2 rounded-full cursor-pointer hover:bg-gray-100"
+            >
+              <ShoppingCart className="w-5 text-gray-700" />
+              {/* {cart.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {cart.length}
               </span>
             )} */}
-            {cart.length > 0 && (
-              <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
-                {cart.length}
-              </span>
-            )}
-          </div>
+              {cart.length > 0 && (
+                <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* User Auth */}
           <div className="relative">

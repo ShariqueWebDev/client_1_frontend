@@ -9,11 +9,11 @@ import { cartActions } from "../redux/actions/cart-actions";
 import { useSelector, useDispatch } from "react-redux";
 import { setCart, clearCart } from "../redux/reducers/cart-reducer";
 import { getGuestCart, setGuestCart, clearGuestCart } from "../utils/addToCart";
-import {
-  useGetCartQuery,
-  useMergeGuestCartMutation,
-  useAddToCartMutation,
-} from "../redux/api/cartApi";
+// import {
+//   useGetCartQuery,
+//   useMergeGuestCartMutation,
+//   useAddToCartMutation,
+// } from "../redux/api/cartApi";
 
 const Cart = ({ product, isSlider }) => {
   const cartItem = useSelector((state) => state.cart.items);
@@ -24,16 +24,26 @@ const Cart = ({ product, isSlider }) => {
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const [addToCart] = useAddToCartMutation();
+  // const [addToCart] = useAddToCartMutation();
 
   const handleAddToCart = (product) => {
+    console.log(product, "add to cart.......");
+
     if (!user) {
       let guestCart = getGuestCart();
       const existing = guestCart.find((i) => i.productId === product?._id);
       console.log(guestCart, "existing product....");
 
       if (existing) existing.quantity += 1;
-      else guestCart.push({ productId: product?._id, quantity: 1 });
+      else
+        guestCart.push({
+          name: product?.name,
+          productId: product?._id,
+          photo: product?.photo,
+          price: product?.price,
+          quantity: 1,
+          stock: product?.stock,
+        });
       setGuestCart(guestCart);
       dispatch(setCart(guestCart));
       return;
@@ -50,6 +60,15 @@ const Cart = ({ product, isSlider }) => {
         isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
       } block group max-w-[300px] w-full max-sm:max-w-[200px]`}
     >
+      {product?.stock === 0 && (
+        <div
+          className={`${
+            isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
+          }  absolute text-white bg-black/70 flex justify-center items-center  j z-10 group max-w-[300px] w-full h-full max-sm:max-w-[200px] `}
+        >
+          <p className="">Out of stock</p>
+        </div>
+      )}
       {/* Product Card */}
       <div className="w-full lg:h-[350px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
         {/* Product Image */}

@@ -12,9 +12,13 @@ import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { formatePrice, calculatePercentage } from "../../utils/features";
 import { cartActions } from "@/redux/actions/cart-actions";
+import { getGuestCart, setGuestCart } from "@/utils/addToCart";
+import { setCart } from "@/redux/reducers/cart-reducer";
+import { useDispatch } from "react-redux";
 
 const ProductDetailsPage = ({ slug }) => {
   const [user, setUser] = useState(null);
+  const dispatch = useDispatch();
   const id = user?._id;
 
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
@@ -31,6 +35,33 @@ const ProductDetailsPage = ({ slug }) => {
       setUser(JSON.parse(storedUser)); // agar object stored hai
     }
   }, []);
+
+  const handleAddToCart = (product) => {
+    console.log(product, "add to cart.......");
+
+    if (!user) {
+      let guestCart = getGuestCart();
+      const existing = guestCart.find((i) => i.productId === product?._id);
+      console.log(guestCart, "existing product....");
+
+      if (existing) existing.quantity += 1;
+      else
+        guestCart.push({
+          name: product?.name,
+          productId: product?._id,
+          photo: product?.photo,
+          price: product?.price,
+          quantity: 1,
+          stock: product?.stock,
+        });
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+      return;
+    }
+
+    // Logged-in user
+    cartActions.handleAdd({ productId: product?._id });
+  };
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");
 
@@ -75,13 +106,24 @@ const ProductDetailsPage = ({ slug }) => {
                 <p className="text-gray-600 text-sm leading-relaxed mb-8">
                   {productDetails?.description}
                 </p>
+                {productDetails?.stock === 0 && (
+                  <p className=" text-red-500 mb-3 ">Out of stock</p>
+                )}
                 <div
                   className="flex gap-4"
                   onClick={() => {
-                    cartActions.handleAdd({ productId: productDetails?._id });
+                    // cartActions.handleAdd({ productId: productDetails?._id });
+                    handleAddToCart(productDetails);
                   }}
                 >
-                  <button className="px-6 py-2 text-white bg-yellow-500 rounded-sm text-sm cursor-pointer  hover:bg-yellow-600 transition">
+                  <button
+                    disabled={productDetails?.stock === 0}
+                    className={` ${
+                      productDetails?.stock === 0
+                        ? "bg-yellow-300 cursor-not-allowed"
+                        : "bg-yellow-500 hover:bg-yellow-600  cursor-pointer"
+                    } px-6 py-2 text-white  rounded-sm text-sm   transition`}
+                  >
                     Add to Cart
                   </button>
                 </div>
@@ -144,6 +186,7 @@ const ProductDetailsPage = ({ slug }) => {
               // products={relatedData?.products}
               isSlider={true}
               category={data?.product?.category}
+              productId={productDetails?._id}
             />
           </div>
         </>

@@ -5,6 +5,7 @@ import {
   setCart,
   clearCart,
   setCartOpen,
+  isloadingHandler,
 } from "../../redux/reducers/cart-reducer";
 import {
   getGuestCart,
@@ -19,20 +20,30 @@ import Image from "next/image";
 import { formatePrice } from "@/utils/features";
 import { cartActions } from "@/redux/actions/cart-actions";
 import { AiOutlineDelete } from "react-icons/ai";
+import LoaderComponent from "../LoaderComponent/LoaderComponent";
+import Link from "next/link";
 
 export default function CartDrawer() {
   const { user } = useSelector((state) => state.auth);
-  const { items: cart, cartOpen } = useSelector((state) => state.cart);
+  const {
+    items: cart,
+    cartOpen,
+    isLoading,
+  } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const { data, refetch, isSuccess } = useGetCartQuery(undefined, {
     skip: !user,
   });
   const [mergeGuestCart] = useMergeGuestCartMutation();
+  const isCartLoading = isLoading || (user && !isSuccess);
 
   // Sync API cart to Redux
   useEffect(() => {
     if (isSuccess && data?.cart) dispatch(setCart(data.cart.items));
+    if (!user) {
+      dispatch(isloadingHandler(false));
+    }
   }, [isSuccess, data]);
 
   // Merge guest cart on login
@@ -68,21 +79,95 @@ export default function CartDrawer() {
     }
   }, [user, dispatch, mergeGuestCart, refetch]);
 
-  // Guest add to cart example
-  // const handleAddToCart = (product) => {
-  //   if (!user) {
-  //     let guestCart = getGuestCart();
-  //     const existing = guestCart.find((i) => i.productId === product._id);
-  //     if (existing) existing.quantity += 1;
-  //     else guestCart.push({ productId: product._id, quantity: 1 });
-  //     setGuestCart(guestCart);
-  //     dispatch(setCart(guestCart));
-  //     return;
-  //   }
+  const increaseCart = (product) => {
+    console.log(product?.productId, "increase cart fucntin");
+    dispatch;
+    if (!user) {
+      let guestCart = getGuestCart() || [];
+      const existing = guestCart.find(
+        (i) => i.productId === product?.productId
+      );
 
-  //   // Logged-in user
-  //   addToCart({ productId: product._id });
-  // };
+      if (existing) {
+        // agar already hai to quantity badhao
+        if (existing.quantity <= existing?.stock) {
+          existing.quantity += 1;
+        } else {
+          return console.log("You reached max stock!");
+        }
+      } else {
+        // agar pehli baar add ho raha hai
+        guestCart.push({
+          productId: product?._id,
+          quantity: 1,
+          name: product?.name,
+          photo: product?.photo,
+          price: product?.price,
+          stock: product?.stock,
+        });
+      }
+
+      // update localStorage + redux state
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+    } else {
+      cartActions.handleIncrease({
+        productId: product?.productId?._id,
+      });
+    }
+  };
+
+  // decrease cart
+  const decreaseCart = (product) => {
+    if (!user) {
+      let guestCart = getGuestCart() || [];
+      const existing = guestCart.find(
+        (i) => i.productId === product?.productId
+      );
+
+      if (existing) {
+        if (existing.quantity > 1) {
+          existing.quantity -= 1;
+        } else {
+          // agar quantity 1 thi aur aur kam kiya to remove kar do
+          guestCart = guestCart.filter(
+            (i) => i.productId !== product?.productId
+          );
+        }
+      }
+
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+    } else {
+      cartActions.handleDecrease({ productId: product?.productId?._id });
+    }
+  };
+
+  // remove cart
+  const removeCart = (product) => {
+    if (!user) {
+      let guestCart = getGuestCart() || [];
+      const removeProduct = guestCart.filter(
+        (i) => i.productId !== product?.productId
+      );
+      setGuestCart(removeProduct);
+      dispatch(setCart(removeProduct));
+    } else {
+      cartActions.handleRemove({ productId: product?.productId?._id });
+    }
+  };
+
+  // clear all cart
+  const clearCartAll = () => {
+    if (!user) {
+      // Guest Cart ke liye
+      setGuestCart([]);
+      dispatch(setCart([]));
+    } else {
+      // Logged-in User Cart ke liye
+      cartActions.handleClear();
+    }
+  };
 
   // total amount
   const total = cart.reduce(
@@ -90,21 +175,11 @@ export default function CartDrawer() {
     0
   );
 
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     const userDet = localStorage.getItem("user");
-  //     if (userDet) {
-  //       try {
-  //         const parsed = JSON.parse(userDet); // agar object hai
-  //         setUserId(parsed?._id); // ya jo field chahiye
-  //       } catch (err) {
-  //         console.error("Invalid JSON in localStorage", err);
-  //       }
-  //     }
-  //   }
-  // }, []);
+  const guestTotal = cart.reduce(
+    (acc, item) => acc + item?.price * item.quantity,
+    0
+  );
 
-  // console.log(userId, "userId");
   console.log(cart, "cart data..");
   console.log(data, "only data..");
 
@@ -140,7 +215,10 @@ export default function CartDrawer() {
           {!cart.length <= 0 && (
             <p
               className="text-right pt-2   border-gray-200 px-4 text-xs cursor-pointer "
-              onClick={() => cartActions.handleClear()}
+              onClick={() => {
+                // cartActions.handleClear();
+                clearCartAll();
+              }}
             >
               Clear All
             </p>
@@ -149,23 +227,43 @@ export default function CartDrawer() {
 
         {/* Cart Items */}
 
-        <div className="overflow-y-auto h-full p-4">
-          {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center ">
-              <div className="w-[120px]">
-                <Image
-                  src={"/assets/empty-cart.webp"}
-                  width={500}
-                  height={500}
-                  alt="empty cart image"
-                />
-              </div>
-              <p className="text-gray-500">Your cart is empty</p>
+        <div className="overflow-y-auto h-screen hide-scrollbar p-4 relative">
+          {isCartLoading && (
+            <div className="absolute top-0 left-0 w-full h-full bg-black/40 backdrop-blur-[3px] z-50 flex justify-center items-baseline">
+              <LoaderComponent
+                status="Loading..."
+                size={20}
+                color={"white"}
+                className={"text-sm !bg-transparent "}
+                textClass={"!text-gray-200"}
+              />
             </div>
+          )}
+          {cart.length === 0 ? (
+            <>
+              <div className="h-full flex flex-col items-center justify-center ">
+                <div className="w-[120px]">
+                  <Image
+                    src={"/assets/empty-cart.webp"}
+                    width={500}
+                    height={500}
+                    alt="empty cart image"
+                  />
+                </div>
+                <p className="text-gray-500">Your cart is empty</p>
+              </div>
+            </>
           ) : (
             cart?.map((item) => {
               const prod = item?.productId;
-              console.log(item?.productId?._id, "single cart data.........");
+              console.log(
+                item,
+                "itemssssssssss........",
+                prod,
+                "prod...........",
+                cart,
+                "single cart data........."
+              );
 
               return (
                 <div className="relative" key={prod?._id}>
@@ -173,26 +271,27 @@ export default function CartDrawer() {
                     <Image
                       width={200}
                       height={200}
-                      src={prod?.photo || "/assets/tshirt-mockup.png"}
-                      alt={prod?.name}
+                      src={!user ? item?.photo : prod?.photo}
+                      alt={!user ? item?.name : prod?.name}
                       className="w-12 h-12 object-cover rounded"
                     />
                     <div className=" px-2">
                       <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2 max-sm:max-w-[160px]">
-                        {prod?.name}
+                        {!user ? item?.name : prod?.name}
                       </p>
                       <div className="flex  items-center gap-5">
                         <p className="text-gray-600 text-sm font-semibold">
-                          {formatePrice(prod?.price)}
+                          {formatePrice(!user ? item?.price : prod?.price)}
                         </p>
 
                         {/* Quantity Controls */}
                         <div className="flex h-[20px] items-center mt-1">
                           <button
                             onClick={() =>
-                              cartActions?.handleDecrease({
-                                productId: prod?._id,
-                              })
+                              // cartActions?.handleDecrease({
+                              //   productId: prod?._id,
+                              // })
+                              decreaseCart(item)
                             }
                             className="px-2 h-full text-sm bg-yellow-500 text-white rounded-tl-sm rounded-bl-sm cursor-pointer"
                           >
@@ -203,9 +302,10 @@ export default function CartDrawer() {
                           </span>
                           <button
                             onClick={() => {
-                              cartActions?.handleIncrease({
-                                productId: prod?._id,
-                              });
+                              // cartActions?.handleIncrease({
+                              //   productId: prod?._id,
+                              // });
+                              increaseCart(item);
                             }}
                             className="px-2 text-sm bg-yellow-500 text-white rounded-tr-sm rounded-br-sm  cursor-pointer"
                           >
@@ -217,7 +317,8 @@ export default function CartDrawer() {
                     <button
                       className="text-red-500 bg-gray-100 p-0.5 text-[10px] rounded-[2px] hover:underline absolute right-0 top-0 cursor-pointer"
                       onClick={() => {
-                        cartActions.handleRemove({ productId: prod?._id });
+                        // cartActions.handleRemove({ productId: prod?._id });
+                        removeCart(item);
                       }}
                     >
                       Remove
@@ -232,15 +333,14 @@ export default function CartDrawer() {
           {/* ✅ Total Price */}
           <div className="flex items-center justify-between font-semibold text-gray-800">
             <span>Total:</span>
-            <span>₹{total}</span>
+            <span>₹{!user ? guestTotal : total}</span>
           </div>
 
-          <button
-            className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 cursor-pointer transition"
-            onClick={() => alert("Checkout Coming Soon 🚀")}
-          >
-            Proceed to Checkout
-          </button>
+          <Link href={"/checkout"} onClick={() => dispatch(setCartOpen(false))}>
+            <div className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 cursor-pointer transition text-center">
+              Proceed to Checkout
+            </div>
+          </Link>
         </div>
 
         {/*Drawer Footer */}

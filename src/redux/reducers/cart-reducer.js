@@ -3,7 +3,7 @@ import { cartApi } from "../api/cartApi";
 
 const initialState = {
   items: [],
-  isLoading: false,
+  isLoading: true,
   cartOpen: false,
 };
 
@@ -18,6 +18,9 @@ const cartSlice = createSlice({
       state.cartOpen = action.payload;
     },
 
+    isloadingHandler: (state, action) => {
+      state.isLoading = action.payload;
+    },
     setCart: (state, action) => {
       state.items = action.payload;
     },
@@ -80,33 +83,38 @@ const cartSlice = createSlice({
         cartApi.endpoints.addToCart.matchFulfilled,
         (state, { payload }) => {
           state.items = payload.cart.items;
+          state.isLoading = false;
         }
       )
       .addMatcher(
         cartApi.endpoints.removeFromCart.matchFulfilled,
         (state, { payload }) => {
           state.items = payload.cart.items;
+          state.isLoading = false;
         }
       )
       .addMatcher(
         cartApi.endpoints.increaseCartItem.matchFulfilled,
         (state, { payload }) => {
           state.items = payload.cart.items;
+          state.isLoading = false;
         }
       )
       .addMatcher(
         cartApi.endpoints.decreaseCartItem.matchFulfilled,
         (state, { payload }) => {
           state.items = payload.cart.items;
+          state.isLoading = false;
         }
       )
       .addMatcher(cartApi.endpoints.clearCartItem.matchFulfilled, (state) => {
         state.items = [];
+        state.isLoading = false;
       });
   },
 });
 
-export const { toggleCart, setCartOpen, clearCart, setCart } =
+export const { toggleCart, setCartOpen, clearCart, setCart, isloadingHandler } =
   cartSlice.actions;
 
 export default cartSlice.reducer;

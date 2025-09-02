@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Cart from "./Cart";
 import { motion } from "framer-motion";
 import AOS from "aos";
@@ -17,14 +17,24 @@ const Categories = ({
   hrefLink,
   category,
   relatedCarousel,
+  productId,
 }) => {
+  const [filterData, setFilterData] = useState(null);
   const { data } = useGetRelatedProductQuery({
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
     userQuery: category,
     filterQuery: "category",
   });
+  console.log(productId, "single product id....");
 
   const products = data?.products || [];
+
+  useEffect(() => {
+    if (relatedCarousel && products?.length) {
+      const filterdata = products.filter((item) => item?._id !== productId);
+      setFilterData(filterdata);
+    }
+  }, [relatedCarousel, products, productId]);
 
   // console.log(products, category, ".............................");
 
@@ -102,7 +112,7 @@ const Categories = ({
           className="w-full overflow-x-auto pb-6 scrollbar-hide"
         >
           <div className="flex gap-6 min-w-max">
-            {products?.map((product, idx) => {
+            {(relatedCarousel ? filterData : products)?.map((product, idx) => {
               return (
                 <motion.div
                   key={product?.id ?? idx}
