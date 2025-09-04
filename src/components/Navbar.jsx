@@ -26,6 +26,8 @@ export default function Navbar() {
   // const {} = userAPI();
   const dispatch = useDispatch();
   const { items: cart, cartOpen } = useSelector((state) => state.cart);
+  // const toggleMenu = useSelector((state) => state.menu.toggleMenu);
+
   // const isOpen = useSelector((state) => state.menu.isOpen);
   const auth = useSelector((state) => state.auth) || { user: null };
   const { user } = auth;
@@ -181,20 +183,25 @@ export default function Navbar() {
         {/* Right Side (Mobile Only) */}
         <div className="md:hidden flex items-center space-x-4">
           {/* Cart Icon */}
-          <div
-            // onClick={() => setCartOpen(true)}
-            className="relative p-2 rounded-full hover:bg-gray-100"
-          >
-            <ShoppingCart className="w-6 h-6 text-gray-700" />
-            {/* {cart.length > 0 && (
+          {path !== "/checkout" && (
+            <div
+              onClick={() => dispatch(toggleCart())}
+              // href={"/cart"}
+              className="relative p-2 rounded-full cursor-pointer hover:bg-gray-100"
+            >
+              <ShoppingCart className="w-5 text-gray-700" />
+              {/* {cart.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                 {cart.length}
               </span>
             )} */}
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-              5
-            </span>
-          </div>
+              {cart.length > 0 && (
+                <span className="absolute top-0.5 -right-1 bg-red-500 text-white text-xs px-1 py-0 rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Auth Mobile */}
           {/* <ClientWrapper>

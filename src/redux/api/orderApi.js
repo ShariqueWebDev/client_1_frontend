@@ -19,6 +19,28 @@ export const orderApi = createApi({
   }),
   tagTypes: ["Order", "AdminOrders"],
   endpoints: (builder) => ({
+    // Create backend Razorpay order
+    createRazorpayOrder: builder.mutation({
+      query: (amount) => ({
+        url: `/razorpay/order`, // ../payment kyunki baseUrl /order pe set hai
+        method: "POST",
+        body: { amount },
+        headers: {
+          "Content-Type": "application/json", // Ensure Content-Type is set
+        },
+      }),
+    }),
+
+    // Verify Razorpay payment
+    verifyRazorpayPayment: builder.mutation({
+      query: (payload) => ({
+        url: `/razorpay/verify`,
+        method: "POST",
+        body: payload,
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
     createOrder: builder.mutation({
       query: (payload) => ({
         url: "/new-order",
@@ -36,13 +58,12 @@ export const orderApi = createApi({
     }),
 
     getSingleOrder: builder.query({
-      query: ({ orderId, isAdmin }) =>
-        `/single-order/${orderId}?_id=${isAdmin}`,
+      query: ({ orderId }) => `/single-order/${orderId}`,
     }),
     processOrder: builder.mutation({
       query: ({ orderId, isAdmin }) => ({
         url: `/process/${orderId}?_id=${isAdmin}`,
-        method: "GET", // backend me GET hai, even then mutation use karo
+        method: "PUT", // backend me GET hai, even then mutation use karo
       }),
       invalidatesTags: ["Orders"], // table refetch ho jaaye status update ke baad
     }),
@@ -51,6 +72,11 @@ export const orderApi = createApi({
       query: ({ orderId, isAdmin }) => ({
         url: `delete/${orderId}?_id=${isAdmin}`,
         method: "DELETE",
+      }),
+    }),
+    getUserOrder: builder.query({
+      query: () => ({
+        url: `/user-order`,
       }),
     }),
   }),
@@ -62,4 +88,7 @@ export const {
   useGetSingleOrderQuery,
   useProcessOrderMutation,
   useDeleteOrderMutation,
+  useGetUserOrderQuery,
+  useCreateRazorpayOrderMutation,
+  useVerifyRazorpayPaymentMutation,
 } = orderApi;

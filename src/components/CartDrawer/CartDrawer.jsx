@@ -180,8 +180,8 @@ export default function CartDrawer() {
     0
   );
 
-  console.log(cart, "cart data..");
-  console.log(data, "only data..");
+  // console.log(cart, "cart data..");
+  // console.log(data, "only data..");
 
   return (
     <div
@@ -256,14 +256,14 @@ export default function CartDrawer() {
           ) : (
             cart?.map((item) => {
               const prod = item?.productId;
-              console.log(
-                item,
-                "itemssssssssss........",
-                prod,
-                "prod...........",
-                cart,
-                "single cart data........."
-              );
+              // console.log(
+              //   item,
+              //   "itemssssssssss........",
+              //   prod,
+              //   "prod...........",
+              //   cart,
+              //   "single cart data........."
+              // );
 
               return (
                 <div className="relative" key={prod?._id}>

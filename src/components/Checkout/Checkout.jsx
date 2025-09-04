@@ -1,26 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useGetCartQuery } from "../../redux/api/cartApi";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { formatePrice } from "../../utils/features";
-import { AiOutlineDelete } from "react-icons/ai";
-
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { useCreateOrderMutation } from "../../redux/api/orderApi";
-import axios from "axios";
-
-import LoaderComponent from "../LoaderComponent/LoaderComponent";
-import LoginWithCheckout from "../Checkout/LoginWithCheckout";
-import Image from "next/image";
-
-// import {clearCart} from "../../redux/reducers/cart-reducer"
+import {
+  useCreateOrderMutation,
+  useCreateRazorpayOrderMutation,
+  useVerifyRazorpayPaymentMutation,
+} from "../../redux/api/orderApi";
 import { cartActions } from "../../redux/actions/cart-actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { productApi } from "../../redux/api/productApi";
+import { X } from "lucide-react";
+import LoaderComponent from "../LoaderComponent/LoaderComponent";
+import LoginWithCheckout from "../Checkout/LoginWithCheckout";
+import Image from "next/image";
 
 // Zod schema
 const orderSchema = z.object({
@@ -38,244 +36,296 @@ const Checkout = () => {
   const { data, isSuccess } = useGetCartQuery(undefined, { skip: !user });
   const router = useRouter();
 
-  //  for order creation
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(orderSchema),
+  });
+
+  const [cartMobile, setCartMobile] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("Razorpay");
+
+  // Order creation mutations
   const [createOrder, { isLoading: orderLoading, isSuccess: orderSucceed }] =
     useCreateOrderMutation();
+  const [createRazorpayOrder] = useCreateRazorpayOrderMutation();
+  const [verifyRazorpayPayment] = useVerifyRazorpayPaymentMutation();
 
   const isCartLoading = isLoading || (user && !isSuccess);
 
-  //  total calculate
+  // Total calculation
   const total = cart.reduce(
     (acc, item) =>
       acc + (user ? item?.productId?.price : item?.price) * item.quantity,
     0
   );
 
-  const [paymentMethod, setPaymentMethod] = useState("Razorpay"); // default cash on delivery
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
 
-  //  React Hook Form
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    resetField,
-  } = useForm({
-    resolver: zodResolver(orderSchema),
-  });
+    // Cleanup to remove script on unmount
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
-  // onSubmit
+  // Handle order success
+  useEffect(() => {
+    if (orderSucceed) {
+      cartActions.handleClear();
+      router.replace("/my-orders");
+    }
+  }, [orderSucceed, router]);
+
+  // Form submission
   const onSubmit = async (formData) => {
+    if (!cart.length) {
+      toast.error("Cart is empty");
+      return;
+    }
+
+    if (isNaN(total) || total <= 0) {
+      toast.error("Invalid cart total");
+      return;
+    }
+
     try {
-      //  payment info prepare
-      let paymentInfo = {
-        id: "",
-        status: paymentMethod === "COD" ? "Pending" : "Paid",
-        method: paymentMethod === "COD" ? "Cash On Delivery" : "Razorpay",
-      };
+      if (paymentMethod === "COD") {
+        await createOrder({
+          shippingInfo: formData,
+          orderItems: cart,
+          subtotal: total,
+          tax: 0,
+          shippingCharges: 1,
+          discount: 0,
+          total: total + 1,
+          paymentInfo: {
+            id: "COD_" + Date.now(),
+            status: "Pending",
+            method: "Cash On Delivery",
+          },
+        }).unwrap();
 
-      if (paymentMethod === "Razorpay") {
-        paymentInfo.id = "pay_" + new Date().getTime();
+        toast.success("Order placed with COD!");
+        return;
       }
 
-      //  order items prepare
-      const orderItems = cart.map((item) => ({
-        productId: item?.productId?._id,
-        name: item?.productId?.name,
-        price: item?.productId?.price,
-        quantity: item.quantity,
-        photo: item?.productId?.photo,
-      }));
+      // Razorpay flow
+      console.log("Sending amount to Razorpay:", total + 1); // Debug
+      const response = await createRazorpayOrder(total + 1).unwrap();
+      console.log("Razorpay full response:", response); // Debug
+      const razorpayData = response.data; // Extract data property
 
-      //  payload
-      const payload = {
-        shippingInfo: formData,
-        orderItems,
-        user: user?._id || null,
-        subtotal: total,
-        tax: 0,
-        shippingCharges: 50,
-        discount: 0,
-        total: total + 50,
-        paymentInfo,
+      if (!razorpayData || !razorpayData.id || !razorpayData.amount) {
+        toast.error("Failed to create Razorpay order");
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+        amount: razorpayData.amount,
+        currency: "INR",
+        name: "Refilly",
+        description: "Order Payment",
+        order_id: razorpayData.id,
+        handler: async (response) => {
+          try {
+            await verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              orderData: {
+                shippingInfo: formData,
+                orderItems: cart,
+                subtotal: total,
+                tax: 0,
+                shippingCharges: 1,
+                discount: 0,
+                total: total + 1,
+              },
+            }).unwrap();
+
+            toast.success("Payment successful!");
+            cartActions.handleClear();
+            router.replace("/my-orders");
+          } catch (err) {
+            toast.error("Payment verification failed");
+            console.error("Verification error:", err);
+          }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: formData.phoneNo,
+        },
+        theme: { color: "#F37254" },
       };
 
-      // ✅ RTK Query call
-      const res = await createOrder(payload).unwrap();
-      if (res) {
-        toast.success(res.message || "Order placed successfully!");
-      }
-      resetField();
+      const rzp1 = new window.Razorpay(options);
+      rzp1.open();
     } catch (err) {
-      toast.error(err?.data?.message || err.error || "Order failed");
+      toast.error("Payment failed");
+      console.error("Razorpay order creation error:", err);
     }
   };
 
-  useEffect(() => {
-    // 2️⃣ Order successful
-    if (orderSucceed) {
-      cartActions.handleClear(); // cart clear kar do
-    }
-  }, [cart, isCartLoading, orderSucceed]);
+  // Conditional rendering after Hooks
+  if (isCartLoading) {
+    return <LoaderComponent status="Loading cart..." />;
+  }
 
-  useEffect(() => {
-    // 2️⃣ Order successful
-    if (orderSucceed) {
-      router.replace("/my-orders");
-    }
-  }, [orderSucceed]);
-
-  //   if (!isCartLoading && cart.length === 0) {
-  //     return <LoaderComponent status="Checkout Loading..." />;
-  //   }
+  if (!user) {
+    return <LoginWithCheckout />;
+  }
 
   return (
-    <div className="flex lg:flex-row flex-col ">
+    <div className="flex lg:flex-row flex-col min-h-screen">
       {/* Left Side Form */}
-      <div className="lg:w-[55%] w-full lg:p-24 p-4">
-        {!user ? (
-          <LoginWithCheckout />
-        ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="flex  items-center gap-1">
-              <Image
-                src={"/logo/refilly.webp"}
-                width={40}
-                height={200}
-                alt="Refilly"
+      <div className="lg:w-[55%] w-full max-sm:px-3 px-20 py-10">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="flex items-center gap-1 max-sm:hidden">
+            <Image
+              src={"/logo/refilly.webp"}
+              width={40}
+              height={200}
+              alt="Refilly"
+            />
+            <p className="text-2xl font-semibold text-gray-700">Refilly</p>
+          </div>
+          <h2 className="text-lg font-semibold mb-4">Shipping Information</h2>
+
+          <input
+            disabled={cart.length === 0}
+            {...register("address")}
+            placeholder="Full Address"
+            className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+          />
+          {errors.address && (
+            <p className="text-red-500 -mt-2 text-sm">
+              {errors.address.message}
+            </p>
+          )}
+
+          <div className="flex lg:flex-row flex-col gap-3 items-center">
+            <div className="w-full">
+              <input
+                disabled={cart.length === 0}
+                {...register("city")}
+                placeholder="City"
+                className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
               />
-              <p className="text-2xl font-semibold text-gray-700">Refilly</p>
-            </div>
-            <h2 className="text-lg font-semibold mb-4">Shipping Information</h2>
-
-            <input
-              disabled={cart.length === 0}
-              {...register("address")}
-              placeholder="Full Address"
-              className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
-            />
-            {errors.address && (
-              <p className="text-red-500 -mt-2 text-sm">
-                {errors.address.message}
-              </p>
-            )}
-
-            <div className="flex lg:flex-row flex-col gap-3 items-center ">
-              <div className="w-full">
-                <input
-                  disabled={cart.length === 0}
-                  {...register("city")}
-                  placeholder="City"
-                  className="border p-2 w-full rounded  border-gray-300 focus:outline-none text-sm"
-                />
-                {errors.city && (
-                  <p className="text-red-500 mt-2 text-sm">
-                    {errors.city.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="w-full">
-                <input
-                  disabled={cart.length === 0}
-                  {...register("state")}
-                  placeholder="State"
-                  className="border p-2 w-full rounded  border-gray-300 focus:outline-none text-sm"
-                />
-                {errors.state && (
-                  <p className="text-red-500 mt-2 text-sm">
-                    {errors.state.message}
-                  </p>
-                )}
-              </div>
+              {errors.city && (
+                <p className="text-red-500 mt-2 text-sm">
+                  {errors.city.message}
+                </p>
+              )}
             </div>
 
-            <div className="flex lg:flex-row flex-col gap-3 items-center">
-              <div className="w-full">
-                <input
-                  disabled={cart.length === 0}
-                  {...register("country")}
-                  placeholder="Country"
-                  className="border p-2 w-full rounded  border-gray-300 focus:outline-none text-sm"
-                />
-                {errors.country && (
-                  <p className="text-red-500 mt-2 text-sm">
-                    {errors.country.message}
-                  </p>
-                )}
-              </div>
-              <div className="w-full">
-                <input
-                  disabled={cart.length === 0}
-                  {...register("pinCode")}
-                  placeholder="Pin Code"
-                  className="border p-2 w-full rounded  border-gray-300 focus:outline-none text-sm"
-                />
-                {errors.pinCode && (
-                  <p className="text-red-500 mt-2 text-sm">
-                    {errors.pinCode.message}
-                  </p>
-                )}
-              </div>
+            <div className="w-full">
+              <input
+                disabled={cart.length === 0}
+                {...register("state")}
+                placeholder="State"
+                className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+              />
+              {errors.state && (
+                <p className="text-red-500 mt-2 text-sm">
+                  {errors.state.message}
+                </p>
+              )}
             </div>
-            <input
-              disabled={cart.length === 0}
-              {...register("phoneNo")}
-              placeholder="Phone Number"
-              className="border p-2 w-full rounded  border-gray-300 focus:outline-none text-sm"
-            />
-            {errors.phoneNo && (
-              <p className="text-red-500 -mt-2 text-sm">
-                {errors.phoneNo.message}
-              </p>
-            )}
+          </div>
 
-            {/*  Payment Method */}
-            <div className="flex gap-4 mt-4 mb-6 lg:text-sm text-xs">
-              <div className="flex gap-1.5 items-center">
-                <input
-                  disabled={cart.length === 0}
-                  type="radio"
-                  value="COD"
-                  checked={paymentMethod === "COD"}
-                  onChange={() => setPaymentMethod("COD")}
-                />
-                <label>Cash on Delivery</label>
-              </div>
-              <div className="flex gap-1.5 items-center">
-                <input
-                  disabled={cart.length === 0}
-                  type="radio"
-                  value="Razorpay"
-                  checked={paymentMethod === "Razorpay"}
-                  onChange={() => setPaymentMethod("Razorpay")}
-                />
-                <label>Razorpay</label>
-              </div>
+          <div className="flex lg:flex-row flex-col gap-3 items-center">
+            <div className="w-full">
+              <input
+                disabled={cart.length === 0}
+                {...register("country")}
+                placeholder="Country"
+                className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+              />
+              {errors.country && (
+                <p className="text-red-500 mt-2 text-sm">
+                  {errors.country.message}
+                </p>
+              )}
             </div>
+            <div className="w-full">
+              <input
+                disabled={cart.length === 0}
+                {...register("pinCode")}
+                placeholder="Pin Code"
+                className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+              />
+              {errors.pinCode && (
+                <p className="text-red-500 mt-2 text-sm">
+                  {errors.pinCode.message}
+                </p>
+              )}
+            </div>
+          </div>
+          <input
+            disabled={cart.length === 0}
+            {...register("phoneNo")}
+            placeholder="Phone Number"
+            className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+          />
+          {errors.phoneNo && (
+            <p className="text-red-500 -mt-2 text-sm">
+              {errors.phoneNo.message}
+            </p>
+          )}
 
-            {/* <Link href={"/my-orders"} className=""> */}
-            <button
-              disabled={cart.length === 0}
-              type="submit"
-              className={` ${
-                cart.length === 0
-                  ? "cursor-not-allowed"
-                  : "cursor-pointer hover:bg-yellow-600 "
-              } bg-yellow-500 text-white py-1.5 px-3 text-sm rounded `}
-            >
-              Place Order
-            </button>
-            {/* </Link> */}
-          </form>
-        )}
+          {/* Payment Method */}
+          <div className="flex gap-4 mt-4 mb-6 lg:text-sm text-xs">
+            <div className="flex gap-1.5 items-center">
+              <input
+                disabled={cart.length === 0}
+                type="radio"
+                value="COD"
+                checked={paymentMethod === "COD"}
+                onChange={() => setPaymentMethod("COD")}
+              />
+              <label>Cash on Delivery</label>
+            </div>
+            <div className="flex gap-1.5 items-center">
+              <input
+                disabled={cart.length === 0}
+                type="radio"
+                value="Razorpay"
+                checked={paymentMethod === "Razorpay"}
+                onChange={() => setPaymentMethod("Razorpay")}
+              />
+              <label>Razorpay</label>
+            </div>
+          </div>
+
+          <button
+            disabled={cart.length === 0}
+            type="submit"
+            className={`${
+              cart.length === 0
+                ? "cursor-not-allowed"
+                : "cursor-pointer hover:bg-yellow-600"
+            } bg-yellow-500 text-white py-1.5 px-3 text-sm rounded`}
+          >
+            Place Order
+          </button>
+        </form>
       </div>
 
       {/* Right Side Cart Summary */}
-      <div className="lg:w-[45%] w-full lg:px-5">
+      <div className={`lg:w-[45%] max-sm:hidden w-full lg:px-5`}>
         <div className="overflow-y-auto h-screen hide-scrollbar p-4 w relative">
-          {isCartLoading && <LoaderComponent status="Loading..." />}
           {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center ">
+            <div className="h-full flex flex-col items-center justify-center">
               <div className="w-[120px]">
                 <Image
                   src={"/assets/empty-cart.webp"}
@@ -324,6 +374,96 @@ const Checkout = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile Cart Popup */}
+      <div
+        className={`fixed bottom-0 bg-white w-full z-10 transform transition-transform duration-300 ${
+          cartMobile ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        {/* Close Button */}
+        <div className="absolute top-0 z-10 flex justify-between items-center px-4 pb-3 pt-4 bg-white border-b border-gray-300 cursor-pointer w-full">
+          <div className="flex items-center gap-1">
+            <Image
+              src={"/logo/refilly.webp"}
+              width={40}
+              height={200}
+              alt="Refilly"
+            />
+            <p className="text-2xl font-semibold text-gray-700">Refilly</p>
+          </div>
+          <div onClick={() => setCartMobile(false)}>
+            <X size={17} />
+          </div>
+        </div>
+
+        {/* Cart Content */}
+        <div className="overflow-y-auto h-screen hide-scrollbar p-4 pt-24 pb-14 relative">
+          {cart.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center">
+              <div className="w-[120px]">
+                <Image
+                  src={"/assets/empty-cart.webp"}
+                  width={500}
+                  height={500}
+                  alt="empty cart image"
+                />
+              </div>
+              <p className="text-gray-500 text-sm">Your cart is empty</p>
+            </div>
+          ) : (
+            cart.map((item) => {
+              const prod = user ? item?.productId : item;
+              return (
+                <div className="relative" key={prod?._id}>
+                  <div className="flex items-center gap-3 border-b border-b-gray-200 pb-2">
+                    <Image
+                      width={200}
+                      height={200}
+                      src={prod?.photo}
+                      alt={prod?.name}
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                    <div className="px-2">
+                      <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2">
+                        {prod?.name}
+                      </p>
+                      <div className="flex items-center gap-5">
+                        <p className="text-gray-600 text-sm font-semibold">
+                          {formatePrice(prod?.price)}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Quantity: {item?.quantity}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div className="p-4 sticky -bottom-4 bg-white">
+            <div className="flex items-center justify-between font-semibold text-gray-800">
+              <span>Total:</span>
+              <span>₹{total}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toggle Button */}
+      <div
+        className="fixed gap-2 md:hidden bottom-0 z-20 flex justify-center items-center w-full py-3 border bg-white border-t border-gray-300 rounded-tl-xl rounded-tr-xl cursor-pointer"
+        onClick={() => setCartMobile(!cartMobile)}
+      >
+        <Image
+          src={"/assets/order-summary.png"}
+          width={22}
+          height={22}
+          alt="order summary"
+        />
+        <p className="text-sm">Order summary</p>
       </div>
     </div>
   );

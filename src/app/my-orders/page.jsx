@@ -1,9 +1,15 @@
 import React from "react";
+import MyOrder from "../../components/MyOrder/MyOrder";
+import ProtectedRoute from "../../components/ProtectedRoutes/ProtectedRoutes";
 
-const MyOrders = () => {
+const MyOrdersPage = () => {
   return (
-    <div className="h-[500px] flex justify-center items-center"> My Orders</div>
+    <div className="">
+      <ProtectedRoute authRequired={true}>
+        <MyOrder />
+      </ProtectedRoute>
+    </div>
   );
 };
 
-export default MyOrders;
+export default MyOrdersPage;

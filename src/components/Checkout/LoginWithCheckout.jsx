@@ -103,8 +103,8 @@ export default function LoginRegisterPage() {
       const res = await loginUser(data).unwrap();
       dispatch(setCredentials(res));
       toast.success("Login success");
-      // window.location.reload();
-      router.refresh();
+      window.location.reload();
+      // router.refresh();
     } catch (err) {
       toast.error(err?.data?.message || "Login failed");
     }
