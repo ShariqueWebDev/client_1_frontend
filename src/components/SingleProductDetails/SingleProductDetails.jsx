@@ -37,12 +37,12 @@ const ProductDetailsPage = ({ slug }) => {
   }, []);
 
   const handleAddToCart = (product) => {
-    console.log(product, "add to cart.......");
+    // console.log(product, "add to cart.......");
 
     if (!user) {
       let guestCart = getGuestCart();
       const existing = guestCart.find((i) => i.productId === product?._id);
-      console.log(guestCart, "existing product....");
+      // console.log(guestCart, "existing product....");
 
       if (existing) existing.quantity += 1;
       else

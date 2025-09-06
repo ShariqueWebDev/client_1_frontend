@@ -32,7 +32,7 @@ const AddBannerModal = ({ btnLable, table }) => {
     resolver: zodResolver(bannerSchema), // ✅ fixed
   });
 
-  console.log(process.env.NEXT_PUBLIC_ADMIN_ID, "admin id............");
+  // console.log(process.env.NEXT_PUBLIC_ADMIN_ID, "admin id............");
 
   const onSubmit = async (data) => {
     try {

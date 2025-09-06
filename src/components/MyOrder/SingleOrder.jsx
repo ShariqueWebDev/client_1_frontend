@@ -29,7 +29,7 @@ export default function MyOrder() {
       console.log("logout failed");
     }
   };
-  console.log(data?.single_order, slug, "single order data......");
+  // console.log(data?.single_order, slug, "single order data......");
 
   const steps = [
     "Pending",
@@ -147,18 +147,18 @@ export default function MyOrder() {
                 <Image
                   width={500}
                   height={500}
-                  src={order?.photo}
+                  src={order?.productId?.photo}
                   alt={order?.name}
                   className="w-32 h-36 object-cover rounded"
                 />
                 <div className="px-2">
-                  <p className="font-medium text-xs lg:text-sm mb-1 max-w-[200px] line-clamp-2">
-                    {order?.name}
+                  <p className="font-medium text-xs lg:text-lg mb-1 max-w-[250px] line-clamp-2">
+                    {order?.productId?.name}
                   </p>
                   <p className="text-gray-400 lg:text-sm text-xs mt-1 mb-1">
                     Price:{" "}
                     <span className="text-gray-700">
-                      {formatePrice(order?.price)}
+                      {formatePrice(order?.productId?.price)}
                     </span>
                   </p>
                   <div className="flex items-center gap-5">

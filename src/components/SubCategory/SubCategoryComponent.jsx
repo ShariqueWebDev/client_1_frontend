@@ -115,7 +115,7 @@ const SubCategoryComponent = ({ slug }) => {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:px-10 px-3">
                 {data?.products?.map((product) => (
-                  <Link href={`/products/${product._id}`}>
+                  <Link href={`/products/${product._id}`} key={product?._id}>
                     <Cart
                       key={product._id}
                       product={product}

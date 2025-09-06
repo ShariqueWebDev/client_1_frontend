@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const userAPI = createApi({
   reducerPath: "userAPI",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:4000/api/v1/auth", // apna backend base url
+    baseUrl: `${process.env.NEXT_PUBLIC_SERVER}/api/v1/auth`, // apna backend base url
     credentials: "include", // cookie allow karne ke liye
   }),
   tagTypes: ["Statics"], // yahi tag same hona chahiye

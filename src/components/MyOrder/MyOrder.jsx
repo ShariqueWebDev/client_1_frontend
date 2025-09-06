@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
 import { useGetUserOrderQuery } from "../../redux/api/orderApi";
 import { useLogoutUserMutation } from "../../redux/api/userApi";
 import Image from "next/image";
+import dayjs from "dayjs";
 import { logout } from "../../redux/reducers/auth-reducers";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
@@ -26,7 +26,7 @@ export default function MyOrder() {
       console.log("logout failed");
     }
   };
-  // console.log(data, user, "user order data......");
+  // console.log(data, "user order data......");
 
   return (
     <div className="lg:px-20 px-4 flex lg:flex-row flex-col lg:gap-10 my-10 min-h-screen">
@@ -48,41 +48,53 @@ export default function MyOrder() {
 
       <div className="lg:w-[70%] w-full max-sm:mt-10">
         {data?.orders?.map((item) => {
+          // console.log(data?.orders, "parent order data.......");
+
           return (
             <Link href={`/single-order/${item?._id}`} key={item?._id}>
               <div key={item?._id} className=" ">
                 <div className="mb-3">
-                  Ordered on: {new Date(item?.createdAt).toLocaleString()}
+                  Ordered on:{" "}
+                  {dayjs(item?.createdAt).format("YYYY-MM-DD HH:mm")}
                 </div>
-                {item?.orderItems?.map((order, index) => (
-                  <div className="relative " key={index}>
-                    {/* <Link href={`/single-order/1`}> */}
-                    <div className="flex items-center gap-3 mb-4 border-b border-b-gray-200 pb-2">
-                      <Image
-                        width={300}
-                        height={300}
-                        src={order?.photo}
-                        alt={order?.name}
-                        className="w-20 h-20 object-cover rounded"
-                      />
-                      <div className="px-2">
-                        <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2">
-                          {order?.name}
-                        </p>
-                        <div className="flex items-center gap-5">
-                          <p className="text-gray-400 text-xs">
-                            Quantity: {order?.quantity}
+                {item?.orderItems?.map?.((order, index) => {
+                  console.log(order?.photo, "order item........");
+
+                  return (
+                    <div className="relative " key={index}>
+                      {/* <Link href={`/single-order/1`}> */}
+                      <div className="flex items-center gap-3 mb-4 border-b border-b-gray-200 pb-2">
+                        <Image
+                          width={300}
+                          height={300}
+                          src={
+                            order?.productId?.photo ||
+                            "/assets/tshirt-mockup.png"
+                          } // fallback image
+                          alt={order?.productId?.name || "Product Image"} // fallback alt text
+                          className="w-20 h-20 object-cover rounded"
+                        />
+                        <div className="px-2">
+                          <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2">
+                            {order?.productId?.name}
+                          </p>
+                          <div className="flex items-center gap-5">
+                            <p className="text-gray-400 text-xs">
+                              Quantity: {order?.quantity}
+                            </p>
+                          </div>
+                          <p className="text-gray-400 text-xs mt-1">
+                            Status:{" "}
+                            <span className="text-gray-700">
+                              {item?.status}
+                            </span>
                           </p>
                         </div>
-                        <p className="text-gray-400 text-xs mt-1">
-                          Status:{" "}
-                          <span className="text-gray-700">{item?.status}</span>
-                        </p>
                       </div>
+                      {/* </Link> */}
                     </div>
-                    {/* </Link> */}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Link>
           );

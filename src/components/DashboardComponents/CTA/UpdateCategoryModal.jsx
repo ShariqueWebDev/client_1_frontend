@@ -39,7 +39,7 @@ export default function UpdateCategoryForm({ product, onClose }) {
       if (data?.photo && data?.photo?.[0]) {
         formData.append("photo", data?.photo[0]); // only if new file
       }
-      console.log([...formData.entries()], "Form Data entries");
+      // console.log([...formData.entries()], "Form Data entries");
 
       await updateCategory({
         id: product?._id,

@@ -30,7 +30,7 @@ const MobileAdminSidebar = () => {
     }
   };
 
-  console.log(isOpenSidebar, "sidebar status");
+  // console.log(isOpenSidebar, "sidebar status");
 
   return (
     <div className="block lg:hidden ">

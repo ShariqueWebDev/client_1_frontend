@@ -121,15 +121,15 @@ export default function BannerTable() {
             </thead>
             <tbody>
               {banners?.map((p) => (
-                <tr key={p._id} className="hover:bg-gray-50">
+                <tr key={p?._id} className="hover:bg-gray-50">
                   <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                    {p.name}
+                    {p?.name}
                   </td>
                   {/* <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
                     {p.isActive === true ? "Active" : "Deactive"}
                   </td> */}
                   <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
-                    {p.priority}
+                    {p?.priority}
                   </td>
                   <td className="px-2 py-2 border border-gray-300">
                     <div className="flex items-center gap-2 ">

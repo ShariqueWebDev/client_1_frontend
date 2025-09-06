@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const staticApi = createApi({
   reducerPath: "staticAPI",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:4000/api/v1/dashboard",
+    baseUrl: `${process.env.NEXT_PUBLIC_SERVER}/api/v1/dashboard`,
     credentials: "include",
   }),
   tagTypes: ["Statics"], // add tags

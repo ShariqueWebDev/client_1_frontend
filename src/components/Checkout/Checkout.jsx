@@ -63,6 +63,8 @@ const Checkout = () => {
     0
   );
 
+  // console.log(cart, "cart data..");
+
   // Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
@@ -96,8 +98,8 @@ const Checkout = () => {
       return;
     }
 
-    try {
-      if (paymentMethod === "COD") {
+    if (paymentMethod === "COD") {
+      try {
         await createOrder({
           shippingInfo: formData,
           orderItems: cart,
@@ -111,19 +113,25 @@ const Checkout = () => {
             status: "Pending",
             method: "Cash On Delivery",
           },
+          user: user?._id,
         }).unwrap();
 
         toast.success("Order placed with COD!");
-        return;
+        cartActions.handleClear();
+        router.replace("/my-orders");
+      } catch (err) {
+        toast.error("COD order failed");
+        console.error("COD order error:", err);
       }
+      return; // ✅ ensure Razorpay block never runs
+    }
 
-      // Razorpay flow
-      console.log("Sending amount to Razorpay:", total + 1); // Debug
+    // ✅ Razorpay flow
+    try {
       const response = await createRazorpayOrder(total + 1).unwrap();
-      console.log("Razorpay full response:", response); // Debug
-      const razorpayData = response.data; // Extract data property
+      const razorpayData = response.data;
 
-      if (!razorpayData || !razorpayData.id || !razorpayData.amount) {
+      if (!razorpayData?.id || !razorpayData?.amount) {
         toast.error("Failed to create Razorpay order");
         return;
       }

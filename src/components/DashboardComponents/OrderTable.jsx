@@ -84,6 +84,7 @@ export default function AdminOrderTable() {
 
   const orders = data?.all_Orders || [];
   const totalPages = data?.totalPages || 1;
+  // console.log(orders, "order list");
 
   return (
     <div className="px-6 w-full mb-5">
@@ -176,7 +177,9 @@ export default function AdminOrderTable() {
                 orders.map((p) => (
                   <tr key={p._id} className="hover:bg-gray-50">
                     <td className="px-2 py-2 border border-gray-300">
-                      {p.orderItems?.map((pro) => pro?.name).join(", ")}
+                      {p.orderItems
+                        ?.map((pro) => pro?.productId?.name)
+                        .join(", ")}
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       {p._id}

@@ -3,7 +3,7 @@ import SingleProductDetials from "../../../components/SingleProductDetails/Singl
 
 const SingleProductDetailsPage = async ({ params }) => {
   const { slug } = await params;
-  console.log(slug, "params.................");
+  // console.log(slug, "params.................");
 
   return (
     <div>

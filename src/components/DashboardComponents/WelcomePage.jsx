@@ -13,7 +13,7 @@ const WelcomePage = () => {
   const { data, error, isLoading } = useGetStaticQuery();
 
   const overviewCounts = data?.stats?.counts;
-  console.log(data?.stats, "Welcome comp data.......");
+  // console.log(data?.stats, "Welcome comp data.......");
 
   if (isLoading)
     return <LoaderComponent status="Fetching Overview Business..." />;

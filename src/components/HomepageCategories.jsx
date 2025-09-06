@@ -7,7 +7,7 @@ const HomepageCategories = () => {
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID,
   });
 
-  console.log(data, "categories data for home cat");
+  // console.log(data, "categories data for home cat");
 
   return (
     <div>

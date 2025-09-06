@@ -36,7 +36,7 @@ export default function UpdateBannerForm({ product, onClose }) {
   });
 
   const onSubmit = async (data) => {
-    console.log(data, "submit Data");
+    // console.log(data, "submit Data");
     try {
       const formData = new FormData();
       formData.append("name", data?.name);
@@ -45,7 +45,7 @@ export default function UpdateBannerForm({ product, onClose }) {
       if (data?.photo && data?.photo?.[0]) {
         formData.append("photo", data?.photo[0]); // ✅ only if new file
       }
-      console.log([...formData.entries()], "Form Data entries");
+      // console.log([...formData.entries()], "Form Data entries");
 
       await updateProduct({
         id: product?._id,

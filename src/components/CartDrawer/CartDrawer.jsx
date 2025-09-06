@@ -80,7 +80,7 @@ export default function CartDrawer() {
   }, [user, dispatch, mergeGuestCart, refetch]);
 
   const increaseCart = (product) => {
-    console.log(product?.productId, "increase cart fucntin");
+    // console.log(product?.productId, "increase cart fucntin");
     dispatch;
     if (!user) {
       let guestCart = getGuestCart() || [];
@@ -256,25 +256,29 @@ export default function CartDrawer() {
           ) : (
             cart?.map((item) => {
               const prod = item?.productId;
-              // console.log(
-              //   item,
-              //   "itemssssssssss........",
-              //   prod,
-              //   "prod...........",
-              //   cart,
-              //   "single cart data........."
-              // );
 
               return (
-                <div className="relative" key={prod?._id}>
+                <div
+                  className="relative"
+                  key={prod?._id || item?.productId || `guest-${index}`}
+                >
                   <div className="flex items-center justify- gap-3 mb-4  border-b border-b-gray-200 pb-2 cursor-pointer">
                     <Image
                       width={200}
                       height={200}
-                      src={!user ? item?.photo : prod?.photo}
-                      alt={!user ? item?.name : prod?.name}
+                      src={
+                        !user
+                          ? item?.photo || "/assets/tshirt-mockup.png"
+                          : prod?.photo || "/assets/tshirt-mockup.png"
+                      }
+                      alt={
+                        !user
+                          ? item?.name || "No name"
+                          : prod?.name || "No name"
+                      }
                       className="w-12 h-12 object-cover rounded"
                     />
+
                     <div className=" px-2">
                       <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2 max-sm:max-w-[160px]">
                         {!user ? item?.name : prod?.name}

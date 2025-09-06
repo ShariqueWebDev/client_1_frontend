@@ -31,7 +31,7 @@ export default function Products() {
     }
   }, [subCatData]);
 
-  console.log(data, query, "subcategory product");
+  // console.log(data, query, "subcategory product");
 
   const categoriesData = useSelector((state) => state.category.categories) || {
     categories: [],
@@ -47,14 +47,16 @@ export default function Products() {
       <div className="max-w-7xl mx-auto px-3 mb-12">
         {/* Mobile Horizontal Scroll */}
         <div className="flex gap-4 overflow-x-auto no-scrollbar md:hidden py-3">
-          {categoriesData?.categories?.map((cat, index) => (
-            <Link href={`/category-class/${cat.link}`} key={index}>
+          {categoriesData?.categories?.map((cat) => (
+            <Link
+              href={`/category-class/${cat.link}`}
+              key={cat._id || cat.link}
+            >
               <motion.div
-                key={cat.id}
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 200 }}
                 className="flex-shrink-0 w-28 h-32 flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer"
-                data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
+                data-aos="fade-up"
               >
                 <Image
                   width={300}
@@ -73,15 +75,12 @@ export default function Products() {
 
         {/* Desktop Grid */}
         <div className="hidden md:grid grid-cols-4 lg:grid-cols-8 gap-4">
-          {categoriesData?.categories?.map((cat, index) => (
-            <Link href={`/category-class/${cat.link}`} key={index}>
-              <div
-                key={cat.id}
-                // whileHover={{ scale: 1.05 }}
-                // transition={{ type: "spring", stiffness: 200 }}
-                className="flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer hover:scale-105 transition-transform duration-300"
-                data-aos={index % 2 === 0 ? "fade-up" : "fade-down"}
-              >
+          {categoriesData?.categories?.map((cat) => (
+            <Link
+              href={`/category-class/${cat.link}`}
+              key={cat._id || cat.link}
+            >
+              <div className="flex flex-col items-center bg-white border border-gray-200 rounded-md p-3 shadow-sm hover:shadow-md cursor-pointer hover:scale-105 transition-transform duration-300">
                 <Image
                   width={500}
                   height={700}
@@ -137,7 +136,7 @@ export default function Products() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {data?.products?.map?.((product, index) => (
             <motion.div
-              key={product?.id}
+              key={product?._id || index}
               data-aos={index % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

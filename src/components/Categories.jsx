@@ -25,7 +25,7 @@ const Categories = ({
     userQuery: category,
     filterQuery: "category",
   });
-  console.log(productId, "single product id....");
+  // console.log(productId, "single product id....");
 
   const products = data?.products || [];
 

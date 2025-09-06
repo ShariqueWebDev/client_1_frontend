@@ -1,15 +1,9 @@
-import React from "react";
-import MyOrder from "../../components/MyOrder/MyOrder";
-import ProtectedRoute from "../../components/ProtectedRoutes/ProtectedRoutes";
+import ClientBoundary from "../../components/MyOrder/ClientBoundary";
 
-const MyOrdersPage = () => {
+export default function MyOrdersPage() {
   return (
-    <div className="">
-      <ProtectedRoute authRequired={true}>
-        <MyOrder />
-      </ProtectedRoute>
+    <div>
+      <ClientBoundary />
     </div>
   );
-};
-
-export default MyOrdersPage;
+}

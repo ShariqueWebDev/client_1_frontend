@@ -42,10 +42,10 @@ export const orderApi = createApi({
     }),
 
     createOrder: builder.mutation({
-      query: (payload) => ({
+      query: (orderData) => ({
         url: "/new-order",
         method: "POST",
-        body: payload,
+        body: orderData, // direct order object
       }),
       invalidatesTags: ["Order"],
     }),

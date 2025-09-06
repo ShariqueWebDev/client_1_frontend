@@ -20,19 +20,19 @@ const Cart = ({ product, isSlider }) => {
 
   if (!product) return null; // safety check
 
-  console.log(cartItem);
+  // console.log(cartItem);
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   // const [addToCart] = useAddToCartMutation();
 
   const handleAddToCart = (product) => {
-    console.log(product, "add to cart.......");
+    // console.log(product, "add to cart.......");
 
     if (!user) {
       let guestCart = getGuestCart();
       const existing = guestCart.find((i) => i.productId === product?._id);
-      console.log(guestCart, "existing product....");
+      // console.log(guestCart, "existing product....");
 
       if (existing) existing.quantity += 1;
       else

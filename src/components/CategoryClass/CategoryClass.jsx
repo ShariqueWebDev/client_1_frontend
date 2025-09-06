@@ -45,7 +45,7 @@ const CategoryClass = ({ slug }) => {
     limit: 8, // items per page
   });
 
-  console.log(data, "filter data.....");
+  // console.log(data, "filter data.....");
 
   const title = String(slug).split("-").join(" ").toUpperCase();
 
@@ -117,7 +117,7 @@ const CategoryClass = ({ slug }) => {
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:px-10 px-3">
                 {data?.products?.map((product) => (
-                  <Link href={`/products/${product._id}`}>
+                  <Link href={`/products/${product?._id}`} key={product?._id}>
                     <Cart
                       key={product._id}
                       product={product}

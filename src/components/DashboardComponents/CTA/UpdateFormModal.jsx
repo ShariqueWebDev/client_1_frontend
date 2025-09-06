@@ -38,7 +38,7 @@ export default function UpdateProductForm({ product, onClose }) {
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
   });
 
-  console.log(product.photo);
+  // console.log(product.photo);
 
   const {
     register,
