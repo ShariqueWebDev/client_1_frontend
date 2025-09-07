@@ -14,7 +14,8 @@ import { formatePrice, calculatePercentage } from "../../utils/features";
 import { cartActions } from "@/redux/actions/cart-actions";
 import { getGuestCart, setGuestCart } from "@/utils/addToCart";
 import { setCart } from "@/redux/reducers/cart-reducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const ProductDetailsPage = ({ slug }) => {
   const [user, setUser] = useState(null);
@@ -23,6 +24,7 @@ const ProductDetailsPage = ({ slug }) => {
 
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
   const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
+  const cartItem = useSelector((state) => state.cart.items);
 
   const productDetails = data?.product;
 
@@ -42,7 +44,18 @@ const ProductDetailsPage = ({ slug }) => {
     if (!user) {
       let guestCart = getGuestCart();
       const existing = guestCart.find((i) => i.productId === product?._id);
-      // console.log(guestCart, "existing product....");
+      console.log(product, "Guest cart....");
+      const existProduct = guestCart?.some((item) => {
+        console.log(item?.productId);
+
+        return item?.productId === product?._id;
+      });
+      console.log(existProduct, "boolean value....");
+
+      if (existProduct) {
+        toast.error("Product already exist in cart!");
+        return;
+      }
 
       if (existing) existing.quantity += 1;
       else
@@ -56,11 +69,27 @@ const ProductDetailsPage = ({ slug }) => {
         });
       setGuestCart(guestCart);
       dispatch(setCart(guestCart));
+      toast.success("Product added in cart");
       return;
     }
 
-    // Logged-in user
+    if (product?._id) {
+      const alreadyInCart = cartItem?.some((item) => {
+        const itemId =
+          item.productId?._id || item._id || item.id || item?.product?._id;
+        return String(itemId) === String(product._id);
+      });
+
+      if (alreadyInCart) {
+        toast.error("Product already exist in cart!");
+        return; // yahi ensure karega ke neeche ka code tabhi chale jab item cart mein na ho
+      }
+      console.log(alreadyInCart, cartItem, "already exist..");
+    }
+
+    // agar product cart mein nahi hai to yeh chalega
     cartActions.handleAdd({ productId: product?._id });
+    toast.success("Product added to cart");
   };
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");

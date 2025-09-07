@@ -22,6 +22,7 @@ import { cartActions } from "@/redux/actions/cart-actions";
 import { AiOutlineDelete } from "react-icons/ai";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function CartDrawer() {
   const { user } = useSelector((state) => state.auth);
@@ -69,6 +70,7 @@ export default function CartDrawer() {
         refetch().then((fresh) => {
           if (fresh?.data?.cart) {
             dispatch(setCart(fresh.data.cart.items));
+            // toast.success("Product added to cart");
           }
         });
       }

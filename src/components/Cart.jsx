@@ -9,6 +9,7 @@ import { cartActions } from "../redux/actions/cart-actions";
 import { useSelector, useDispatch } from "react-redux";
 import { setCart, clearCart } from "../redux/reducers/cart-reducer";
 import { getGuestCart, setGuestCart, clearGuestCart } from "../utils/addToCart";
+import toast from "react-hot-toast";
 // import {
 //   useGetCartQuery,
 //   useMergeGuestCartMutation,
@@ -32,7 +33,18 @@ const Cart = ({ product, isSlider }) => {
     if (!user) {
       let guestCart = getGuestCart();
       const existing = guestCart.find((i) => i.productId === product?._id);
-      // console.log(guestCart, "existing product....");
+      console.log(product, "Guest cart....");
+      const existProduct = guestCart?.some((item) => {
+        console.log(item?.productId);
+
+        return item?.productId === product?._id;
+      });
+      console.log(existProduct, "boolean value....");
+
+      if (existProduct) {
+        toast.error("Product already exist in cart!");
+        return;
+      }
 
       if (existing) existing.quantity += 1;
       else
@@ -46,19 +58,37 @@ const Cart = ({ product, isSlider }) => {
         });
       setGuestCart(guestCart);
       dispatch(setCart(guestCart));
+      toast.success("Product added in cart");
       return;
     }
 
-    // Logged-in user
+    if (product?._id) {
+      const alreadyInCart = cartItem?.some((item) => {
+        const itemId =
+          item.productId?._id || item._id || item.id || item?.product?._id;
+        return String(itemId) === String(product._id);
+      });
+
+      if (alreadyInCart) {
+        toast.error("Product already exist in cart!");
+        return; // yahi ensure karega ke neeche ka code tabhi chale jab item cart mein na ho
+      }
+      console.log(alreadyInCart, cartItem, "already exist..");
+    }
+
+    // agar product cart mein nahi hai to yeh chalega
     cartActions.handleAdd({ productId: product?._id });
+    toast.success("Product added to cart");
   };
 
   return (
     <div
       // href={`/products/${id}`}
       className={` relative overflow-hidden${
-        isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
-      } block group max-w-[300px] w-full max-sm:max-w-[200px]`}
+        isSlider
+          ? " max-w-[300px] max-sm:max-w-[170px] w-full"
+          : "max-w-[300px] w-full "
+      } block group  `}
     >
       {product?.stock === 0 && (
         <div
@@ -70,7 +100,7 @@ const Cart = ({ product, isSlider }) => {
         </div>
       )}
       {/* Product Card */}
-      <div className="w-full lg:h-[350px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
+      <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
         {/* Product Image */}
         <Image
           src={product.image || product.photo}
@@ -91,21 +121,21 @@ const Cart = ({ product, isSlider }) => {
       </p>
 
       {/* ✅ Price + Cut Price (Fixed 999) */}
-      <div className="flex items-center gap-5 mt-1">
+      <div className="flex items-center lg:gap-5 gap-2 mt-1">
         <span className="font-semibold text-lg text-primary-500">
           {formatePrice(product?.price)}
         </span>
         <span className="text-sm text-gray-500 line-through">
           {formatePrice(product?.mrpPrice)}
         </span>
-        <span className="text-sm text-green-500  ">
+        <span className="text-sm max-sm:text-xs text-green-500  ">
           {calculatePercentage(product?.mrpPrice, product?.price)}% off
         </span>
       </div>
 
       {/* View More (smaller button) */}
-      <div className="flex lg:flex-row flex-col justify-between">
-        <button className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
+      <div className="flex  justify-between">
+        <button className="mt-3 px-2 py-2 max-sm:text-[11px] bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
           View More
         </button>
         <button
@@ -115,7 +145,7 @@ const Cart = ({ product, isSlider }) => {
             // cartActions.handleAdd({ productId: product?._id });
             handleAddToCart(product);
           }}
-          className="mt-3 px-4 py-2 bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium cursor-pointer"
+          className="mt-3 px-2 py-2 max-sm:text-[11px] bg-yellow-500 rounded-sm text-white hover:bg-yellow-600 transition text-sm font-medium cursor-pointer"
         >
           Add to Cart
         </button>

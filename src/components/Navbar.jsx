@@ -55,21 +55,21 @@ export default function Navbar() {
   // 👇 yaha ref banaya
   const searchRef = useRef(null);
 
-  // 👇 click outside listener
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setOpenSearch(false);
-        setSearchTerm("");
-        setQuery("");
-      }
-    }
+  // // 👇 click outside listener
+  // useEffect(() => {
+  //   function handleClickOutside(event) {
+  //     if (searchRef.current && !searchRef.current.contains(event.target)) {
+  //       setOpenSearch(false);
+  //       setSearchTerm("");
+  //       setQuery("");
+  //     }
+  //   }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, []);
 
   const handleLogout = async () => {
     try {
@@ -156,7 +156,7 @@ export default function Navbar() {
             )}
 
             {openSearch && (
-              <div className="absolute z-50 top-10 right-20  md:-left-32 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-72">
+              <div className="absolute z-50 top-10 right-20  md:-left-5 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-72">
                 <div className="flex items-center px-2 py-1">
                   <input
                     type="text"
@@ -318,7 +318,7 @@ export default function Navbar() {
             )}
 
             {openSearch && (
-              <div className="absolute z-50 top-10 -right-28 md:right-auto md:left-0 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-72">
+              <div className="absolute z-50 top-10 -right-28 md:right-auto md:left-0 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-88">
                 <div className="flex items-center px-2 py-1">
                   <input
                     type="text"
@@ -340,7 +340,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Product List */}
-                <div className="max-h-72 overflow-y-auto">
+                <div className="max-h-[500px] overflow-y-auto">
                   {searchLoading ? (
                     <div className="p-2 text-gray-500">Loading...</div>
                   ) : products?.products?.length > 0 ? (
