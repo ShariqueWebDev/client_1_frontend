@@ -32,11 +32,11 @@ export default function Footer() {
                 Home
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link href="/shop" className="hover:text-yellow-400">
                 Shop
               </Link>
-            </li>
+            </li> */}
             <li>
               <Link href="/about" className="hover:text-yellow-400">
                 About Us

@@ -59,6 +59,20 @@ const MobileMenu = ({ user, handleLogout }) => {
               >
                 Contact Us
               </Link>
+              <Link
+                href="/returns"
+                onClick={() => dispatch(closeMenu())}
+                className="hover:text-yellow-500 border-b pb-3 border-gray-300"
+              >
+                Return Policy
+              </Link>
+              <Link
+                href="/shipping"
+                onClick={() => dispatch(closeMenu())}
+                className="hover:text-yellow-500 border-b pb-3 border-gray-300"
+              >
+                Shipping Info
+              </Link>
 
               <>
                 {user && user.role === "admin" && (
@@ -97,16 +111,18 @@ const MobileMenu = ({ user, handleLogout }) => {
                 </>
               ) : (
                 <>
-                  <div
-                    onClick={() => {
-                      openLogin();
-                      dispatch(closeMenu());
-                    }}
-                    className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                  >
-                    <LogIn className="w-5 h-5" />
-                    <span>Login</span>
-                  </div>
+                  <Link href={"/login"}>
+                    <div
+                      onClick={() => {
+                        // openLogin();
+                        dispatch(closeMenu());
+                      }}
+                      className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                    >
+                      <LogIn className="w-5 h-5" />
+                      <span>Login</span>
+                    </div>
+                  </Link>
                 </>
               )}
             </nav>

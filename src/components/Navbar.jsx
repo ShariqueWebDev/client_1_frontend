@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -7,6 +7,8 @@ import {
   ChevronDown,
   ListOrdered,
   LogOut,
+  Search,
+  X,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLogoutUserMutation } from "@/redux/api/userApi";
@@ -19,10 +21,18 @@ import ClientWrapper from "./ClientWrapper";
 import { toggleMenu } from "../redux/reducers/menu-reducers";
 import { toggleCart } from "../redux/reducers/cart-reducer";
 import Image from "next/image";
+import {
+  useGetAllProductWithFilterQuery,
+  useSearchAllProductQuery,
+} from "@/redux/api/productApi";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function Navbar() {
   // const [isOpen, setIsOpen] = useState(false);
   const [isOpenSubMenu, setIsOpenSubMenu] = useState(false);
+  const [openSearch, setOpenSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [query, setQuery] = useState("");
   // const {} = userAPI();
   const dispatch = useDispatch();
   const { items: cart, cartOpen } = useSelector((state) => state.cart);
@@ -32,10 +42,34 @@ export default function Navbar() {
   const auth = useSelector((state) => state.auth) || { user: null };
   const { user } = auth;
 
+  const { data: products, isLoading: searchLoading } = useSearchAllProductQuery(
+    searchTerm ? { search: searchTerm } : skipToken // agar empty hai to API call skip
+  );
+  console.log(products?.products, "search product....... by navbar");
+
   const router = useRouter();
   const path = usePathname();
 
   const [logoutUser, { isLoading }] = useLogoutUserMutation();
+
+  // 👇 yaha ref banaya
+  const searchRef = useRef(null);
+
+  // 👇 click outside listener
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setOpenSearch(false);
+        setSearchTerm("");
+        setQuery("");
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -47,6 +81,14 @@ export default function Navbar() {
       console.log("logout failed");
     }
   };
+
+  // Debounce search to avoid too many API calls
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setSearchTerm(query);
+    }, 300); // 300ms debounce
+    return () => clearTimeout(delay);
+  }, [query]);
 
   return (
     <nav className="w-full bg-white border-b border-gray-200  z-50 h-[70px] ">
@@ -103,6 +145,88 @@ export default function Navbar() {
 
         {/* Right Menu (Desktop Only) */}
         <div className="hidden md:flex items-center space-x-6">
+          <div className="relative max-sm:block" ref={searchRef}>
+            {!openSearch && (
+              <div
+                className="cursor-pointer p-2 rounded-full hover:bg-gray-100"
+                onClick={() => setOpenSearch(true)}
+              >
+                <Search className="w-5 text-gray-700" />
+              </div>
+            )}
+
+            {openSearch && (
+              <div className="absolute z-50 top-10 right-20  md:-left-32 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-72">
+                <div className="flex items-center px-2 py-1">
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="flex-1 px-2 py-1 outline-none text-sm"
+                  />
+                  <button
+                    className="p-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setOpenSearch(false);
+                      setSearchTerm("");
+                      setQuery("");
+                    }}
+                  >
+                    <X className="w-4 text-gray-700" />
+                  </button>
+                </div>
+
+                {/* Product List */}
+                <div className="max-h-96 overflow-y-auto">
+                  {searchLoading ? (
+                    <div className="p-2 text-gray-500">Loading...</div>
+                  ) : products?.products?.length > 0 ? (
+                    products?.products.map((product) => (
+                      <Link
+                        href={`/products/${product?._id}`}
+                        onClick={() => {
+                          setOpenSearch(false);
+                        }}
+                      >
+                        <div
+                          className="flex gap-2 p-2 hover:bg-gray-100"
+                          key={product?._id}
+                        >
+                          <div className="">
+                            <Image
+                              src={product?.photo}
+                              width={70}
+                              height={70}
+                              alt={product?.name}
+                            />
+                          </div>
+                          <div className="w-full">
+                            <div className=" cursor-pointer text-xs line-clamp-1 font-semibold">
+                              {product.name}
+                            </div>
+                            <div className="line-clamp-1  cursor-pointer text-xs text-gray-600">
+                              {product.description}
+                            </div>
+                            <div className=" text-gray-500 cursor-pointer text-xs">
+                              price:{" "}
+                              <span className="text-black">
+                                {product.price}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-2 text-gray-500 text-sm px-3">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           {/* Cart Icon */}
           {path !== "/checkout" && (
             <div
@@ -183,6 +307,88 @@ export default function Navbar() {
         {/* Right Side (Mobile Only) */}
         <div className="md:hidden flex items-center space-x-4">
           {/* Cart Icon */}
+          <div className="relative max-sm:block">
+            {!openSearch && (
+              <div
+                className="cursor-pointer p-2 rounded-full hover:bg-gray-100"
+                onClick={() => setOpenSearch(true)}
+              >
+                <Search className="w-5 text-gray-700" />
+              </div>
+            )}
+
+            {openSearch && (
+              <div className="absolute z-50 top-10 -right-28 md:right-auto md:left-0 flex flex-col bg-white border border-gray-300 rounded-md shadow-md overflow-hidden transition-all duration-300 w-72">
+                <div className="flex items-center px-2 py-1">
+                  <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search products..."
+                    className="flex-1 px-2 py-1 outline-none text-sm"
+                  />
+                  <button
+                    className="p-2 hover:bg-gray-100"
+                    onClick={() => {
+                      setOpenSearch(false);
+                      setSearchTerm("");
+                      setQuery("");
+                    }}
+                  >
+                    <X className="w-4 text-gray-700" />
+                  </button>
+                </div>
+
+                {/* Product List */}
+                <div className="max-h-72 overflow-y-auto">
+                  {searchLoading ? (
+                    <div className="p-2 text-gray-500">Loading...</div>
+                  ) : products?.products?.length > 0 ? (
+                    products?.products.map((product) => (
+                      <Link
+                        href={`/products/${product?._id}`}
+                        onClick={() => {
+                          setOpenSearch(false);
+                        }}
+                      >
+                        <div
+                          className="flex gap-2 p-2 hover:bg-gray-100"
+                          key={product?._id}
+                        >
+                          <div className="">
+                            <Image
+                              src={product?.photo}
+                              width={70}
+                              height={70}
+                              alt={product?.name}
+                            />
+                          </div>
+                          <div className="w-full">
+                            <div className=" cursor-pointer text-xs line-clamp-1 font-semibold">
+                              {product.name}
+                            </div>
+                            <div className="line-clamp-1  cursor-pointer text-xs text-gray-600">
+                              {product.description}
+                            </div>
+                            <div className=" text-gray-500 cursor-pointer text-xs">
+                              price:{" "}
+                              <span className="text-black">
+                                {product.price}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="p-2 text-gray-500 text-sm px-3">
+                      No products found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
           {path !== "/checkout" && (
             <div
               onClick={() => dispatch(toggleCart())}

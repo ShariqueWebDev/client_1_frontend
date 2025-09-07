@@ -56,13 +56,13 @@ const Cart = ({ product, isSlider }) => {
   return (
     <div
       // href={`/products/${id}`}
-      className={`${
+      className={` relative overflow-hidden${
         isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
       } block group max-w-[300px] w-full max-sm:max-w-[200px]`}
     >
       {product?.stock === 0 && (
         <div
-          className={`${
+          className={` rounded-sm ${
             isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
           }  absolute text-white bg-black/70 flex justify-center items-center  j z-10 group max-w-[300px] w-full h-full max-sm:max-w-[200px] `}
         >

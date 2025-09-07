@@ -254,7 +254,7 @@ export default function CartDrawer() {
               </div>
             </>
           ) : (
-            cart?.map((item) => {
+            cart?.map((item, index) => {
               const prod = item?.productId;
 
               return (

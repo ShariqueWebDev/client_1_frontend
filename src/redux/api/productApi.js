@@ -76,6 +76,9 @@ export const productApi = createApi({
       }) =>
         `/all?_id=${isAdmin}&${filterQuery}=${userQuery}&price=${priceRange}&subCategory=${subcategory}&search=${search}&page=${page}`, // ✅ arrow function implicit return
     }),
+    searchAllProduct: builder.query({
+      query: ({ search }) => `/search-all?search=${search}`, //  arrow function implicit return
+    }),
     getRelatedProduct: builder.query({
       query: ({ isAdmin, userQuery, filterQuery }) =>
         `/all?_id=${isAdmin}&${filterQuery}=${userQuery}`, // arrow function implicit return
@@ -101,4 +104,5 @@ export const {
   useGetSingleProductDetailsQuery,
   useGetRecommendedProductsQuery,
   useGetRelatedProductQuery,
+  useSearchAllProductQuery,
 } = productApi;

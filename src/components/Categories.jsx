@@ -94,10 +94,13 @@ const Categories = ({
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:w-[40%] w-full"
+              className="lg:w-[40%] w-full "
             >
-              <p className="text-gray-700 content-all text-sm ">{mainDesc}</p>
-              <Link href={String(hrefLink)}>
+              <p className="text-gray-700 content-all text-sm  ">{mainDesc}</p>
+              <Link
+                href={String(hrefLink)}
+                className="max-sm:flex justify-center items-center"
+              >
                 <p className="text-white bg-yellow-500 hover:bg-yellow-600  content-all text-sm  w-fit px-5 py-1.5 rounded-sm mt-5">
                   {"View More"}
                 </p>
