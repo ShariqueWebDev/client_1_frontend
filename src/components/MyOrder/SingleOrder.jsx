@@ -1,6 +1,10 @@
 "use client";
 import React from "react";
-import { useGetSingleOrderQuery } from "../../redux/api/orderApi";
+import {
+  orderApi,
+  useGetSingleOrderQuery,
+  usePutCancelOrderMutation,
+} from "../../redux/api/orderApi";
 import { useLogoutUserMutation } from "../../redux/api/userApi";
 import Image from "next/image";
 import { logout } from "../../redux/reducers/auth-reducers";
@@ -8,16 +12,47 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 
 import { formatePrice } from "../../utils/features";
+import toast from "react-hot-toast";
 
 export default function MyOrder() {
   const { slug } = useParams();
-  const { data, isLoading } = useGetSingleOrderQuery({ orderId: slug });
+  const { data, isLoading, refetch } = useGetSingleOrderQuery({
+    orderId: slug,
+  });
+  const [putCancelOrder, { isLoading: isCancelling }] =
+    usePutCancelOrderMutation();
   const [logoutUser] = useLogoutUserMutation();
   const { user } = useSelector((state) => {
     return state.auth;
   });
 
   const dispatch = useDispatch();
+
+  const handleCancelOrder = async (orderId) => {
+    try {
+      // Step 1: Optimistic update
+      dispatch(
+        orderApi.util.updateQueryData(
+          "getSingleOrder",
+          { orderId },
+          (draft) => {
+            if (draft?.single_order) {
+              draft.single_order.status = "Cancelled";
+            }
+          }
+        )
+      );
+
+      // Step 2: API call
+      const response = await putCancelOrder({ orderId }).unwrap();
+      toast.success("Your order has cancelled");
+    } catch (error) {
+      toast.error(error?.data?.message || "Failed to cancel order");
+
+      // Step 3: Rollback (force refetch)
+      dispatch(orderApi.util.invalidateTags(["Order"]));
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -140,6 +175,31 @@ export default function MyOrder() {
             </div>
           </div>
         </div>
+        {data?.single_order?.status === "Cancelled" &&
+          (isCancelling ? (
+            <div className="my-3 text-sm text-gray-400">Loading...</div>
+          ) : (
+            <div className="text-red-500 text-sm my-3">
+              {data?.single_order?.paymentInfo?.method === "Razorpay"
+                ? "Your order has been cancelled successfully and a refund has been initiated to your original payment method. Refunds may take 5–7 business days to reflect."
+                : ` We’ve processed your cancellation request. Your order is now
+              cancelled.`}
+            </div>
+          ))}
+
+        <button
+          disabled={isCancelling || data?.single_order?.status === "Cancelled"}
+          onClick={() => handleCancelOrder(slug)}
+          className={`bg-yellow-500 hover:bg-yellow-600 w-fit px-4 py-2 mb-5 text-white lg:text-sm text-xs rounded-sm ${
+            isCancelling ? "opacity-50 cursor-not-allowed" : ""
+          } ${
+            data?.single_order?.status === "Cancelled"
+              ? "cursor-not-allowed"
+              : "cursor-pointer"
+          }`}
+        >
+          {isCancelling ? "Cancelling..." : "Cancel Order"}
+        </button>
         <div key={data?.single_order?._id} className=" ">
           {data?.single_order?.orderItems?.map((order, index) => (
             <div className="relative " key={index}>

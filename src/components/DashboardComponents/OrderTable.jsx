@@ -155,6 +155,9 @@ export default function AdminOrderTable() {
                   Payment Status
                 </th>
                 <th className="px-2 py-2 border border-gray-300">Total</th>
+                <th className="px-2 py-2 border border-gray-300">
+                  Refund Status
+                </th>
                 <th className="px-2 py-2 border border-gray-300">Actions</th>
                 <th className="px-2 py-2 border border-gray-300">
                   Process Action
@@ -213,6 +216,9 @@ export default function AdminOrderTable() {
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       {p.total}
+                    </td>
+                    <td className="px-2 py-2 border text-center border-gray-300">
+                      {p.refund?.status || "-"}
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       <button

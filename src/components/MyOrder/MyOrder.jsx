@@ -1,11 +1,12 @@
 "use client";
-import { useGetUserOrderQuery } from "../../redux/api/orderApi";
+import { orderApi, useGetUserOrderQuery } from "../../redux/api/orderApi";
 import { useLogoutUserMutation } from "../../redux/api/userApi";
 import Image from "next/image";
 import dayjs from "dayjs";
 import { logout } from "../../redux/reducers/auth-reducers";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function MyOrder() {
   const { data, isLoading } = useGetUserOrderQuery();
@@ -13,8 +14,11 @@ export default function MyOrder() {
   const { user } = useSelector((state) => {
     return state.auth;
   });
-
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(orderApi.util.invalidateTags(["Order"]));
+  }, []);
 
   const handleLogout = async () => {
     try {

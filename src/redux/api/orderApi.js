@@ -59,6 +59,7 @@ export const orderApi = createApi({
 
     getSingleOrder: builder.query({
       query: ({ orderId }) => `/single-order/${orderId}`,
+      providesTags: ["Order"],
     }),
     processOrder: builder.mutation({
       query: ({ orderId, isAdmin }) => ({
@@ -78,6 +79,14 @@ export const orderApi = createApi({
       query: () => ({
         url: `/user-order`,
       }),
+      providesTags: ["Order"],
+    }),
+    putCancelOrder: builder.mutation({
+      query: ({ orderId }) => ({
+        url: `/cancel-order/${orderId}`,
+        method: "PUT",
+      }),
+      invalidatesTags: ["Orders"],
     }),
   }),
 });
@@ -91,4 +100,5 @@ export const {
   useGetUserOrderQuery,
   useCreateRazorpayOrderMutation,
   useVerifyRazorpayPaymentMutation,
+  usePutCancelOrderMutation,
 } = orderApi;
