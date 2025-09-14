@@ -29,9 +29,9 @@ export const DashboardData = [
     link: "/dashboard/low-stocks",
     imgPath: "/assets/dashboard/low-stock.png",
   },
-  {
-    lable: "Statics",
-    link: "/dashboard/static",
-    imgPath: "/assets/dashboard/static.png",
-  },
+  // {
+  //   lable: "Statics",
+  //   link: "/dashboard/static",
+  //   imgPath: "/assets/dashboard/static.png",
+  // },
 ];

@@ -20,7 +20,7 @@ const servicesData = [
     icon: <BsTruck className="text-black font-bold text-5xl" />,
     title: "Shipping & Return",
     description:
-      "At Clauch, we ensure a smooth and reliable shopping experience from cart to closet. Enjoy fast, secure shipping and real-time tracking on every order.",
+      "At Refilly, we ensure a smooth and reliable shopping experience from cart to closet. Enjoy fast, secure shipping and real-time tracking on every order.",
   },
   {
     icon: <PiPackage className="text-black font-thin text-5xl" />,

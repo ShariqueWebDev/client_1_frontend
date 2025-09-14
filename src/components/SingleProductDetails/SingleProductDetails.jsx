@@ -188,7 +188,7 @@ const ProductDetailsPage = ({ slug }) => {
                     <div className="flex gap-3 mt-3">
                       <Mail size={16} />
                       <div className="">
-                        <a href="mailto:info@theclauch.com" className="">
+                        <a href="mailto:info@refilly.com" className="">
                           info@refilly.com
                         </a>
                       </div>
