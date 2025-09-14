@@ -81,18 +81,18 @@ export default function MyOrder() {
     <div className="lg:px-20 px-4 flex lg:flex-row flex-col lg:gap-10 my-10 min-h-screen">
       <div className="lg:w-[30%] w-full h-full lg:sticky top-5">
         <div className="p-5 h-fit bg-gray-200 rounded-sm">
-          <div className="text-xl font-semibold">{user?.name}</div>
+          <div className="text-xl font-semibold capitalize">{user?.name}</div>
           <div className="flex items-center gap-1 text-sm mt-1">
             <span className="">Email: </span>
             <span className="text-gray-500">{user?.email}</span>
           </div>
         </div>
-        <div
+        {/* <div
           className="text-center mt-2 bg-yellow-500 rounded-sm text-white py-2 text-sm font-medium cursor-pointer"
           onClick={() => handleLogout()}
         >
           Logout
-        </div>
+        </div> */}
       </div>
 
       <div className="lg:w-[70%] w-full max-sm:mt-10">
