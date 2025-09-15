@@ -2,15 +2,44 @@
 import Link from "next/link";
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 import ClientOnly from "./ClientWrapper";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
+import { useCreateNewsletterMutation } from "@/redux/api/newsletterApi";
+
+const newsletterSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
 
 export const getCurrentYear = () => {
   if (typeof window !== "undefined") {
     return new Date().getFullYear();
   }
-  return ""; // SSR ke liye blank ya safe default
+  return "";
 };
 
 export default function Footer() {
+  const [createNewsletter, { isLoading }] = useCreateNewsletterMutation();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(newsletterSchema),
+  });
+
+  const onSubmit = async (data) => {
+    try {
+      await createNewsletter({ formData: data }).unwrap();
+      toast.success("Subscribed successfully!");
+      reset();
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to subscribe");
+    }
+  };
   return (
     <footer className="bg-gray-900 text-gray-300 pt-12 pb-6 ">
       <div className="max-w-screen-xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -92,14 +121,27 @@ export default function Footer() {
           <p className="text-sm mb-4 text-gray-400">
             Get updates on new arrivals and exclusive offers.
           </p>
-          <form className="flex">
-            <input
-              type="email"
-              placeholder="Your email"
-              className="p-2 rounded-l bg-gray-800 text-white text-sm focus:outline-none placeholder:pl-2 w-full"
-            />
-            <button className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 text-sm rounded-r">
-              Subscribe
+          <form className="flex" onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex flex-col w-full">
+              <input
+                type="email"
+                placeholder="Your email"
+                {...register("email")}
+                className="p-2 rounded-l bg-gray-800 text-white text-sm focus:outline-none placeholder:pl-2 w-full"
+              />
+              {errors.email && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 text-sm rounded-r disabled:opacity-50"
+            >
+              {isLoading ? "Submitting..." : "Subscribe"}
             </button>
           </form>
         </div>

@@ -12,6 +12,7 @@ import { dashboardUserApi } from "../api/dashboardUserApi";
 import { bannerApi } from "../api/bannerApi";
 import { categoryApi } from "../api/CategoryApi";
 import { cartApi } from "../api/cartApi";
+import { newsLetterApi } from "../api/newsletterApi";
 
 export const store = configureStore({
   reducer: {
@@ -23,6 +24,7 @@ export const store = configureStore({
     [bannerApi.reducerPath]: bannerApi.reducer,
     [categoryApi.reducerPath]: categoryApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
+    [newsLetterApi.reducerPath]: newsLetterApi.reducer,
     auth: authReducer,
     menu: menuReducer,
     cart: cartReducer,
@@ -38,6 +40,7 @@ export const store = configureStore({
       dashboardUserApi.middleware,
       bannerApi.middleware,
       categoryApi.middleware,
-      cartApi.middleware
+      cartApi.middleware,
+      newsLetterApi.middleware
     ),
 });
