@@ -32,7 +32,7 @@ export default function ReturnPolicy() {
         <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
           <h2 className="text-2xl font-bold mb-4">Our Commitment to Quality</h2>
           <p>
-            At <strong>Refilley</strong>, we are dedicated to providing premium
+            At <strong>Refilly</strong>, we are dedicated to providing premium
             apparel with authentic prints and unmatched comfort. Every T-shirt
             or product that leaves our facility undergoes multiple layers of
             quality inspection. However, to ensure fairness and hygiene
@@ -64,7 +64,7 @@ export default function ReturnPolicy() {
             Why This Policy Exists
           </h2>
           <p>
-            Unlike many mass-produced clothing brands, Refilley emphasizes
+            Unlike many mass-produced clothing brands, Refilly emphasizes
             authenticity, personalization, and limited-edition designs. Allowing
             post-use returns would undermine our efforts to maintain exclusivity
             and premium quality. Furthermore, clothing is a personal-use item.

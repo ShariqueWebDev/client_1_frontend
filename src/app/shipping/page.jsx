@@ -13,19 +13,24 @@ export default function ShippingInfo() {
           transition={{ duration: 0.8 }}
           className="text-5xl font-extrabold text-center text-gray-900 mb-10"
         >
-          Shipping <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">Information</span>
+          Shipping{" "}
+          <span className="bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">
+            Information
+          </span>
         </motion.h1>
 
         {/* Intro */}
         <p className="text-gray-600 mb-8 leading-relaxed text-lg">
-          At <strong>Refilley</strong>, we take pride in delivering your
-          favorite T-shirts with care, speed, and transparency. Below, you’ll
-          find all the information regarding our shipping process, timelines,
-          charges, and policies.
+          At <strong>Refilly</strong>, we take pride in delivering your favorite
+          T-shirts with care, speed, and transparency. Below, you’ll find all
+          the information regarding our shipping process, timelines, charges,
+          and policies.
         </p>
 
         {/* Section 1 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">1. Delivery Locations</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          1. Delivery Locations
+        </h2>
         <p className="text-gray-600 mb-4">
           We currently ship across all major cities and towns in India. For
           remote or hard-to-reach areas, shipping may take additional time. We
@@ -34,25 +39,25 @@ export default function ShippingInfo() {
         </p>
 
         {/* Section 2 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">2. Shipping Charges</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          2. Shipping Charges
+        </h2>
         <p className="text-gray-600 mb-4">
           - <strong>Standard Shipping:</strong> Free for all orders above ₹999.
-          <br />
-          - <strong>Orders below ₹999:</strong> A nominal fee of ₹99 will be
-          charged.
-          <br />
-          - <strong>Express Shipping:</strong> Available at an additional cost,
-          calculated at checkout.
+          <br />- <strong>Orders below ₹999:</strong> A nominal fee of ₹99 will
+          be charged.
+          <br />- <strong>Express Shipping:</strong> Available at an additional
+          cost, calculated at checkout.
         </p>
 
         {/* Section 3 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">3. Estimated Delivery Time</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          3. Estimated Delivery Time
+        </h2>
         <p className="text-gray-600 mb-4">
           - <strong>Metro Cities:</strong> 2 – 4 business days.
-          <br />
-          - <strong>Tier 2 & Tier 3 Cities:</strong> 4 – 7 business days.
-          <br />
-          - <strong>Remote Areas:</strong> 7 – 10 business days.
+          <br />- <strong>Tier 2 & Tier 3 Cities:</strong> 4 – 7 business days.
+          <br />- <strong>Remote Areas:</strong> 7 – 10 business days.
         </p>
         <p className="text-gray-600 mb-4">
           Please note that weekends and public holidays are not counted as
@@ -62,7 +67,9 @@ export default function ShippingInfo() {
         </p>
 
         {/* Section 4 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">4. Order Processing</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          4. Order Processing
+        </h2>
         <p className="text-gray-600 mb-4">
           Once your order is placed, our warehouse team carefully inspects and
           packs your product within <strong>24 to 48 hours</strong>. Orders
@@ -70,16 +77,20 @@ export default function ShippingInfo() {
         </p>
 
         {/* Section 5 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">5. Tracking Your Order</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          5. Tracking Your Order
+        </h2>
         <p className="text-gray-600 mb-4">
           As soon as your order is dispatched, you’ll receive a confirmation
           email and SMS with a tracking ID and a link to track your shipment in
           real-time. You can also track your order directly through the{" "}
-          <strong>“My Orders”</strong> section of your Refilley account.
+          <strong>“My Orders”</strong> section of your Refilly account.
         </p>
 
         {/* Section 6 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">6. Multiple Shipments</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          6. Multiple Shipments
+        </h2>
         <p className="text-gray-600 mb-4">
           In rare cases, if your order contains multiple items, they may be
           shipped separately due to packaging or stock availability. You will
@@ -87,7 +98,9 @@ export default function ShippingInfo() {
         </p>
 
         {/* Section 7 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">7. Delays in Delivery</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          7. Delays in Delivery
+        </h2>
         <p className="text-gray-600 mb-4">
           While we do our best to ensure timely delivery, certain factors may
           cause delays beyond our control. These include:
@@ -100,7 +113,9 @@ export default function ShippingInfo() {
         </ul>
 
         {/* Section 8 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">8. Undelivered Orders</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          8. Undelivered Orders
+        </h2>
         <p className="text-gray-600 mb-4">
           If the courier is unable to deliver your package after multiple
           attempts, it will be returned to our warehouse. In such cases, we will
@@ -109,19 +124,26 @@ export default function ShippingInfo() {
         </p>
 
         {/* Section 9 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">9. International Shipping (Coming Soon)</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          9. International Shipping (Coming Soon)
+        </h2>
         <p className="text-gray-600 mb-4">
-          We are actively working to expand Refilley to customers worldwide.
+          We are actively working to expand Refilly to customers worldwide.
           International shipping will be announced shortly with full details on
           charges, timelines, and duties.
         </p>
 
         {/* Section 10 */}
-        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">10. Contact Us</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+          10. Contact Us
+        </h2>
         <p className="text-gray-600 mb-4">
           For any shipping-related queries, please reach out to us at{" "}
-          <a href="mailto:support@refilley.com" className="text-purple-600 underline">
-            support@refilley.com
+          <a
+            href="mailto:support@refilly.com"
+            className="text-purple-600 underline"
+          >
+            support@refilly.com
           </a>{" "}
           or call us at +91-9876543210. Our customer support team is available
           Monday to Saturday, 10 AM – 7 PM.

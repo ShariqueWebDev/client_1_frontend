@@ -8,6 +8,10 @@ import {
   useGetRelatedProductQuery,
   useGetSingleProductDetailsQuery,
 } from "../../redux/api/productApi";
+import {
+  useGetReviewByIdQuery,
+  useAddCustomerReviewMutation,
+} from "../../redux/api/reviewApi";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { formatePrice, calculatePercentage } from "../../utils/features";
@@ -16,17 +20,52 @@ import { getGuestCart, setGuestCart } from "@/utils/addToCart";
 import { setCart } from "@/redux/reducers/cart-reducer";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 const ProductDetailsPage = ({ slug }) => {
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState(5); // default 5 stars
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
   const id = user?._id;
 
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
+  const { data: reviewData, isLoading: reviewLoading } =
+    useGetReviewByIdQuery(slug);
   const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
   const cartItem = useSelector((state) => state.cart.items);
 
   const productDetails = data?.product;
+
+  const [addReview, { isLoading: addReviewLoading }] =
+    useAddCustomerReviewMutation();
+
+  // Handle submit review
+  const handleAddReview = async () => {
+    if (!user) {
+      toast.error("You must be logged in to add a review");
+      return;
+    }
+    if (!reviewText.trim()) {
+      toast.error("Please write a review");
+      return;
+    }
+
+    try {
+      await addReview({
+        productId: slug,
+        comment: reviewText,
+        rating,
+      }).unwrap();
+
+      toast.success("Review added successfully!");
+      setReviewText(""); // clear textarea
+      setRating(5); // reset rating
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add review");
+    }
+  };
 
   //   console.log(data, "single product page data and slug...........");
   // console.log(relatedData, "Related product data...........");
@@ -93,6 +132,8 @@ const ProductDetailsPage = ({ slug }) => {
   };
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");
+
+  console.log(reviewData, "reivewdata.....");
 
   return (
     <div>
@@ -205,6 +246,76 @@ const ProductDetailsPage = ({ slug }) => {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="mt-16 max-w-[1220px] w-full mx-auto max-sm:px-4">
+            <h3 className="text-xl font-semibold">Customer Reviews</h3>
+
+            {reviewData?.reviews?.length === 0 ? (
+              <div className="text-sm mt-5 text-gray-500">
+                No customer reviews available
+              </div>
+            ) : (
+              reviewData?.reviews?.map((rev) => (
+                <div
+                  key={rev._id}
+                  className="border-b pb-3 mt-5 border-gray-200"
+                >
+                  <div className="font-semibold text-sm capitalize">
+                    {rev?.name}
+                  </div>
+                  <div className="text-sm mt-1 text-gray-500">
+                    {rev?.comment}
+                  </div>
+                  <div className="text-sm text-yellow-500 mt-1">
+                    Rating: {rev?.rating} {"⭐".repeat(rev?.rating)}
+                  </div>
+                </div>
+              ))
+            )}
+            {!user && (
+              <div className="">
+                <Link href={"/login"}>
+                  <button className="bg-yellow-500 text-white mt-3 px-3 py-1.5 text-sm rounded hover:bg-yellow-600 cursor-pointer">
+                    Add review
+                  </button>
+                </Link>
+              </div>
+            )}
+            {/* Add Review Form */}
+            {user && (
+              <div className="mt-6">
+                <textarea
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="Write your review here..."
+                  className="w-full border border-gray-300 rounded p-2 text-sm mb-2"
+                  rows={4}
+                />
+
+                <div className="flex items-center gap-3 mb-3">
+                  <label className="text-sm font-medium">Rating:</label>
+                  <select
+                    value={rating}
+                    onChange={(e) => setRating(Number(e.target.value))}
+                    className="border border-gray-300 rounded p-1 text-sm  cursor-pointer"
+                  >
+                    {[1, 2, 3, 4, 5].map((num) => (
+                      <option key={num} value={num} className="text-sm">
+                        {num} {"⭐".repeat(num)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleAddReview}
+                  disabled={reviewLoading}
+                  className="bg-yellow-500 text-white mt-3 px-3 py-1.5 text-sm rounded hover:bg-yellow-600 cursor-pointer"
+                >
+                  {reviewLoading ? "Submitting..." : "Submit Review"}
+                </button>
+              </div>
+            )}
           </div>
           <div className="mt-10">
             <Categories

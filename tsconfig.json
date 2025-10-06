@@ -29,7 +29,8 @@
     ".next/types/**/*.ts",
     "src/services/auth.js",
     "src/app/layout.jsx",
-    "src/components/Embla/EmblaCarouselArrowButtonCat.jsx"
+    "src/components/Embla/EmblaCarouselArrowButtonCat.jsx",
+    "src/app/reviews/page.jsx"
   ],
   "exclude": ["node_modules"]
 }

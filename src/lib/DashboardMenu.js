@@ -30,6 +30,11 @@ export const DashboardData = [
     imgPath: "/assets/dashboard/low-stock.png",
   },
   {
+    lable: "Reviews",
+    link: "/dashboard/reviews",
+    imgPath: "/assets/dashboard/reviews.png",
+  },
+  {
     lable: "News Letter",
     link: "/dashboard/news-letter",
     imgPath: "/assets/dashboard/news.png",

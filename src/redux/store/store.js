@@ -13,6 +13,7 @@ import { bannerApi } from "../api/bannerApi";
 import { categoryApi } from "../api/CategoryApi";
 import { cartApi } from "../api/cartApi";
 import { newsLetterApi } from "../api/newsletterApi";
+import { reviewApi } from "../api/reviewApi";
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
     [newsLetterApi.reducerPath]: newsLetterApi.reducer,
+    [reviewApi.reducerPath]: reviewApi.reducer,
     auth: authReducer,
     menu: menuReducer,
     cart: cartReducer,
@@ -41,6 +43,7 @@ export const store = configureStore({
       bannerApi.middleware,
       categoryApi.middleware,
       cartApi.middleware,
-      newsLetterApi.middleware
+      newsLetterApi.middleware,
+      reviewApi.middleware
     ),
 });
