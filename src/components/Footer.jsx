@@ -155,16 +155,16 @@ export default function Footer() {
           </p>
         </ClientOnly>
         <div className="flex gap-4 text-gray-400">
-          <Link href="#">
+          <Link href="https://www.facebook.com/people/Refilly-Streetstyle/pfbid02gNTjZMc9XDRH7jwDrhZrirWonQcZJXwxC18qJfiQn7EzwhBUkGrEMjzkj3JZsnCJl/?rdid=5KTVOAkYrSUQvqD7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1JjDwJX7RY%2F">
             <FaFacebookF className="hover:text-yellow-400 cursor-pointer" />
           </Link>
-          <Link href="#">
+          <Link href="https://x.com/Refilly_?t=9ipblt2ac5iIHQaXmbQOyw&s=08">
             <FaTwitter className="hover:text-yellow-400 cursor-pointer" />
           </Link>
-          <Link href="#">
+          <Link href="https://www.instagram.com/refillyofficial/?utm_source=qr&igsh=MTVkdjYwbnF1dDF1eg%3D%3D#">
             <FaInstagram className="hover:text-yellow-400 cursor-pointer" />
           </Link>
-          <Link href="#">
+          <Link href="https://www.youtube.com/@refillyofficial">
             <FaYoutube className="hover:text-yellow-400 cursor-pointer" />
           </Link>
         </div>
