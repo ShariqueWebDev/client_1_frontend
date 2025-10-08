@@ -76,7 +76,7 @@ const Instagram = () => {
         {/* Instagram Follow Button */}
         <div className="text-center mt-10">
           <a
-            href="https://instagram.com/md_affan_003"
+            href="https://www.instagram.com/refillyofficial/?utm_source=qr&igsh=MTVkdjYwbnF1dDF1eg%3D%3D#"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-full shadow-md transition"

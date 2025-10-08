@@ -30,7 +30,7 @@ const registerSchema = z.object({
   gender: z.enum(["male", "female", "other"], {
     errorMap: () => ({ message: "Select gender" }),
   }),
-  photo: z.string().url("Invalid photo URL"),
+  // photo: z.string().url("Invalid photo URL"),
 });
 
 const forgotSchema = z.object({
@@ -115,7 +115,7 @@ export default function LoginRegisterPage() {
       name: data.name,
       email: data.email,
       password: data.password,
-      photo: data.photo || "https://i.pravatar.cc/150",
+      // photo: data.photo || "https://i.pravatar.cc/150",
       gender: data.gender,
       dob: new Date(data.dob).toISOString(),
     };
@@ -289,7 +289,7 @@ export default function LoginRegisterPage() {
                 </p>
               )}
 
-              <input
+              {/* <input
                 type="url"
                 placeholder="Photo URL"
                 {...regRegister("photo")}
@@ -299,7 +299,7 @@ export default function LoginRegisterPage() {
                 <p className="text-red-500 text-sm">
                   {regErrors.photo.message}
                 </p>
-              )}
+              )} */}
 
               <button
                 type="submit"
