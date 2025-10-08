@@ -153,6 +153,9 @@ export default function Footer() {
           <p className="text-sm text-gray-400">
             © {getCurrentYear()} Refilly | All Rights Reserved
           </p>
+          <p className="text-sm text-gray-400">
+            Designed By Affan and Sharique
+          </p>
         </ClientOnly>
         <div className="flex gap-4 text-gray-400">
           <Link href="https://www.facebook.com/people/Refilly-Streetstyle/pfbid02gNTjZMc9XDRH7jwDrhZrirWonQcZJXwxC18qJfiQn7EzwhBUkGrEMjzkj3JZsnCJl/?rdid=5KTVOAkYrSUQvqD7&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1JjDwJX7RY%2F">
