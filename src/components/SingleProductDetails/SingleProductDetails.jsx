@@ -211,12 +211,12 @@ const ProductDetailsPage = ({ slug }) => {
                     <div className="flex gap-3">
                       <Phone size={16} />
                       <div className="flex gap-3">
-                        <a href="+917448135379" className="">
-                          +91 9999999999
+                        <a href="tel:+917385346401" className="">
+                          +91 7385346401
                         </a>
                         <div>|</div>{" "}
-                        <a href=" +917498881806" className="">
-                          +91 9999999999
+                        <a href="tel:+919527988214" className="">
+                          +91 9527988214
                         </a>
                       </div>
                     </div>
