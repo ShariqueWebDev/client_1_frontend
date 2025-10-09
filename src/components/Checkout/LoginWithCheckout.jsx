@@ -45,6 +45,10 @@ const otpSchema = z.object({
 
 export default function LoginRegisterPage() {
   const [view, setView] = useState("login"); // login | register | forgot | verification
+  const [resendDisabled, setResendDisabled] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [forgotEmail, setForgotEmail] = useState(0);
+
   // const [email, setEmail] = useState("");
   const router = useRouter();
   const dispatch = useDispatch();
@@ -127,6 +131,7 @@ export default function LoginRegisterPage() {
       dispatch(staticApi.util.invalidateTags(["Statics"]));
     } catch (err) {
       toast.error(err?.data?.message || "Register failed");
+      console.log(err);
     }
   };
 
@@ -134,7 +139,7 @@ export default function LoginRegisterPage() {
     try {
       const res = await sendOtp({ email: data.email }).unwrap();
       if (res.success) {
-        // setEmail(data.email);
+        setForgotEmail(data.email);
         setView("verification");
       } else {
         alert(res.message);
@@ -157,6 +162,32 @@ export default function LoginRegisterPage() {
       console.log("OTP verification failed!");
     }
     // 🔹 Yahan backend se OTP verify karna hai
+  };
+
+  const handleResend = async () => {
+    if (!forgotEmail) return toast.error("Email not found");
+
+    try {
+      await sendOtp({ email: forgotEmail }).unwrap();
+      toast.success("OTP resent successfully");
+
+      setResendDisabled(true);
+      setCountdown(60);
+
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setResendDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to resend OTP");
+      setResendDisabled(false);
+    }
   };
 
   return (
@@ -409,10 +440,11 @@ export default function LoginRegisterPage() {
             <p className="text-sm text-center mt-3">
               Didn’t get OTP?{" "}
               <button
-                className="text-blue-600 underline"
-                onClick={() => setView("forgot")}
+                className="text-blue-600 underline disabled:opacity-50"
+                disabled={resendDisabled || sendOtpLoading}
+                onClick={handleResend}
               >
-                Resend
+                {resendDisabled ? `Resend in ${countdown}s` : "Resend"}
               </button>
             </p>
           </>
