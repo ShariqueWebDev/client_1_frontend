@@ -438,7 +438,7 @@ export default function LoginRegisterPage() {
             </form>
 
             <p className="text-sm text-center mt-3">
-              Did not get OTP?{" "}
+              Didn’t get OTP?{" "}
               <button
                 className="text-blue-600 underline disabled:opacity-50"
                 disabled={resendDisabled || sendOtpLoading}
