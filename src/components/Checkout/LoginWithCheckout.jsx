@@ -301,6 +301,7 @@ export default function LoginRegisterPage() {
                 {...regRegister("dob")}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm"
               />
+              <p className="text-xs text-gray-600">Enter your date of birth</p>
               {regErrors.dob && (
                 <p className="text-red-500 text-sm">{regErrors.dob.message}</p>
               )}
