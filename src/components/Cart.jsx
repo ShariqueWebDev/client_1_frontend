@@ -51,7 +51,9 @@ const Cart = ({ product, isSlider }) => {
         guestCart.push({
           name: product?.name,
           productId: product?._id,
-          photo: product?.photo,
+          photos: product?.photos?.length
+            ? product.photos
+            : [product?.photo || "/assets/tshirt-mockup.png"],
           price: product?.price,
           quantity: 1,
           stock: product?.stock,
@@ -61,6 +63,8 @@ const Cart = ({ product, isSlider }) => {
       toast.success("Product added in cart");
       return;
     }
+
+    console.log(product, "product details....");
 
     if (product?._id) {
       const alreadyInCart = cartItem?.some((item) => {
@@ -103,7 +107,7 @@ const Cart = ({ product, isSlider }) => {
       <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
         {/* Product Image */}
         <Image
-          src={product.image || product.photo}
+          src={product.image || product.photos?.[0] || product.photo}
           alt={product.name}
           width={500}
           height={700}

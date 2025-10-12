@@ -28,7 +28,9 @@ const productSchema = z.object({
   category: z.string().min(2, "Category required"),
   subCategory: z.string().min(2, "Sub-category required"),
   color: z.string().min(2, "Color required"),
-  photo: z.any().refine((file) => file?.length === 1, "Photo is required"),
+  photos: z
+    .any()
+    .refine((files) => files?.length > 0, "At least one photo is required"),
 });
 
 const AddProductModal = ({ btnLable, table }) => {
@@ -64,7 +66,9 @@ const AddProductModal = ({ btnLable, table }) => {
       formData.append("category", data?.category);
       formData.append("subCategory", data?.subCategory);
       formData.append("color", data?.color);
-      formData.append("photo", data?.photo[0]);
+      for (let i = 0; i < data.photos.length; i++) {
+        formData.append("photos", data.photos[i]); // field name "photos" = backend multer expects
+      }
 
       const res = await addNewProduct({
         formData,
@@ -260,10 +264,13 @@ const AddProductModal = ({ btnLable, table }) => {
               <div>
                 <input
                   type="file"
-                  {...register("photo")}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none"
+                  {...register("photos")}
+                  multiple
+                  accept="image/*"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
                 />
-                {errors.photo && (
+
+                {errors.photos && (
                   <p className="text-red-500 text-sm">{errors.photo.message}</p>
                 )}
               </div>

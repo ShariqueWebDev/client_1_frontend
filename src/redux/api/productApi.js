@@ -47,6 +47,14 @@ export const productApi = createApi({
       invalidatesTags: [{ type: "AdminProducts", id: "LIST" }, "Products"],
     }),
 
+    // deleteImage: builder.mutation({
+    //   query: () => ({
+    //     url: `/delete-image`,
+    //     method: "PUT",
+    //   }),
+    //   // invalidatesTags: [{ type: "AdminProducts", id: "LIST" }, "Products"],
+    // }),
+
     updateProduct: builder.mutation({
       query: ({ id, formData, isAdmin }) => ({
         url: `/${id}?_id=${isAdmin}`,

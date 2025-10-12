@@ -24,6 +24,8 @@ import Link from "next/link";
 
 const ProductDetailsPage = ({ slug }) => {
   const [reviewText, setReviewText] = useState("");
+  const [selectedImage, setSelectedImage] = useState("");
+
   const [rating, setRating] = useState(5); // default 5 stars
   const [user, setUser] = useState(null);
   const dispatch = useDispatch();
@@ -71,6 +73,12 @@ const ProductDetailsPage = ({ slug }) => {
   // console.log(relatedData, "Related product data...........");
 
   useEffect(() => {
+    if (data?.product?.photos?.length > 0) {
+      setSelectedImage(data.product.photos[0]); // default pehli image
+    }
+  }, [data]);
+
+  useEffect(() => {
     const storedUser = localStorage.getItem("user"); // get from localStorage
     if (storedUser) {
       setUser(JSON.parse(storedUser)); // agar object stored hai
@@ -101,7 +109,9 @@ const ProductDetailsPage = ({ slug }) => {
         guestCart.push({
           name: product?.name,
           productId: product?._id,
-          photo: product?.photo,
+          photos: product?.photos?.length
+            ? product.photos
+            : [product?.photo || "/assets/tshirt-mockup.png"],
           price: product?.price,
           quantity: 1,
           stock: product?.stock,
@@ -133,7 +143,7 @@ const ProductDetailsPage = ({ slug }) => {
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");
 
-  console.log(reviewData, "reivewdata.....");
+  console.log(data?.product, "single product data.....");
 
   return (
     <div>
@@ -143,14 +153,41 @@ const ProductDetailsPage = ({ slug }) => {
         <>
           <div className="max-w-5xl mx-auto px-4 lg:py-12  pt-12  ">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-20 gap-8 items-center">
-              <div className="w-full border border-gray-200 rounded-md">
-                <Image
-                  src={productDetails?.photo}
-                  alt={"Anime Tshirt"}
-                  width={700}
-                  height={1000}
-                  className=""
-                />
+              {/* 🖼️ Left Section - Product Images */}
+              <div className="w-full flex flex-col items-center">
+                {/* Main image frame */}
+                <div className="w-full border border-gray-200 rounded-md overflow-hidden">
+                  <Image
+                    src={selectedImage || productDetails?.photo}
+                    alt="Product Main Image"
+                    width={700}
+                    height={700}
+                    className="object-cover w-full h-[500px] transition-all duration-300"
+                  />
+                </div>
+
+                {/* Thumbnail images */}
+                <div className="flex flex-wrap justify-center gap-2 mt-4">
+                  {productDetails?.photos?.map((img, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSelectedImage(img)}
+                      className={`cursor-pointer border rounded-md p-1 transition-all duration-200 ${
+                        selectedImage === img
+                          ? "border-yellow-500 scale-105"
+                          : "border-gray-300 hover:border-yellow-400"
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={`Thumbnail ${index}`}
+                        width={80}
+                        height={80}
+                        className="object-cover w-16 h-16 rounded"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>

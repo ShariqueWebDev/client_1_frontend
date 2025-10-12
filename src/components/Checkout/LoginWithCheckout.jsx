@@ -441,7 +441,7 @@ export default function LoginRegisterPage() {
             <p className="text-sm text-center mt-3">
               Didn’t get OTP?{" "}
               <button
-                className="text-blue-600 underline disabled:opacity-50"
+                className="text-blue-600 underline disabled:opacity-50 cursor-pointer"
                 disabled={resendDisabled || sendOtpLoading}
                 onClick={handleResend}
               >

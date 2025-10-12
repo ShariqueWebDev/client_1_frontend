@@ -77,7 +77,7 @@ export default function MyOrder() {
                             width={300}
                             height={300}
                             src={
-                              order?.productId?.photo ||
+                              order?.productId?.photos?.[0] ||
                               "/assets/tshirt-mockup.png"
                             } // fallback image
                             alt={order?.productId?.name || "Product Image"} // fallback alt text

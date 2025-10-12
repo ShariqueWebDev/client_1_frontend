@@ -188,7 +188,11 @@ export default function MyOrder() {
           ))}
 
         <button
-          disabled={isCancelling || data?.single_order?.status === "Cancelled"}
+          disabled={
+            isCancelling ||
+            data?.single_order?.status === "Cancelled" ||
+            data?.single_order.status === "Delivered"
+          }
           onClick={() => handleCancelOrder(slug)}
           className={`bg-yellow-500 hover:bg-yellow-600 w-fit px-4 py-2 mb-5 text-white lg:text-sm text-xs rounded-sm ${
             isCancelling ? "opacity-50 cursor-not-allowed" : ""
@@ -207,7 +211,7 @@ export default function MyOrder() {
                 <Image
                   width={500}
                   height={500}
-                  src={order?.productId?.photo}
+                  src={order?.productId?.photos?.[0]}
                   alt={order?.name}
                   className="w-32 h-36 object-cover rounded"
                 />

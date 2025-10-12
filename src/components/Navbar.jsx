@@ -195,7 +195,10 @@ export default function Navbar() {
                         >
                           <div className="">
                             <Image
-                              src={product?.photo}
+                              src={
+                                product?.photos?.[0] ||
+                                "/assets/tshirt-mockup.png"
+                              }
                               width={70}
                               height={70}
                               alt={product?.name}

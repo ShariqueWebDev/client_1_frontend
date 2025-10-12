@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { useUpdateProductMutation } from "../../../redux/api/productApi";
 import { useGetAllCategoriesQuery } from "../../../redux/api/CategoryApi";
+import axios from "axios";
 
 import Image from "next/image";
 
@@ -25,18 +26,43 @@ const productSchema = z.object({
     .refine((val) => val >= 0, { message: "Enter valid stock" }),
   category: z.string().min(2, "Category required"),
   subCategory: z.string().min(2, "Sub-category required"),
-  photo: z.any().optional(),
+  photos: z.any().optional(),
 });
 
 export default function UpdateProductForm({ product, onClose }) {
   const [updateProduct, { isLoading }] = useUpdateProductMutation();
-  const [filePreview, setFilePreview] = useState(product?.photo || null);
+  const [filePreview, setFilePreview] = useState(
+    product?.photos?.length > 0 ? product.photos : []
+  );
+  const [photoPublicIds, setPhotoPublicIds] = useState(
+    product?.photoPublicId?.length > 0 ? product.photoPublicId : []
+  );
 
   const { data, isLoading: catIsLoading } = useGetAllCategoriesQuery({
     page: 1,
     search: "",
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
   });
+
+  const handleDeleteImage = async (publicId) => {
+    try {
+      const { data } = await axios.put(
+        `${process.env.NEXT_PUBLIC_SERVER}/api/v1/product/delete-image`,
+        {
+          productId: product?._id,
+          publicId,
+        }
+      );
+
+      // Update frontend state
+      setFilePreview(data.photos);
+      setPhotoPublicIds(data.photoPublicId);
+      toast.success("Image deleted successfully!");
+    } catch (err) {
+      toast.error("Failed to delete image");
+      console.error(err);
+    }
+  };
 
   // console.log(product.photo);
 
@@ -68,15 +94,19 @@ export default function UpdateProductForm({ product, onClose }) {
       formData.append("stock", data.stock);
       formData.append("category", data.category);
       formData.append("subCategory", data.subCategory);
-      if (data.photo && data.photo[0]) {
-        formData.append("photo", data.photo[0]);
+
+      if (data.photos && data.photos.length > 0) {
+        for (let i = 0; i < data.photos.length; i++) {
+          formData.append("photos", data.photos[i]); // field name must match backend multer
+        }
       }
 
       await updateProduct({
-        id: product?._id,
+        id: product._id,
         formData,
         isAdmin: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
+
       toast.success("Product updated successfully!");
       onClose();
     } catch (err) {
@@ -84,6 +114,8 @@ export default function UpdateProductForm({ product, onClose }) {
       console.error(err);
     }
   };
+
+  console.log(product, "update product data.......");
 
   return (
     <form
@@ -187,21 +219,42 @@ export default function UpdateProductForm({ product, onClose }) {
 
       <input
         type="file"
-        {...register("photo")}
-        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm  focus:outline-none placeholder:text-gray-300 "
-        onChange={(e) =>
-          setFilePreview(URL.createObjectURL(e?.target?.files?.[0]))
-        }
+        {...register("photos")}
+        multiple
+        accept="image/*"
+        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none"
+        onChange={(e) => {
+          const files = e.target.files;
+          if (files) {
+            const previews = Array.from(files).map((file) =>
+              URL.createObjectURL(file)
+            );
+            setFilePreview(previews); // filePreview ko array me handle karenge
+          }
+        }}
       />
-      {filePreview && (
-        <Image
-          src={filePreview}
-          width={250}
-          height={250}
-          alt="Preview"
-          className="w-24 h-24 object-cover mt-2"
-        />
-      )}
+      <div className="flex flex-wrap gap-2">
+        {filePreview?.map((src, index) => (
+          <div key={index} className="relative w-16 h-16">
+            <Image
+              src={src}
+              alt={`Preview ${index}`}
+              width={100}
+              height={100}
+              className="w-16 h-16 object-cover rounded"
+            />
+            {photoPublicIds[index] && (
+              <button
+                type="button"
+                onClick={() => handleDeleteImage(photoPublicIds[index])}
+                className="absolute inset-0 m-auto bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-90 hover:opacity-100 shadow-md cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
 
       <div className="flex justify-end gap-2 mt-2">
         <button

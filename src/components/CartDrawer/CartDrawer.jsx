@@ -103,7 +103,9 @@ export default function CartDrawer() {
           productId: product?._id,
           quantity: 1,
           name: product?.name,
-          photo: product?.photo,
+          photos: product?.photos?.length
+            ? product.photos
+            : [product?.photo || "/assets/tshirt-mockup.png"],
           price: product?.price,
           stock: product?.stock,
         });
@@ -184,6 +186,7 @@ export default function CartDrawer() {
 
   // console.log(cart, "cart data..");
   // console.log(data, "only data..");
+  // console.log(user, "user data..");
 
   return (
     <div
@@ -258,6 +261,7 @@ export default function CartDrawer() {
           ) : (
             cart?.map((item, index) => {
               const prod = item?.productId;
+              console.log(prod, "product data...");
 
               return (
                 <div
@@ -270,8 +274,8 @@ export default function CartDrawer() {
                       height={200}
                       src={
                         !user
-                          ? item?.photo || "/assets/tshirt-mockup.png"
-                          : prod?.photo || "/assets/tshirt-mockup.png"
+                          ? item?.photos?.[0] || "/assets/tshirt-mockup.png"
+                          : prod?.photos?.[0] || "/assets/tshirt-mockup.png"
                       }
                       alt={
                         !user

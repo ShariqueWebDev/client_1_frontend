@@ -45,7 +45,7 @@ const CategoryClass = ({ slug }) => {
     limit: 8, // items per page
   });
 
-  // console.log(data, "filter data.....");
+  console.log(data, "filter data.....");
 
   const title = String(slug).split("-").join(" ").toUpperCase();
 
