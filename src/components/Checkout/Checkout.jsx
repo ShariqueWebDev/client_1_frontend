@@ -353,7 +353,7 @@ const Checkout = () => {
                     <Image
                       width={200}
                       height={200}
-                      src={prod?.photo}
+                      src={prod?.photos?.[0]}
                       alt={prod?.name}
                       className="w-12 h-12 object-cover rounded"
                     />
