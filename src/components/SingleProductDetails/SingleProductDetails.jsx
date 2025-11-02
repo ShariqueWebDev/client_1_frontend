@@ -266,8 +266,16 @@ const ProductDetailsPage = ({ slug }) => {
                     <div className="flex gap-3 mt-3">
                       <Mail size={16} />
                       <div className="">
-                        <a href="mailto:info@refilly.com" className="">
-                          info@refilly.com
+                        <a href="mailto:shahfiroz677@gmail.com" className="">
+                          shahfiroz677@gmail.com
+                        </a>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 mt-3">
+                      <Mail size={16} />
+                      <div className="">
+                        <a href="mailto:shahfiroz677@gmail.com" className="">
+                          ansaritauheed003@gmail.com
                         </a>
                       </div>
                     </div>
@@ -275,7 +283,8 @@ const ProductDetailsPage = ({ slug }) => {
                       <MapPin size={16} />
                       <div className="">
                         <p className="">
-                          Bhiwandi Gaibi nagar, star hotel, Refilly 421302
+                          Rafique hotel, Naigaon Road, batulsalam masjid
+                          opposite akhtar Compound, bhiwandi, Thane Maharashtra
                         </p>
                       </div>
                     </div>

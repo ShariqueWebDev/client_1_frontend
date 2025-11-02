@@ -105,9 +105,9 @@ const Checkout = () => {
           orderItems: cart,
           subtotal: total,
           tax: 0,
-          shippingCharges: 1,
+          shippingCharges: 40,
           discount: 0,
-          total: total + 1,
+          total: total,
           paymentInfo: {
             id: "COD_" + Date.now(),
             status: "Pending",
@@ -128,7 +128,7 @@ const Checkout = () => {
 
     // ✅ Razorpay flow
     try {
-      const response = await createRazorpayOrder(total + 1).unwrap();
+      const response = await createRazorpayOrder(total).unwrap();
       const razorpayData = response.data;
 
       if (!razorpayData?.id || !razorpayData?.amount) {
@@ -154,9 +154,9 @@ const Checkout = () => {
                 orderItems: cart,
                 subtotal: total,
                 tax: 0,
-                shippingCharges: 1,
+                shippingCharges: 40,
                 discount: 0,
-                total: total + 1,
+                total: total,
               },
             }).unwrap();
 

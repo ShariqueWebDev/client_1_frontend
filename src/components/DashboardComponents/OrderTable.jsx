@@ -138,7 +138,7 @@ export default function AdminOrderTable() {
                 </thead>
               </table>
               <div className="lg:border border-gray-300 text-center text-sm py-20">
-                Search not found!
+                order not found!
               </div>
             </div>
           </>
