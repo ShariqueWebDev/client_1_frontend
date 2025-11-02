@@ -271,7 +271,9 @@ const AddProductModal = ({ btnLable, table }) => {
                 />
 
                 {errors.photos && (
-                  <p className="text-red-500 text-sm">{errors.photo.message}</p>
+                  <p className="text-red-500 text-sm">
+                    {errors.photos.message}
+                  </p>
                 )}
               </div>
 
