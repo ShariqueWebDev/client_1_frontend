@@ -1,7 +1,6 @@
-// components/admin/UpdateProductForm.js
 "use client";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
@@ -27,6 +26,7 @@ const productSchema = z.object({
   category: z.string().min(2, "Category required"),
   subCategory: z.string().min(2, "Sub-category required"),
   photos: z.any().optional(),
+  sizes: z.array(z.string()).min(1, "Select at least one size").default([]),
 });
 
 export default function UpdateProductForm({ product, onClose }) {
@@ -43,6 +43,8 @@ export default function UpdateProductForm({ product, onClose }) {
     search: "",
     isAdmin: process.env.NEXT_PUBLIC_ADMIN_ID, // ya jo bhi adminId hai
   });
+
+  console.log(updateProduct, "update query cheking......");
 
   const handleDeleteImage = async (publicId) => {
     try {
@@ -69,6 +71,7 @@ export default function UpdateProductForm({ product, onClose }) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(productSchema),
@@ -81,6 +84,7 @@ export default function UpdateProductForm({ product, onClose }) {
       category: product?.category,
       subCategory: product?.subCategory,
       photo: null,
+      sizes: Array.isArray(product?.sizes) ? product.sizes : [],
     },
   });
 
@@ -94,6 +98,7 @@ export default function UpdateProductForm({ product, onClose }) {
       formData.append("stock", data.stock);
       formData.append("category", data.category);
       formData.append("subCategory", data.subCategory);
+      formData.append("sizes", JSON.stringify(data.sizes));
 
       if (data.photos && data.photos.length > 0) {
         for (let i = 0; i < data.photos.length; i++) {
@@ -141,7 +146,6 @@ export default function UpdateProductForm({ product, onClose }) {
       {errors.description && (
         <p className="text-red-500 text-sm">{errors.description.message}</p>
       )}
-
       <input
         type="text"
         placeholder="Price"
@@ -151,7 +155,6 @@ export default function UpdateProductForm({ product, onClose }) {
       {errors.price && (
         <p className="text-red-500 text-sm">{errors.price.message}</p>
       )}
-
       <input
         type="text"
         placeholder="MRP Price"
@@ -161,7 +164,6 @@ export default function UpdateProductForm({ product, onClose }) {
       {errors.mrpPrice && (
         <p className="text-red-500 text-sm">{errors.mrpPrice.message}</p>
       )}
-
       <input
         type="text"
         placeholder="Stock"
@@ -171,7 +173,6 @@ export default function UpdateProductForm({ product, onClose }) {
       {errors.stock && (
         <p className="text-red-500 text-sm">{errors.stock.message}</p>
       )}
-
       <div>
         <select
           {...register("category")}
@@ -195,6 +196,38 @@ export default function UpdateProductForm({ product, onClose }) {
         )}
       </div>
 
+      <Controller
+        control={control}
+        name="sizes"
+        defaultValue={[]}
+        render={({ field }) => (
+          <div className="flex flex-wrap gap-2">
+            {["XS", "S", "M", "L", "XL", "XXL"]?.map((size) => (
+              <label key={size} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  value={size}
+                  checked={
+                    Array.isArray(field.value) && field.value.includes(size)
+                  }
+                  onChange={(e) => {
+                    const current = Array.isArray(field.value)
+                      ? field.value
+                      : [];
+                    if (e.target.checked) {
+                      field.onChange([...current, size]);
+                    } else {
+                      field.onChange(current.filter((v) => v !== size));
+                    }
+                  }}
+                />
+                {size}
+              </label>
+            ))}
+          </div>
+        )}
+      />
+
       {/* Sub Category */}
       <div>
         <select
@@ -216,7 +249,6 @@ export default function UpdateProductForm({ product, onClose }) {
           <p className="text-red-500 text-sm">{errors.subCategory.message}</p>
         )}
       </div>
-
       <input
         type="file"
         {...register("photos")}
@@ -255,7 +287,6 @@ export default function UpdateProductForm({ product, onClose }) {
           </div>
         ))}
       </div>
-
       <div className="flex justify-end gap-2 mt-2">
         <button
           type="button"

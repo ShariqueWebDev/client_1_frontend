@@ -77,6 +77,8 @@ export default function MyOrder() {
   const currentStatus = data?.single_order?.status;
   const currentIndex = steps.indexOf(currentStatus);
 
+  console.log(data, "single order data.....");
+
   return (
     <div className="lg:px-20 px-4 flex lg:flex-row flex-col lg:gap-10 my-10 min-h-screen">
       <div className="lg:w-[30%] w-full h-full lg:sticky top-5">

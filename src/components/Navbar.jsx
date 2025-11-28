@@ -45,7 +45,7 @@ export default function Navbar() {
   const { data: products, isLoading: searchLoading } = useSearchAllProductQuery(
     searchTerm ? { search: searchTerm } : skipToken // agar empty hai to API call skip
   );
-  console.log(products?.products, "search product....... by navbar");
+  // console.log(products?.products, "search product....... by navbar");
 
   const router = useRouter();
   const path = usePathname();

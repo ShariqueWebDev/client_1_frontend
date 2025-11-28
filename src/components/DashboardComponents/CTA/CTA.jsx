@@ -31,10 +31,13 @@ const productSchema = z.object({
   photos: z
     .any()
     .refine((files) => files?.length > 0, "At least one photo is required"),
+  sizes: z.array(z.string()).min(1, "Select at least one size"),
 });
 
 const AddProductModal = ({ btnLable, table }) => {
   const [open, setOpen] = useState(false);
+  const sizeOptions = ["S", "M", "L", "XL", "XXL", "XXXL"];
+
   const [addNewProduct, { isLoading, isError, isSuccess }] =
     useAddNewProductMutation();
 
@@ -58,16 +61,22 @@ const AddProductModal = ({ btnLable, table }) => {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("name", data?.name);
-      formData.append("description", data?.description);
-      formData.append("price", data?.price);
-      formData.append("mrpPrice", data?.mrpPrice);
-      formData.append("stock", data?.stock);
-      formData.append("category", data?.category);
-      formData.append("subCategory", data?.subCategory);
-      formData.append("color", data?.color);
+
+      formData.append("name", data.name);
+      formData.append("description", data.description);
+      formData.append("price", data.price);
+      formData.append("mrpPrice", data.mrpPrice);
+      formData.append("stock", data.stock);
+      formData.append("category", data.category);
+      formData.append("subCategory", data.subCategory);
+      formData.append("color", data.color);
+
+      // ⭐ Add sizes (as JSON string)
+      formData.append("sizes", JSON.stringify(data.sizes));
+
+      // Photos
       for (let i = 0; i < data.photos.length; i++) {
-        formData.append("photos", data.photos[i]); // field name "photos" = backend multer expects
+        formData.append("photos", data.photos[i]);
       }
 
       const res = await addNewProduct({
@@ -75,16 +84,13 @@ const AddProductModal = ({ btnLable, table }) => {
         adminId: `${process.env.NEXT_PUBLIC_ADMIN_ID}`,
       }).unwrap();
 
+      // Redux invalidate...
       dispatch(staticApi.util.invalidateTags(["Statics"]));
       dispatch(productApi.util.invalidateTags(["AdminProducts"]));
 
-      if (res) {
-        toast.success("Product created successfully!");
-        reset();
-        setOpen(false);
-      } else {
-        toast.error("Data is null!");
-      }
+      toast.success("Product created successfully!");
+      reset();
+      setOpen(false);
     } catch (error) {
       console.error("Product create failed", error);
     }
@@ -217,6 +223,32 @@ const AddProductModal = ({ btnLable, table }) => {
                   <p className="text-red-500 text-sm">
                     {errors.category.message}
                   </p>
+                )}
+              </div>
+
+              {/* Sizes */}
+              <div>
+                <p className="text-sm font-medium mb-2">Select Sizes</p>
+
+                <div className="grid grid-cols-3 gap-2">
+                  {sizeOptions.map((size) => (
+                    <label
+                      key={size}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        value={size}
+                        {...register("sizes")}
+                        className="cursor-pointer"
+                      />
+                      {size}
+                    </label>
+                  ))}
+                </div>
+
+                {errors.sizes && (
+                  <p className="text-red-500 text-sm">{errors.sizes.message}</p>
                 )}
               </div>
 

@@ -25,6 +25,7 @@ import Link from "next/link";
 const ProductDetailsPage = ({ slug }) => {
   const [reviewText, setReviewText] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
+  const [selectedSize, setSelectedSize] = useState(""); // track user selected size
 
   const [rating, setRating] = useState(5); // default 5 stars
   const [user, setUser] = useState(null);
@@ -34,7 +35,7 @@ const ProductDetailsPage = ({ slug }) => {
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
   const { data: reviewData, isLoading: reviewLoading } =
     useGetReviewByIdQuery(slug);
-  const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
+  // const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
   const cartItem = useSelector((state) => state.cart.items);
 
   const productDetails = data?.product;
@@ -86,58 +87,55 @@ const ProductDetailsPage = ({ slug }) => {
   }, []);
 
   const handleAddToCart = (product) => {
-    // console.log(product, "add to cart.......");
-
-    if (!user) {
-      let guestCart = getGuestCart();
-      const existing = guestCart.find((i) => i.productId === product?._id);
-      console.log(product, "Guest cart....");
-      const existProduct = guestCart?.some((item) => {
-        console.log(item?.productId);
-
-        return item?.productId === product?._id;
-      });
-      console.log(existProduct, "boolean value....");
-
-      if (existProduct) {
-        toast.error("Product already exist in cart!");
-        return;
-      }
-
-      if (existing) existing.quantity += 1;
-      else
-        guestCart.push({
-          name: product?.name,
-          productId: product?._id,
-          photos: product?.photos?.length
-            ? product.photos
-            : [product?.photo || "/assets/tshirt-mockup.png"],
-          price: product?.price,
-          quantity: 1,
-          stock: product?.stock,
-        });
-      setGuestCart(guestCart);
-      dispatch(setCart(guestCart));
-      toast.success("Product added in cart");
+    if (!selectedSize) {
+      toast.error("Please select a size before adding to cart");
       return;
     }
 
-    if (product?._id) {
-      const alreadyInCart = cartItem?.some((item) => {
-        const itemId =
-          item.productId?._id || item._id || item.id || item?.product?._id;
-        return String(itemId) === String(product._id);
+    if (!user) {
+      let guestCart = getGuestCart();
+      const existProduct = guestCart.some(
+        (item) => item.productId === product._id && item.size === selectedSize
+      );
+
+      if (existProduct) {
+        toast.error("Product with this size already in cart");
+        return;
+      }
+
+      guestCart.push({
+        name: product.name,
+        productId: product._id,
+        photos: product.photos?.length ? product.photos : [product.photo],
+        size: selectedSize,
+        price: product.price,
+        quantity: 1,
+        stock: product.stock,
       });
 
-      if (alreadyInCart) {
-        toast.error("Product already exist in cart!");
-        return; // yahi ensure karega ke neeche ka code tabhi chale jab item cart mein na ho
-      }
-      console.log(alreadyInCart, cartItem, "already exist..");
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+      console.log(guestCart, ".....Guest Cart.....");
+
+      toast.success("Product added to cart");
+      return;
     }
 
-    // agar product cart mein nahi hai to yeh chalega
-    cartActions.handleAdd({ productId: product?._id });
+    // Logged in user cart logic
+    const alreadyInCart = cartItem?.some(
+      (item) =>
+        String(item.productId) === String(product._id) &&
+        item.size === selectedSize
+    );
+
+    if (alreadyInCart) {
+      toast.error("Product with this size already in cart");
+      return;
+    }
+    console.log(alreadyInCart, "Already card in cart");
+
+    // Add to cart with size
+    cartActions.handleAdd({ productId: product._id, size: selectedSize });
     toast.success("Product added to cart");
   };
 
@@ -213,9 +211,33 @@ const ProductDetailsPage = ({ slug }) => {
                 <p className="text-gray-600 text-sm leading-relaxed mb-8">
                   {productDetails?.description}
                 </p>
+
+                <div className="mb-4">
+                  <label className="text-sm font-medium mb-1 block">
+                    Select Size:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => setSelectedSize(size)}
+                        className={`px-3 py-1 border rounded cursor-pointer ${
+                          selectedSize === size
+                            ? "bg-yellow-500 text-white border-yellow-500"
+                            : "border-gray-300 text-gray-700 hover:border-yellow-400"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {productDetails?.stock === 0 && (
                   <p className=" text-red-500 mb-3 ">Out of stock</p>
                 )}
+
                 <div
                   className="flex gap-4"
                   onClick={() => {

@@ -3,8 +3,8 @@ import { cartApi } from "../api/cartApi";
 import { store } from "../store/store";
 
 export const cartActions = {
-  handleAdd: (productId) =>
-    store.dispatch(cartApi.endpoints.addToCart.initiate({ productId })),
+  handleAdd: ({ productId, size }) =>
+    store.dispatch(cartApi.endpoints.addToCart.initiate({ productId, size })),
 
   handleRemove: (productId) =>
     store.dispatch(cartApi.endpoints.removeFromCart.initiate({ productId })),

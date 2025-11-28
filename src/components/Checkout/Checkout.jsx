@@ -11,6 +11,7 @@ import {
   useCreateOrderMutation,
   useCreateRazorpayOrderMutation,
   useVerifyRazorpayPaymentMutation,
+  useValidatePincodeMutation,
 } from "../../redux/api/orderApi";
 import { cartActions } from "../../redux/actions/cart-actions";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,8 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import LoginWithCheckout from "../Checkout/LoginWithCheckout";
+import FirebaseOtp from "../Checkout/FirebaseOtp";
+
 import Image from "next/image";
 
 // Zod schema
@@ -27,25 +30,43 @@ const orderSchema = z.object({
   state: z.string().min(3, "State is required"),
   country: z.string().min(3, "Country is required"),
   pinCode: z.string().regex(/^[0-9]{6}$/, "Pin Code should be 6 digits"),
-  phoneNo: z.string().regex(/^[0-9]{10}$/, "Phone should be exactly 10 digits"),
+  phoneNo: z.string().regex(/^[7-9]\d{9}$/, "Enter a valid phone number"),
 });
 
 const Checkout = () => {
+  const [cartMobile, setCartMobile] = useState(false);
+  const [pin, setPin] = useState("");
+
   const { user } = useSelector((state) => state.auth);
   const { items: cart, isLoading } = useSelector((state) => state.cart);
   const { data, isSuccess } = useGetCartQuery(undefined, { skip: !user });
+  const [validatePincode, { data: pinData, error, isLoading: pinLoading }] =
+    useValidatePincodeMutation();
+
+  useEffect(() => {
+    if (!pin) return;
+
+    const timer = setTimeout(() => {
+      validatePincode({ pin });
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timer);
+  }, [pin]);
+
   const router = useRouter();
+
+  console.log(cart, "Checkout Page......");
 
   // React Hook Form
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(orderSchema),
   });
 
-  const [cartMobile, setCartMobile] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("Razorpay");
 
   // Order creation mutations
@@ -64,6 +85,15 @@ const Checkout = () => {
   );
 
   // console.log(cart, "cart data..");
+
+  // Autofill City, District, State from DB
+  useEffect(() => {
+    if (pinData?.success) {
+      setValue("city", pinData.data.city || "");
+      setValue("state", pinData.data.state || "");
+      setValue("country", "India");
+    }
+  }, [pinData, setValue]);
 
   // Load Razorpay script
   useEffect(() => {
@@ -88,6 +118,8 @@ const Checkout = () => {
 
   // Form submission
   const onSubmit = async (formData) => {
+    console.log(formData, cart, "form data.............");
+
     if (!cart.length) {
       toast.error("Cart is empty");
       return;
@@ -265,26 +297,52 @@ const Checkout = () => {
                 </p>
               )}
             </div>
-            <div className="w-full">
+            <div className="w-full relative">
               <input
-                disabled={cart.length === 0}
                 {...register("pinCode")}
-                placeholder="Pin Code"
+                type="number"
+                value={pin}
+                onChange={(e) => {
+                  setPin(e.target.value);
+                  setValue("pinCode", e.target.value); // 👈 important
+                }}
                 className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+                placeholder="Pin Code"
               />
-              {errors.pinCode && (
-                <p className="text-red-500 mt-2 text-sm">
-                  {errors.pinCode.message}
+
+              {/* Loading */}
+              {pinLoading && (
+                <p className="text-blue-500 absolute top-1.5 text-sm right-7 mt-1">
+                  Checking...
                 </p>
               )}
+
+              {/* Invalid */}
+              {error && !pinLoading && pin.length > 0 && (
+                <p className="text-red-500 absolute top-1.5 text-sm right-7 mt-1">
+                  Invalid Pincode
+                </p>
+              )}
+
+              {/* Valid */}
+              {/* {pinData?.success && !pinLoading && (
+                <p className="text-green-600 absolute top-1.5 text-sm right-5 mt-1">
+                  Valid Pincode
+                </p>
+              )} */}
             </div>
           </div>
           <input
-            disabled={cart.length === 0}
+            type="text"
+            maxLength={10}
             {...register("phoneNo")}
             placeholder="Phone Number"
             className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
+            onInput={(e) => {
+              e.target.value = e.target.value.replace(/[^0-9]/g, ""); // only numbers
+            }}
           />
+
           {errors.phoneNo && (
             <p className="text-red-500 -mt-2 text-sm">
               {errors.phoneNo.message}
@@ -327,6 +385,7 @@ const Checkout = () => {
             Place Order
           </button>
         </form>
+        {/* <FirebaseOtp /> */}
       </div>
 
       {/* Right Side Cart Summary */}
@@ -367,6 +426,9 @@ const Checkout = () => {
                         </p>
                         <p className="text-gray-400 text-xs">
                           Quantity: {item?.quantity}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Size: {item?.size}
                         </p>
                       </div>
                     </div>
@@ -423,13 +485,15 @@ const Checkout = () => {
           ) : (
             cart.map((item) => {
               const prod = user ? item?.productId : item;
+              console.log(prod, "mobile checkout.....");
+
               return (
                 <div className="relative" key={prod?._id}>
                   <div className="flex items-center gap-3 border-b border-b-gray-200 pb-2">
                     <Image
                       width={200}
                       height={200}
-                      src={prod?.photo}
+                      src={prod?.photos[0]}
                       alt={prod?.name}
                       className="w-12 h-12 object-cover rounded"
                     />
@@ -443,6 +507,9 @@ const Checkout = () => {
                         </p>
                         <p className="text-gray-400 text-xs">
                           Quantity: {item?.quantity}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          Size: {item?.size}
                         </p>
                       </div>
                     </div>

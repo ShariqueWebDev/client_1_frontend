@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { calculatePercentage, formatePrice } from "../utils/features";
 import { cartActions } from "../redux/actions/cart-actions";
 // import { useSelector } from "react-redux";
@@ -16,8 +16,9 @@ import toast from "react-hot-toast";
 //   useAddToCartMutation,
 // } from "../redux/api/cartApi";
 
-const Cart = ({ product, isSlider }) => {
+const Cart = ({ product, isSlider, linkUrl }) => {
   const cartItem = useSelector((state) => state.cart.items);
+  const [selectedSize, setSelectedSize] = useState(""); // track user selected size
 
   if (!product) return null; // safety check
 
@@ -28,60 +29,65 @@ const Cart = ({ product, isSlider }) => {
   // const [addToCart] = useAddToCartMutation();
 
   const handleAddToCart = (product) => {
-    // console.log(product, "add to cart.......");
-
-    if (!user) {
-      let guestCart = getGuestCart();
-      const existing = guestCart.find((i) => i.productId === product?._id);
-      console.log(product, "Guest cart....");
-      const existProduct = guestCart?.some((item) => {
-        console.log(item?.productId);
-
-        return item?.productId === product?._id;
-      });
-      console.log(existProduct, "boolean value....");
-
-      if (existProduct) {
-        toast.error("Product already exist in cart!");
-        return;
-      }
-
-      if (existing) existing.quantity += 1;
-      else
-        guestCart.push({
-          name: product?.name,
-          productId: product?._id,
-          photos: product?.photos?.length
-            ? product.photos
-            : [product?.photo || "/assets/tshirt-mockup.png"],
-          price: product?.price,
-          quantity: 1,
-          stock: product?.stock,
-        });
-      setGuestCart(guestCart);
-      dispatch(setCart(guestCart));
-      toast.success("Product added in cart");
+    if (!selectedSize) {
+      toast.error("Please select a size before adding to cart");
       return;
     }
 
-    console.log(product, "product details....");
+    // 🟡 Guest User
+    if (!user) {
+      let guestCart = getGuestCart();
 
-    if (product?._id) {
-      const alreadyInCart = cartItem?.some((item) => {
-        const itemId =
-          item.productId?._id || item._id || item.id || item?.product?._id;
-        return String(itemId) === String(product._id);
+      const existing = guestCart.find((item) => item.productId === product._id);
+
+      if (existing) {
+        // ❇️ Override size
+        existing.size = selectedSize;
+
+        setGuestCart(guestCart);
+        dispatch(setCart(guestCart));
+
+        toast.success("Product size updated in cart");
+        return;
+      }
+
+      // ➕ Add New
+      guestCart.push({
+        name: product.name,
+        productId: product._id,
+        photos: product.photos?.length ? product.photos : [product.photo],
+        size: selectedSize,
+        price: product.price,
+        quantity: 1,
+        stock: product.stock,
       });
 
-      if (alreadyInCart) {
-        toast.error("Product already exist in cart!");
-        return; // yahi ensure karega ke neeche ka code tabhi chale jab item cart mein na ho
-      }
-      console.log(alreadyInCart, cartItem, "already exist..");
+      setGuestCart(guestCart);
+      dispatch(setCart(guestCart));
+
+      toast.success("Product added to cart");
+      return;
     }
 
-    // agar product cart mein nahi hai to yeh chalega
-    cartActions.handleAdd({ productId: product?._id });
+    // 🟢 Logged-in User Cart Logic
+    const existingProduct = cartItem?.find(
+      (item) => String(item.productId) === String(product._id)
+    );
+
+    if (existingProduct) {
+      // ❇️ Override size, no duplicate
+      cartActions.handleAdd({
+        productId: product._id,
+        size: selectedSize,
+        updateSize: true, // optional
+      });
+
+      toast.success("Product size updated in cart");
+      return;
+    }
+
+    // ➕ Add New
+    cartActions.handleAdd({ productId: product._id, size: selectedSize });
     toast.success("Product added to cart");
   };
 
@@ -104,16 +110,18 @@ const Cart = ({ product, isSlider }) => {
         </div>
       )}
       {/* Product Card */}
-      <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
-        {/* Product Image */}
-        <Image
-          src={product.image || product.photos?.[0] || product.photo}
-          alt={product.name}
-          width={500}
-          height={700}
-          className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-500"
-        />
-      </div>
+      <Link href={`/products/${product._id}`}>
+        <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
+          {/* Product Image */}
+          <Image
+            src={product.image || product.photos?.[0] || product.photo}
+            alt={product.name}
+            width={500}
+            height={700}
+            className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+      </Link>
 
       {/* Product Info */}
       <h3 className="mt-3 lg:font-medium lg:text-lg  text-sm font-semibold text-gray-800 lg:h-[60px] h-[40px]">
@@ -123,6 +131,27 @@ const Cart = ({ product, isSlider }) => {
         {product?.description ||
           "Stylish and comfortable tee for all occasions."}
       </p>
+      <div className="mt-2">
+        <div className="flex flex-wrap gap-2">
+          {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => (
+            <button
+              key={size}
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation(); // 🛑 yahi navigation roke ga
+                setSelectedSize(size);
+              }}
+              className={`px-3 py-1 border rounded cursor-pointer text-xs ${
+                selectedSize === size
+                  ? "bg-yellow-500 text-white border-yellow-500"
+                  : "border-gray-300 text-gray-700 hover:border-yellow-400"
+              }`}
+            >
+              {size}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* ✅ Price + Cut Price (Fixed 999) */}
       <div className="flex items-center lg:gap-5 gap-2 mt-1">
@@ -139,9 +168,11 @@ const Cart = ({ product, isSlider }) => {
 
       {/* View More (smaller button) */}
       <div className="flex  justify-between">
-        <button className="mt-3 px-2 py-2 max-sm:text-[11px] bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
-          View More
-        </button>
+        <Link href={`/products/${product._id}`}>
+          <button className="mt-3 px-2 py-2 max-sm:text-[11px] bg-yellow-500 rounded-sm text-white cursor-pointer hover:bg-yellow-600 transition lg:text-sm text-xs font-medium">
+            View More
+          </button>
+        </Link>
         <button
           onClick={(e) => {
             e.stopPropagation(); //  bubbling roka

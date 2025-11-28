@@ -47,6 +47,9 @@ export default function CartDrawer() {
     }
   }, [isSuccess, data]);
 
+  const guestCart = getGuestCart();
+  console.log(guestCart, "res data.........................");
+  console.log(cart, "res1 data.........................");
   // Merge guest cart on login
   useEffect(() => {
     if (user) {
@@ -56,6 +59,7 @@ export default function CartDrawer() {
           .unwrap()
           .then(async (res) => {
             // Merge success → Redux update immediately
+
             dispatch(setCart(res.cart.items));
             clearGuestCart();
 
@@ -65,6 +69,7 @@ export default function CartDrawer() {
               dispatch(setCart(fresh.data.cart.items));
             }
           });
+        console.log(guestCart, "merge guest cart");
       } else {
         // No guest cart, sirf DB reload karo
         refetch().then((fresh) => {
@@ -87,7 +92,7 @@ export default function CartDrawer() {
     if (!user) {
       let guestCart = getGuestCart() || [];
       const existing = guestCart.find(
-        (i) => i.productId === product?.productId
+        (i) => i.productId === product?.productId && i.size === product?.size
       );
 
       if (existing) {
@@ -102,6 +107,7 @@ export default function CartDrawer() {
         guestCart.push({
           productId: product?._id,
           quantity: 1,
+          size: product?.size,
           name: product?.name,
           photos: product?.photos?.length
             ? product.photos
@@ -126,7 +132,7 @@ export default function CartDrawer() {
     if (!user) {
       let guestCart = getGuestCart() || [];
       const existing = guestCart.find(
-        (i) => i.productId === product?.productId
+        (i) => i.productId === product?.productId && i.size === product?.size
       );
 
       if (existing) {
@@ -152,7 +158,7 @@ export default function CartDrawer() {
     if (!user) {
       let guestCart = getGuestCart() || [];
       const removeProduct = guestCart.filter(
-        (i) => i.productId !== product?.productId
+        (i) => i.productId === product?.productId && i.size === product?.size
       );
       setGuestCart(removeProduct);
       dispatch(setCart(removeProduct));
@@ -184,9 +190,9 @@ export default function CartDrawer() {
     0
   );
 
-  // console.log(cart, "cart data..");
-  // console.log(data, "only data..");
-  // console.log(user, "user data..");
+  console.log(cart, "cart data..");
+  console.log(data, "Cart data..");
+  console.log(getGuestCart(), "user data..");
 
   return (
     <div
@@ -289,11 +295,15 @@ export default function CartDrawer() {
                       <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2 max-sm:max-w-[160px]">
                         {!user ? item?.name : prod?.name}
                       </p>
-                      <div className="flex  items-center gap-5">
+                      <div className="flex gap-5 items-center">
                         <p className="text-gray-600 text-sm font-semibold">
                           {formatePrice(!user ? item?.price : prod?.price)}
                         </p>
-
+                        <p className="text-gray-600 text-xs font-semibold">
+                          Size: {item?.size || prod?.size}
+                        </p>
+                      </div>
+                      <div className="flex  items-center gap-5">
                         {/* Quantity Controls */}
                         <div className="flex h-[20px] items-center mt-1">
                           <button

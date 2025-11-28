@@ -143,9 +143,9 @@ export default function Products() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="hover:shadow-2xl rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm"
             >
-              <Link href={`/products/${product._id}`}>
-                <Cart product={product} />
-              </Link>
+              {/* <Link href={`/products/${product._id}`}> */}
+              <Cart product={product} />
+              {/* </Link> */}
             </motion.div>
           ))}
         </div>

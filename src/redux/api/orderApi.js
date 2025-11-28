@@ -88,6 +88,13 @@ export const orderApi = createApi({
       }),
       invalidatesTags: ["Orders"],
     }),
+    validatePincode: builder.mutation({
+      query: ({ pin }) => ({
+        url: `/validate-pincode`,
+        method: "POST",
+        body: { pin },
+      }),
+    }),
   }),
 });
 
@@ -101,4 +108,5 @@ export const {
   useCreateRazorpayOrderMutation,
   useVerifyRazorpayPaymentMutation,
   usePutCancelOrderMutation,
+  useValidatePincodeMutation,
 } = orderApi;

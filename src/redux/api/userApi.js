@@ -47,6 +47,22 @@ export const userAPI = createApi({
       }),
     }),
 
+    sendSignupOtp: builder.mutation({
+      query: (data) => ({
+        url: "/send-signup-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
+    verifySignupOtp: builder.mutation({
+      query: (data) => ({
+        url: "/signup",
+        method: "POST",
+        body: data,
+      }),
+    }),
+
     // getProfile: builder.query({
     //   query: () => "/me",
     // }),
@@ -63,5 +79,8 @@ export const {
   useResetPasswordMutation,
   useGetAdminUserQuery,
   useDeleteUserMutation,
+
+  useSendSignupOtpMutation,
+  useVerifySignupOtpMutation,
   // useGetProfileQuery,
 } = userAPI;

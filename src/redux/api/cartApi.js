@@ -14,10 +14,10 @@ export const cartApi = createApi({
   endpoints: (builder) => ({
     getCart: builder.query({ query: () => "/get-cart" }),
     addToCart: builder.mutation({
-      query: ({ productId }) => ({
+      query: (body) => ({
         url: "/add-cart",
         method: "POST",
-        body: productId,
+        body, // yahan pura object jayega { productId, size }
       }),
       invalidatesTags: ["Cart"],
     }),

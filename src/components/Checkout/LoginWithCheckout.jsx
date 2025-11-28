@@ -9,6 +9,8 @@ import {
   useRegisterUserMutation,
   useSendOtpMutation,
   useResetPasswordMutation,
+  useSendSignupOtpMutation,
+  useVerifySignupOtpMutation,
 } from "../../redux/api/userApi";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "@/redux/reducers/auth-reducers";
@@ -37,6 +39,10 @@ const forgotSchema = z.object({
   email: z.string().email("Invalid email"),
 });
 
+const signupOtpSchema = z.object({
+  otp: z.string().min(4, "OTP must be 4 digits"),
+});
+
 const otpSchema = z.object({
   email: z.string().email("Invalid email"),
   resetOtp: z.string().min(4, "OTP must be at least 4 digits"), // changed from "otp"
@@ -60,6 +66,26 @@ export default function LoginRegisterPage() {
   const [resetPassword, { isLoading: resetPassLoading }] =
     useResetPasswordMutation();
   const { user } = useSelector((state) => state.auth);
+  const [sendSignupOtp, { isLoading: otpSending }] = useSendSignupOtpMutation();
+
+  const [verifySignupOtp, { isLoading: verifying }] =
+    useVerifySignupOtpMutation();
+  const [tempUser, setTempUser] = useState(null);
+
+  const onSignupVerifyOtp = async (data) => {
+    try {
+      const res = await verifySignupOtp({
+        email: forgotEmail, // stored email
+        otp: data.otp,
+      }).unwrap();
+
+      dispatch(setCredentials(res));
+      toast.success("Signup successful!");
+      dispatch(staticApi.util.invalidateTags(["Statics"]));
+    } catch (error) {
+      toast.error(error?.data?.message || "Invalid OTP");
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -101,6 +127,12 @@ export default function LoginRegisterPage() {
     formState: { errors: otpErrors },
   } = useForm({ resolver: zodResolver(otpSchema) });
 
+  const {
+    register: signupOtpRegister,
+    handleSubmit: handleSignupOtpSubmit,
+    formState: { errors: varificationErrors },
+  } = useForm({ resolver: zodResolver(signupOtpSchema) });
+
   // Handlers
   const onLogin = async (data) => {
     try {
@@ -119,21 +151,43 @@ export default function LoginRegisterPage() {
       name: data.name,
       email: data.email,
       password: data.password,
-      // photo: data.photo || "https://i.pravatar.cc/150",
       gender: data.gender,
-      dob: new Date(data.dob).toISOString(),
+      dob: data.dob,
     };
 
+    console.log(payload, "user data.........");
+
     try {
-      const res = await registerUser(payload).unwrap();
-      dispatch(setCredentials(res));
-      toast.success("Signup successfully");
-      dispatch(staticApi.util.invalidateTags(["Statics"]));
+      const res = await sendSignupOtp(payload).unwrap();
+      toast.success("OTP sent to your email");
+      setView("signup-verification");
+      setForgotEmail(payload.email); // store email for OTP verification
+      setTempUser(payload); // ⭐ store temp signup data (name/password etc.)
     } catch (err) {
-      toast.error(err?.data?.message || "Register failed");
-      console.log(err);
+      toast.error(err?.data?.message || "Failed to send OTP");
     }
   };
+
+  // const onRegister = async (data) => {
+  //   const payload = {
+  //     name: data.name,
+  //     email: data.email,
+  //     password: data.password,
+  //     // photo: data.photo || "https://i.pravatar.cc/150",
+  //     gender: data.gender,
+  //     dob: new Date(data.dob).toISOString(),
+  //   };
+
+  //   try {
+  //     const res = await registerUser(payload).unwrap();
+  //     dispatch(setCredentials(res));
+  //     toast.success("Signup successfully");
+  //     dispatch(staticApi.util.invalidateTags(["Statics"]));
+  //   } catch (err) {
+  //     toast.error(err?.data?.message || "Register failed");
+  //     console.log(err);
+  //   }
+  // };
 
   const onForgot = async (data) => {
     try {
@@ -351,6 +405,33 @@ export default function LoginRegisterPage() {
                 Login
               </button>
             </p>
+          </>
+        )}
+
+        {view === "signup-verification" && (
+          <>
+            <h2 className="text-xl font-bold mb-4 text-center">
+              Verify Signup OTP
+            </h2>
+
+            <form
+              onSubmit={handleSignupOtpSubmit(onSignupVerifyOtp)}
+              className="space-y-4"
+            >
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                {...signupOtpRegister("otp")}
+                className="w-full border px-4 py-2 rounded-lg"
+              />
+
+              <button
+                type="submit"
+                className="w-full bg-yellow-500 text-white py-2 rounded-lg"
+              >
+                Verify OTP
+              </button>
+            </form>
           </>
         )}
 

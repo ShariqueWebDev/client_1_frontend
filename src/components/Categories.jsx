@@ -122,9 +122,9 @@ const Categories = ({
                   data-aos={idx % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
                   className="rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm shadow-md"
                 >
-                  <Link href={`/products/${product._id}`}>
+                  <div className="">
                     <Cart product={product} isSlider={isSlider} />
-                  </Link>
+                  </div>
                 </motion.div>
               );
             })}
