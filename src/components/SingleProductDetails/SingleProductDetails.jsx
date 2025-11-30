@@ -12,6 +12,7 @@ import {
   useGetReviewByIdQuery,
   useAddCustomerReviewMutation,
 } from "../../redux/api/reviewApi";
+import { useClearCartItemMutation } from "../../redux/api/cartApi";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import Image from "next/image";
 import { formatePrice, calculatePercentage } from "../../utils/features";
@@ -21,6 +22,7 @@ import { setCart } from "@/redux/reducers/cart-reducer";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const ProductDetailsPage = ({ slug }) => {
   const [reviewText, setReviewText] = useState("");
@@ -33,10 +35,13 @@ const ProductDetailsPage = ({ slug }) => {
   const id = user?._id;
 
   const { data, isLoading } = useGetSingleProductDetailsQuery({ slug });
+  const [clearCartItem] = useClearCartItemMutation();
   const { data: reviewData, isLoading: reviewLoading } =
     useGetReviewByIdQuery(slug);
   // const { data: recommendedData } = useGetRecommendedProductsQuery({ id });
   const cartItem = useSelector((state) => state.cart.items);
+
+  const router = useRouter();
 
   const productDetails = data?.product;
 
@@ -70,6 +75,10 @@ const ProductDetailsPage = ({ slug }) => {
     }
   };
 
+  const handleCartItemData = () => {
+    if (!selectedSize) return;
+    clearCartItem();
+  };
   //   console.log(data, "single product page data and slug...........");
   // console.log(relatedData, "Related product data...........");
 
@@ -86,6 +95,11 @@ const ProductDetailsPage = ({ slug }) => {
     }
   }, []);
 
+  const handleClearData = () => {
+    if (!selectedSize) return;
+    localStorage.removeItem("checkout");
+  };
+
   const handleAddToCart = (product) => {
     if (!selectedSize) {
       toast.error("Please select a size before adding to cart");
@@ -94,12 +108,18 @@ const ProductDetailsPage = ({ slug }) => {
 
     if (!user) {
       let guestCart = getGuestCart();
-      const existProduct = guestCart.some(
-        (item) => item.productId === product._id && item.size === selectedSize
+      const existProduct = guestCart.find(
+        (item) => item.productId === product._id
       );
 
+      console.log(existProduct, "Exist product........");
+
       if (existProduct) {
-        toast.error("Product with this size already in cart");
+        existProduct.size = selectedSize;
+        setGuestCart(guestCart);
+        dispatch(setCart(guestCart));
+
+        toast.success("Product size updated in cart");
         return;
       }
 
@@ -141,7 +161,37 @@ const ProductDetailsPage = ({ slug }) => {
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");
 
-  console.log(data?.product, "single product data.....");
+  const handleDirectCheckout = async (product) => {
+    console.log(selectedSize, "function DATA");
+
+    if (selectedSize === "" || !selectedSize) {
+      toast.error("Please select size");
+      return;
+    }
+
+    const checkoutProductData = {
+      name: product.name,
+      description: product.description,
+      color: product.color,
+      photos: product.photos,
+      photoPublicId: product.photoPublicId,
+      mrpPrice: product.mrpPrice,
+      price: product.price,
+      stock: product.stock,
+      subCategory: product.subCategory,
+      productId: product._id,
+      size: selectedSize,
+      quantity: 1,
+    };
+    let storeProduct = await localStorage.setItem(
+      "checkout",
+      JSON.stringify(checkoutProductData)
+    );
+    router.push("/checkout");
+    console.log(storeProduct, "Store Product....");
+  };
+
+  console.log(data?.product, "single product data.......");
 
   return (
     <div>
@@ -217,35 +267,64 @@ const ProductDetailsPage = ({ slug }) => {
                     Select Size:
                   </label>
                   <div className="flex flex-wrap gap-2">
-                    {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => setSelectedSize(size)}
-                        className={`px-3 py-1 border rounded cursor-pointer ${
-                          selectedSize === size
-                            ? "bg-yellow-500 text-white border-yellow-500"
-                            : "border-gray-300 text-gray-700 hover:border-yellow-400"
-                        }`}
-                      >
-                        {size}
-                      </button>
-                    ))}
+                    {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
+                      const isAvailable = productDetails?.sizes?.includes(size);
+
+                      return (
+                        <button
+                          key={size}
+                          disabled={!isAvailable}
+                          type="button"
+                          onClick={() => isAvailable && setSelectedSize(size)}
+                          className={` 
+                            ${
+                              !isAvailable
+                                ? "line-through hover:cursor-not-allowed text-gray-300"
+                                : ""
+                            }
+                            px-3 py-1 border rounded cursor-pointer
+                            ${
+                              selectedSize === size
+                                ? "bg-yellow-500 text-white border-yellow-500"
+                                : "border-gray-300 text-gray-700 hover:border-yellow-400"
+                            }
+                          `}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {productDetails?.stock === 0 && (
                   <p className=" text-red-500 mb-3 ">Out of stock</p>
                 )}
-
-                <div
-                  className="flex gap-4"
-                  onClick={() => {
-                    // cartActions.handleAdd({ productId: productDetails?._id });
-                    handleAddToCart(productDetails);
-                  }}
-                >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex gap-4"
+                    onClick={() => {
+                      // cartActions.handleAdd({ productId: productDetails?._id });
+                      handleAddToCart(productDetails);
+                    }}
+                  >
+                    <button
+                      disabled={productDetails?.stock === 0}
+                      className={` ${
+                        productDetails?.stock === 0
+                          ? "bg-yellow-300 cursor-not-allowed"
+                          : "bg-yellow-500 hover:bg-yellow-600  cursor-pointer"
+                      } px-6 py-2 text-white  rounded-sm text-sm   transition`}
+                      onClick={handleClearData}
+                    >
+                      Add to Cart
+                    </button>
+                  </div>
                   <button
+                    onClick={() => {
+                      handleDirectCheckout(productDetails);
+                      handleCartItemData();
+                    }}
                     disabled={productDetails?.stock === 0}
                     className={` ${
                       productDetails?.stock === 0
@@ -253,7 +332,7 @@ const ProductDetailsPage = ({ slug }) => {
                         : "bg-yellow-500 hover:bg-yellow-600  cursor-pointer"
                     } px-6 py-2 text-white  rounded-sm text-sm   transition`}
                   >
-                    Add to Cart
+                    Buy now
                   </button>
                 </div>
                 <p className="text-gray-600 text-sm leading-relaxed mt-5 mb-3 capitalize">

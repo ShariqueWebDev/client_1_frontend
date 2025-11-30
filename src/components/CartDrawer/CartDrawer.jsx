@@ -23,6 +23,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { handleClearData } from "../SingleProductDetails/SingleProductDetails";
 
 export default function CartDrawer() {
   const { user } = useSelector((state) => state.auth);
@@ -158,8 +159,9 @@ export default function CartDrawer() {
     if (!user) {
       let guestCart = getGuestCart() || [];
       const removeProduct = guestCart.filter(
-        (i) => i.productId === product?.productId && i.size === product?.size
+        (i) => i.productId !== product?.productId
       );
+
       setGuestCart(removeProduct);
       dispatch(setCart(removeProduct));
     } else {
@@ -189,6 +191,10 @@ export default function CartDrawer() {
     (acc, item) => acc + item?.price * item.quantity,
     0
   );
+
+  const handleClearData = () => {
+    localStorage.removeItem("checkout");
+  };
 
   console.log(cart, "cart data..");
   console.log(data, "Cart data..");
@@ -356,7 +362,13 @@ export default function CartDrawer() {
             <span>₹{!user ? guestTotal : total}</span>
           </div>
 
-          <Link href={"/checkout"} onClick={() => dispatch(setCartOpen(false))}>
+          <Link
+            href={"/checkout"}
+            onClick={() => {
+              dispatch(setCartOpen(false));
+              handleClearData();
+            }}
+          >
             <div className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600 cursor-pointer transition text-center">
               Proceed to Checkout
             </div>

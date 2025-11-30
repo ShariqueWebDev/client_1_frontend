@@ -109,10 +109,7 @@ export default function MyOrder() {
             <div className="w-full p-5 rounded-sm bg-gray-100">
               <div className="max-sm:text-sm">Total amount</div>
               <div className="lg:text-sm text-xs mt-2 text-gray-600 ">
-                {formatePrice(
-                  data?.single_order?.subtotal +
-                    data?.single_order?.shippingCharges
-                )}
+                {formatePrice(data?.single_order?.total)}
               </div>
             </div>
             <div className="w-full p-5 rounded-sm bg-gray-100">
@@ -233,6 +230,9 @@ export default function MyOrder() {
                       <span className="text-gray-800">{order?.quantity}</span>
                     </p>
                   </div>
+                  <p className="text-gray-400 lg:text-sm text-xs mt-1">
+                    Size: <span className="text-gray-800">{order?.size}</span>
+                  </p>
                 </div>
               </div>
             </div>
@@ -258,6 +258,9 @@ export default function MyOrder() {
                 {formatePrice(data?.single_order?.subtotal)}
               </div>
               <div className="lg:text-sm text-xs mt-2 text-gray-600 ">
+                GST: {formatePrice(data?.single_order?.subtotal * 0.18)}
+              </div>
+              <div className="lg:text-sm text-xs mt-2 text-gray-600 ">
                 Shipping charges:{" "}
                 {formatePrice(data?.single_order?.shippingCharges)}
               </div>
@@ -267,8 +270,9 @@ export default function MyOrder() {
                 <span className="text-gray-800">
                   {" "}
                   {formatePrice(
-                    data?.single_order?.shippingCharges +
-                      data?.single_order?.subtotal
+                    data?.single_order?.subtotal +
+                      data?.single_order?.tax +
+                      data?.single_order?.shippingCharges
                   )}
                 </span>
               </div>

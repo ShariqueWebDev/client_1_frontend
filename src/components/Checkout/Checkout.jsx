@@ -36,12 +36,49 @@ const orderSchema = z.object({
 const Checkout = () => {
   const [cartMobile, setCartMobile] = useState(false);
   const [pin, setPin] = useState("");
+  const [localStorageData, setLocalStorageData] = useState(null);
 
   const { user } = useSelector((state) => state.auth);
   const { items: cart, isLoading } = useSelector((state) => state.cart);
   const { data, isSuccess } = useGetCartQuery(undefined, { skip: !user });
   const [validatePincode, { data: pinData, error, isLoading: pinLoading }] =
     useValidatePincodeMutation();
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("checkout");
+      if (!raw) {
+        setLocalStorageData(null);
+        return;
+      }
+      const parsed = JSON.parse(raw);
+      setLocalStorageData(parsed);
+    } catch (err) {
+      console.error("Invalid checkout data in localStorage", err);
+      setLocalStorageData(null);
+    }
+  }, []);
+
+  const subtotal = cart.reduce(
+    (acc, item) =>
+      acc + (user ? item?.productId?.price : item?.price) * item.quantity,
+    0
+  );
+  const shippingCharges = 40;
+  const gst = subtotal * 0.18; // 18% GST
+  const finalTotal = subtotal + gst + shippingCharges; // 40 = shipping
+
+  const buynowPrice = localStorageData?.price;
+
+  const buynowSubtotal = Number(localStorageData?.price ?? 0);
+  const buynowTax = buynowSubtotal * 0.18;
+  const buynowTotal = buynowSubtotal + buynowTax + shippingCharges;
+
+  const totalToUse = cart.length === 0 ? buynowTotal : finalTotal;
+  const subtotalToUse = cart.length === 0 ? buynowSubtotal : subtotal;
+  const taxToUse = cart.length === 0 ? buynowTax : gst;
+
+  console.log(localStorageData, "Parse Prouduct");
 
   useEffect(() => {
     if (!pin) return;
@@ -78,11 +115,6 @@ const Checkout = () => {
   const isCartLoading = isLoading || (user && !isSuccess);
 
   // Total calculation
-  const total = cart.reduce(
-    (acc, item) =>
-      acc + (user ? item?.productId?.price : item?.price) * item.quantity,
-    0
-  );
 
   // console.log(cart, "cart data..");
 
@@ -108,6 +140,8 @@ const Checkout = () => {
     };
   }, []);
 
+  console.log(localStorageData, "checout dataaa.....");
+
   // Handle order success
   useEffect(() => {
     if (orderSucceed) {
@@ -120,12 +154,12 @@ const Checkout = () => {
   const onSubmit = async (formData) => {
     console.log(formData, cart, "form data.............");
 
-    if (!cart.length) {
+    if (cart.length === 0 && localStorageData === null) {
       toast.error("Cart is empty");
       return;
     }
 
-    if (isNaN(total) || total <= 0) {
+    if (!Number.isFinite(totalToUse) || totalToUse <= 0) {
       toast.error("Invalid cart total");
       return;
     }
@@ -134,12 +168,12 @@ const Checkout = () => {
       try {
         await createOrder({
           shippingInfo: formData,
-          orderItems: cart,
-          subtotal: total,
-          tax: 0,
-          shippingCharges: 40,
+          orderItems: cart.length === 0 ? [localStorageData] : cart,
+          subtotal: subtotalToUse,
+          tax: taxToUse,
+          shippingCharges: shippingCharges,
           discount: 0,
-          total: total,
+          total: totalToUse,
           paymentInfo: {
             id: "COD_" + Date.now(),
             status: "Pending",
@@ -158,9 +192,24 @@ const Checkout = () => {
       return; // ✅ ensure Razorpay block never runs
     }
 
+    console.log("Creating razorpay order with amount (rupees):", totalToUse, {
+      subtotalToUse,
+      taxToUse,
+      totalToUse,
+    });
+
     // ✅ Razorpay flow
     try {
-      const response = await createRazorpayOrder(total).unwrap();
+      if (!Number.isFinite(totalToUse)) {
+        toast.error("Payment amount invalid: " + String(totalToUse));
+        console.error("Invalid payment amount", {
+          totalToUse,
+          buynowSubtotal,
+          localStorageData,
+        });
+        return;
+      }
+      const response = await createRazorpayOrder(totalToUse).unwrap();
       const razorpayData = response.data;
 
       if (!razorpayData?.id || !razorpayData?.amount) {
@@ -183,12 +232,12 @@ const Checkout = () => {
               razorpay_signature: response.razorpay_signature,
               orderData: {
                 shippingInfo: formData,
-                orderItems: cart,
-                subtotal: total,
-                tax: 0,
-                shippingCharges: 40,
+                orderItems: cart.length === 0 ? localStorageData : cart,
+                subtotal: subtotalToUse,
+                tax: taxToUse,
+                shippingCharges,
                 discount: 0,
-                total: total,
+                total: totalToUse,
               },
             }).unwrap();
 
@@ -225,6 +274,8 @@ const Checkout = () => {
     return <LoginWithCheckout />;
   }
 
+  console.log(cart.length, cart, "length of cart....");
+
   return (
     <div className="flex lg:flex-row flex-col min-h-screen">
       {/* Left Side Form */}
@@ -242,7 +293,7 @@ const Checkout = () => {
           <h2 className="text-lg font-semibold mb-4">Shipping Information</h2>
 
           <input
-            disabled={cart.length === 0}
+            disabled={cart.length === 0 && localStorageData === null}
             {...register("address")}
             placeholder="Full Address"
             className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
@@ -256,7 +307,7 @@ const Checkout = () => {
           <div className="flex lg:flex-row flex-col gap-3 items-center">
             <div className="w-full">
               <input
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 && localStorageData === null}
                 {...register("city")}
                 placeholder="City"
                 className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
@@ -270,7 +321,7 @@ const Checkout = () => {
 
             <div className="w-full">
               <input
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 && localStorageData === null}
                 {...register("state")}
                 placeholder="State"
                 className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
@@ -286,7 +337,7 @@ const Checkout = () => {
           <div className="flex lg:flex-row flex-col gap-3 items-center">
             <div className="w-full">
               <input
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 && localStorageData === null}
                 {...register("country")}
                 placeholder="Country"
                 className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
@@ -300,6 +351,7 @@ const Checkout = () => {
             <div className="w-full relative">
               <input
                 {...register("pinCode")}
+                disabled={cart.length === 0 && localStorageData === null}
                 type="number"
                 value={pin}
                 onChange={(e) => {
@@ -336,6 +388,7 @@ const Checkout = () => {
             type="text"
             maxLength={10}
             {...register("phoneNo")}
+            disabled={cart.length === 0 && localStorageData === null}
             placeholder="Phone Number"
             className="border p-2 w-full rounded border-gray-300 focus:outline-none text-sm"
             onInput={(e) => {
@@ -353,7 +406,7 @@ const Checkout = () => {
           <div className="flex gap-4 mt-4 mb-6 lg:text-sm text-xs">
             <div className="flex gap-1.5 items-center">
               <input
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 && localStorageData === null}
                 type="radio"
                 value="COD"
                 checked={paymentMethod === "COD"}
@@ -363,7 +416,7 @@ const Checkout = () => {
             </div>
             <div className="flex gap-1.5 items-center">
               <input
-                disabled={cart.length === 0}
+                disabled={cart.length === 0 && localStorageData === null}
                 type="radio"
                 value="Razorpay"
                 checked={paymentMethod === "Razorpay"}
@@ -374,10 +427,10 @@ const Checkout = () => {
           </div>
 
           <button
-            disabled={cart.length === 0}
             type="submit"
+            disabled={cart.length === 0 && localStorageData === null}
             className={`${
-              cart.length === 0
+              cart.length === 0 && localStorageData === null
                 ? "cursor-not-allowed"
                 : "cursor-pointer hover:bg-yellow-600"
             } bg-yellow-500 text-white py-1.5 px-3 text-sm rounded`}
@@ -391,7 +444,7 @@ const Checkout = () => {
       {/* Right Side Cart Summary */}
       <div className={`lg:w-[45%] max-sm:hidden w-full lg:px-5`}>
         <div className="overflow-y-auto h-screen hide-scrollbar p-4 w relative">
-          {cart.length === 0 ? (
+          {cart.length === 0 && localStorageData === null ? (
             <div className="h-full flex flex-col items-center justify-center">
               <div className="w-[120px]">
                 <Image
@@ -402,6 +455,34 @@ const Checkout = () => {
                 />
               </div>
               <p className="text-gray-500">Your cart is empty</p>
+            </div>
+          ) : cart.length === 0 ? (
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4 border-b border-b-gray-200 pb-2">
+                <Image
+                  width={200}
+                  height={200}
+                  src={localStorageData?.photos?.[0]}
+                  alt={localStorageData?.name}
+                  className="w-12 h-12 object-cover rounded"
+                />
+                <div className="px-2">
+                  <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2">
+                    {localStorageData?.name}
+                  </p>
+                  <div className="flex items-center gap-5">
+                    <p className="text-gray-600 text-sm font-semibold">
+                      {formatePrice(localStorageData?.price)}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Quantity: {localStorageData?.quantity}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Size: {localStorageData?.size}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             cart.map((item) => {
@@ -439,8 +520,31 @@ const Checkout = () => {
           )}
           <div className="p-4 sticky -bottom-4 bg-white">
             <div className="flex items-center justify-between font-semibold text-gray-800">
+              <span>Sub Total:</span>
+              <span>₹{cart.length === 0 ? buynowPrice : subtotal}</span>
+            </div>
+            <div className="flex items-center justify-between font-semibold text-gray-800">
+              <span>GST:</span>
+              <span>
+                ₹
+                {cart.length === 0
+                  ? (buynowPrice * 0.18).toFixed(2)
+                  : gst.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-semibold text-gray-800">
+              <span>Shipping Charges:</span>
+              <span>₹40</span>
+            </div>
+            <hr className="text-gray-300 my-3" />
+            <div className="flex items-center justify-between font-semibold text-gray-800">
               <span>Total:</span>
-              <span>₹{total}</span>
+              <span>
+                ₹
+                {cart.length === 0
+                  ? buynowPrice + (buynowPrice * 0.18 + shippingCharges)
+                  : finalTotal}
+              </span>
             </div>
           </div>
         </div>
@@ -519,9 +623,21 @@ const Checkout = () => {
             })
           )}
           <div className="p-4 sticky -bottom-4 bg-white">
-            <div className="flex items-center justify-between font-semibold text-gray-800">
-              <span>Total:</span>
-              <span>₹{total}</span>
+            <div className="p-4 sticky -bottom-4 bg-white">
+              <div className="flex items-center justify-between font-semibold text-gray-800">
+                <span>Sub Total:</span>
+                <span>₹{cart.length === 0 ? buynowPrice : subtotal}</span>
+              </div>
+              <div className="flex items-center justify-between font-semibold text-gray-800">
+                <span>GST:</span>
+                <span>₹{cart.length === 0 ? buynowPrice * 0.18 : gst}</span>
+              </div>
+              <div className="flex items-center justify-between font-semibold text-gray-800">
+                <span>Total:</span>
+                <span>
+                  ₹{cart.length === 0 ? buynowPrice * 0.18 : finalTotal}
+                </span>
+              </div>
             </div>
           </div>
         </div>

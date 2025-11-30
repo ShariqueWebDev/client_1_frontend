@@ -1,16 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  items: [],
+  buttonType: "CheckoutBtn",
   buyNowProduct: null,
 };
 
 const buynowSlice = createSlice({
-  name: "buy-now",
+  name: "buyNow",
   initialState,
   reducers: {
-    setCart: (state, action) => {
-      state.items = action.payload;
+    setButtonType: (state, action) => {
+      state.buttonType = action.payload;
     },
     setBuyNowProduct: (state, action) => {
       state.buyNowProduct = action.payload;
@@ -21,6 +21,6 @@ const buynowSlice = createSlice({
   },
 });
 
-export const { setCart, setBuyNowProduct, clearBuyNowProduct } =
+export const { setButtonType, setBuyNowProduct, clearBuyNowProduct } =
   buynowSlice.actions;
 export default buynowSlice.reducer;

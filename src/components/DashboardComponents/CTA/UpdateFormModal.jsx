@@ -202,7 +202,7 @@ export default function UpdateProductForm({ product, onClose }) {
         defaultValue={[]}
         render={({ field }) => (
           <div className="flex flex-wrap gap-2">
-            {["XS", "S", "M", "L", "XL", "XXL"]?.map((size) => (
+            {["S", "M", "L", "XL", "XXL", "XXXL"]?.map((size) => (
               <label key={size} className="flex items-center gap-2">
                 <input
                   type="checkbox"
