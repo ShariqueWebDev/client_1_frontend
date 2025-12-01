@@ -123,12 +123,21 @@ export default function AdminOrderTable() {
                     <th className="px-2 py-2 border border-gray-300">
                       Address
                     </th>
+                    <th className="px-2 py-2 border border-gray-300">
+                      Pincode
+                    </th>
+                    <th className="px-2 py-2 border border-gray-300">City</th>
+                    <th className="px-2 py-2 border border-gray-300">State</th>
                     <th className="px-2 py-2 border border-gray-300">Status</th>
                     <th className="px-2 py-2 border border-gray-300">
                       Payment Type
                     </th>
                     <th className="px-2 py-2 border border-gray-300">
                       Payment Status
+                    </th>
+                    <th className="px-2 py-2 border border-gray-300">Tax</th>
+                    <th className="px-2 py-2 border border-gray-300">
+                      Sub Total
                     </th>
                     <th className="px-2 py-2 border border-gray-300">Total</th>
                     <th className="px-2 py-2 border border-gray-300">
@@ -143,7 +152,7 @@ export default function AdminOrderTable() {
             </div>
           </>
         ) : (
-          <table className="min-w-full border-gray-200 rounded-lg text-xs">
+          <table className="min-w-screen border-gray-200 rounded-lg text-xs">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-2 py-2 border border-gray-300">Product</th>
@@ -151,6 +160,9 @@ export default function AdminOrderTable() {
                 <th className="px-2 py-2 border border-gray-300">Date</th>
                 <th className="px-2 py-2 border border-gray-300">Phone No</th>
                 <th className="px-2 py-2 border border-gray-300">Address</th>
+                <th className="px-2 py-2 border border-gray-300">Pincode</th>
+                <th className="px-2 py-2 border border-gray-300">City</th>
+                <th className="px-2 py-2 border border-gray-300">State</th>
                 <th className="px-2 py-2 border border-gray-300">Status</th>
                 <th className="px-2 py-2 border border-gray-300">
                   Payment Type
@@ -158,6 +170,8 @@ export default function AdminOrderTable() {
                 <th className="px-2 py-2 border border-gray-300">
                   Payment Status
                 </th>
+                <th className="px-2 py-2 border border-gray-300">Tax</th>
+                <th className="px-2 py-2 border border-gray-300">Sub Total</th>
                 <th className="px-2 py-2 border border-gray-300">Total</th>
                 <th className="px-2 py-2 border border-gray-300">
                   Refund Status
@@ -200,6 +214,15 @@ export default function AdminOrderTable() {
                     <td className="px-2 py-2 border border-gray-300">
                       {p.shippingInfo?.address + " " + p.shippingInfo?.city}
                     </td>
+                    <td className="px-2 py-2 border border-gray-300">
+                      {p.shippingInfo?.pinCode}
+                    </td>
+                    <td className="px-2 py-2 border border-gray-300">
+                      {p.shippingInfo?.city}
+                    </td>
+                    <td className="px-2 py-2 border border-gray-300">
+                      {p.shippingInfo?.state}
+                    </td>
                     <td
                       className={` ${
                         p.status === "Delivered"
@@ -220,6 +243,12 @@ export default function AdminOrderTable() {
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       {p.paymentInfo?.status}
+                    </td>
+                    <td className="px-2 py-2 border border-gray-300">
+                      {p.tax.toFixed(2)}
+                    </td>
+                    <td className="px-2 py-2 border border-gray-300">
+                      {p.subtotal}
                     </td>
                     <td className="px-2 py-2 border border-gray-300">
                       {p.total}

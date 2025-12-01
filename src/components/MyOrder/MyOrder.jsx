@@ -20,16 +20,6 @@ export default function MyOrder() {
     dispatch(orderApi.util.invalidateTags(["Order"]));
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logoutUser().unwrap();
-      dispatch(logout());
-      router.push("/login");
-      toast.success(`${user.name} logged out`);
-    } catch (error) {
-      console.log("logout failed");
-    }
-  };
   console.log(data?.orders, "user order data......");
 
   return (
@@ -67,7 +57,7 @@ export default function MyOrder() {
                     {dayjs(item?.createdAt).format("YYYY-MM-DD HH:mm")}
                   </div>
                   {item?.orderItems?.map?.((order, index) => {
-                    console.log(order?.photo, "order item........");
+                    console.log(order?.size, "order item........");
 
                     return (
                       <div className="relative " key={index}>
@@ -96,6 +86,12 @@ export default function MyOrder() {
                               Status:{" "}
                               <span className="text-gray-700">
                                 {item?.status}
+                              </span>
+                            </p>
+                            <p className="text-gray-400 text-xs mt-1">
+                              Size:{" "}
+                              <span className="text-gray-700">
+                                {order?.size}
                               </span>
                             </p>
                           </div>

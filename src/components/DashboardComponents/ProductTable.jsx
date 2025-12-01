@@ -52,6 +52,8 @@ export default function AdminProductsTable() {
   const products = data?.products;
   const totalPages = data?.totalPages;
 
+  console.log(data, "order items...........................");
+
   return (
     <div className="p-6">
       {/* Search */}
@@ -82,6 +84,9 @@ export default function AdminProductsTable() {
                     Category
                   </th>
                   <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                    Sizes
+                  </th>
+                  <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
                     Price
                   </th>
                   <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
@@ -98,7 +103,7 @@ export default function AdminProductsTable() {
             </div>
           </>
         ) : (
-          <table className="min-w-full border-gray-200 rounded-lg text-xs">
+          <table className="min-w-screen border-gray-200 rounded-lg text-xs">
             <thead className="bg-gray-100">
               <tr>
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
@@ -106,6 +111,9 @@ export default function AdminProductsTable() {
                 </th>
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
                   Category
+                </th>
+                <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
+                  Sizes
                 </th>
                 <th className="px-2 max-sm:min-w-[150px] py-2 border border-gray-300">
                   Price
@@ -126,6 +134,11 @@ export default function AdminProductsTable() {
                   </td>
                   <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
                     {p.category}
+                  </td>
+                  <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
+                    {p.sizes?.map((size, index) => {
+                      return <span key={index}>{size}, </span>;
+                    })}
                   </td>
                   <td className="px-2 max-sm:min-w-[150px]  py- border border-gray-300">
                     ₹{p.price}

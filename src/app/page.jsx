@@ -8,6 +8,7 @@ import Categories from "../components/Categories";
 // import { categoriesData } from "../lib/categoriesData";
 
 import Instagram from "../components/Instagram";
+import LocationPermission from "@/components/Others/LocationPermission";
 
 export default function Home() {
   return (
@@ -33,6 +34,7 @@ export default function Home() {
         <section className="my-20">
           <Service />
         </section>
+        <LocationPermission />
       </main>
     </>
   );

@@ -258,7 +258,8 @@ export default function MyOrder() {
                 {formatePrice(data?.single_order?.subtotal)}
               </div>
               <div className="lg:text-sm text-xs mt-2 text-gray-600 ">
-                GST: {formatePrice(data?.single_order?.subtotal * 0.18)}
+                GST Charge (18%):{" "}
+                {formatePrice(data?.single_order?.subtotal * 0.18)}
               </div>
               <div className="lg:text-sm text-xs mt-2 text-gray-600 ">
                 Shipping charges:{" "}

@@ -64,6 +64,7 @@ const Checkout = () => {
       acc + (user ? item?.productId?.price : item?.price) * item.quantity,
     0
   );
+
   const shippingCharges = 40;
   const gst = subtotal * 0.18; // 18% GST
   const finalTotal = subtotal + gst + shippingCharges; // 40 = shipping
@@ -77,6 +78,10 @@ const Checkout = () => {
   const totalToUse = cart.length === 0 ? buynowTotal : finalTotal;
   const subtotalToUse = cart.length === 0 ? buynowSubtotal : subtotal;
   const taxToUse = cart.length === 0 ? buynowTax : gst;
+
+  const safeBuyNow = buynowPrice ? buynowPrice : 0;
+  const safeFinalTotal = finalTotal ? finalTotal : 0;
+  const safeGst = gst ? gst : 0;
 
   console.log(localStorageData, "Parse Prouduct");
 
@@ -519,31 +524,48 @@ const Checkout = () => {
             })
           )}
           <div className="p-4 sticky -bottom-4 bg-white">
+            {/* SUBTOTAL */}
             <div className="flex items-center justify-between font-semibold text-gray-800">
               <span>Sub Total:</span>
-              <span>₹{cart.length === 0 ? buynowPrice : subtotal}</span>
+              <span>₹{cart.length === 0 ? safeBuyNow : subtotal || 0}</span>
             </div>
+
+            {/* GST */}
             <div className="flex items-center justify-between font-semibold text-gray-800">
-              <span>GST:</span>
+              <span>GST Charge 18%:</span>
               <span>
                 ₹
                 {cart.length === 0
-                  ? (buynowPrice * 0.18).toFixed(2)
-                  : gst.toFixed(2)}
+                  ? (safeBuyNow * 0.18).toFixed(2)
+                  : safeGst.toFixed(2)}
               </span>
             </div>
+
+            {/* SHIPPING */}
             <div className="flex items-center justify-between font-semibold text-gray-800">
               <span>Shipping Charges:</span>
-              <span>₹40</span>
+              <span>
+                ₹
+                {cart.length === 0 && localStorageData === null
+                  ? 0
+                  : shippingCharges || 0}
+              </span>
             </div>
+
             <hr className="text-gray-300 my-3" />
+
+            {/* TOTAL */}
             <div className="flex items-center justify-between font-semibold text-gray-800">
               <span>Total:</span>
               <span>
                 ₹
                 {cart.length === 0
-                  ? buynowPrice + (buynowPrice * 0.18 + shippingCharges)
-                  : finalTotal}
+                  ? safeBuyNow +
+                    safeBuyNow * 0.18 +
+                    (cart.length === 0 && localStorageData === null
+                      ? 0
+                      : shippingCharges || 0)
+                  : safeFinalTotal}
               </span>
             </div>
           </div>
@@ -574,7 +596,7 @@ const Checkout = () => {
 
         {/* Cart Content */}
         <div className="overflow-y-auto h-screen hide-scrollbar p-4 pt-24 pb-14 relative">
-          {cart.length === 0 ? (
+          {cart.length === 0 && localStorageData === null ? (
             <div className="h-full flex flex-col items-center justify-center">
               <div className="w-[120px]">
                 <Image
@@ -585,6 +607,34 @@ const Checkout = () => {
                 />
               </div>
               <p className="text-gray-500 text-sm">Your cart is empty</p>
+            </div>
+          ) : cart.length === 0 ? (
+            <div className="relative">
+              <div className="flex items-center gap-3 mb-4 border-b border-b-gray-200 pb-2">
+                <Image
+                  width={200}
+                  height={200}
+                  src={localStorageData?.photos?.[0]}
+                  alt={localStorageData?.name}
+                  className="w-12 h-12 object-cover rounded"
+                />
+                <div className="px-2">
+                  <p className="font-medium text-xs mb-1 max-w-[200px] line-clamp-2">
+                    {localStorageData?.name}
+                  </p>
+                  <div className="flex items-center gap-5">
+                    <p className="text-gray-600 text-sm font-semibold">
+                      {formatePrice(localStorageData?.price)}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Quantity: {localStorageData?.quantity}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      Size: {localStorageData?.size}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             cart.map((item) => {
@@ -622,22 +672,50 @@ const Checkout = () => {
               );
             })
           )}
-          <div className="p-4 sticky -bottom-4 bg-white">
-            <div className="p-4 sticky -bottom-4 bg-white">
-              <div className="flex items-center justify-between font-semibold text-gray-800">
-                <span>Sub Total:</span>
-                <span>₹{cart.length === 0 ? buynowPrice : subtotal}</span>
-              </div>
-              <div className="flex items-center justify-between font-semibold text-gray-800">
-                <span>GST:</span>
-                <span>₹{cart.length === 0 ? buynowPrice * 0.18 : gst}</span>
-              </div>
-              <div className="flex items-center justify-between font-semibold text-gray-800">
-                <span>Total:</span>
-                <span>
-                  ₹{cart.length === 0 ? buynowPrice * 0.18 : finalTotal}
-                </span>
-              </div>
+          <div className="p-4 sticky space-y-1 -bottom-4 bg-white">
+            {/* SUBTOTAL */}
+            <div className="flex items-center justify-between font-semibold text-sm text-gray-800">
+              <span>Sub Total:</span>
+              <span>₹{cart.length === 0 ? safeBuyNow : subtotal || 0}</span>
+            </div>
+
+            {/* GST */}
+            <div className="flex items-center justify-between font-semibold text-sm text-gray-800">
+              <span>GST Charge 18%:</span>
+              <span>
+                ₹
+                {cart.length === 0
+                  ? (safeBuyNow * 0.18).toFixed(2)
+                  : safeGst.toFixed(2)}
+              </span>
+            </div>
+
+            {/* SHIPPING */}
+            <div className="flex items-center justify-between font-semibold text-sm text-gray-800">
+              <span>Shipping Charges:</span>
+              <span>
+                ₹
+                {cart.length === 0 && localStorageData === null
+                  ? 0
+                  : shippingCharges || 0}
+              </span>
+            </div>
+
+            <hr className="text-gray-300 my-3" />
+
+            {/* TOTAL */}
+            <div className="flex items-center justify-between font-semibold  text-sm text-gray-800">
+              <span>Total:</span>
+              <span>
+                ₹
+                {cart.length === 0
+                  ? safeBuyNow +
+                    safeBuyNow * 0.18 +
+                    (cart.length === 0 && localStorageData === null
+                      ? 0
+                      : shippingCharges || 0)
+                  : safeFinalTotal}
+              </span>
             </div>
           </div>
         </div>
