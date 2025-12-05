@@ -31,7 +31,10 @@
     "src/app/layout.jsx",
     "src/components/Embla/EmblaCarouselArrowButtonCat.jsx",
     "src/app/reviews/page.jsx",
-    "src/components/Others/LocationPermission.jsx"
+    "src/components/Others/LocationPermission.jsx",
+    "src/utils/sendmail.js",
+    "src/utils/contactMailEnq.js",
+    "src/utils/formTemplate.js"
   ],
   "exclude": ["node_modules"]
 }

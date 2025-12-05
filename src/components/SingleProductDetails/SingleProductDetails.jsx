@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ImageZoom from "../ImageMagnify";
 
 const ProductDetailsPage = ({ slug }) => {
   const [reviewText, setReviewText] = useState("");
@@ -204,14 +205,15 @@ const ProductDetailsPage = ({ slug }) => {
               {/* 🖼️ Left Section - Product Images */}
               <div className="w-full flex flex-col items-center">
                 {/* Main image frame */}
-                <div className="w-full border border-gray-200 rounded-md overflow-hidden">
-                  <Image
+                <div className="w-full lg:h-[600px] h-[500px] border border-gray-200 rounded-md overflow-hidden">
+                  <ImageZoom imgPath={selectedImage || productDetails?.photo} />
+                  {/* <Image
                     src={selectedImage || productDetails?.photo}
                     alt="Product Main Image"
                     width={700}
                     height={700}
-                    className="object-cover w-full h-[500px] transition-all duration-300"
-                  />
+                    className="object-cover w-full h-full transition-all duration-300"
+                  /> */}
                 </div>
 
                 {/* Thumbnail images */}
@@ -258,25 +260,43 @@ const ProductDetailsPage = ({ slug }) => {
                     % <span className="font-normal">off</span>
                   </p>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                <p className="text-gray-600 text-sm leading-relaxed mb-5">
                   {productDetails?.description}
                 </p>
+                {productDetails?.stock > 0 && (
+                  <p className="text-green-600 text- leading-relaxed mb-5">
+                    {`${productDetails?.stock} ${
+                      productDetails?.stock === 1 ? "piece" : "pieces"
+                    } available in stock`}
+                  </p>
+                )}
 
-                <div className="mb-4">
-                  <label className="text-sm font-medium mb-1 block">
-                    Select Size:
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
-                      const isAvailable = productDetails?.sizes?.includes(size);
+                <div className="">
+                  <p className="text-gray-600 text-sm leading-relaxed mt-5 mb-3 capitalize">
+                    Size: {formateSize}
+                  </p>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-5">
+                    Color: {productDetails?.color}
+                  </p>
+                </div>
 
-                      return (
-                        <button
-                          key={size}
-                          disabled={!isAvailable}
-                          type="button"
-                          onClick={() => isAvailable && setSelectedSize(size)}
-                          className={` 
+                {productDetails?.stock > 0 && (
+                  <div className="mb-4">
+                    <label className="text-sm font-medium mb-2 block">
+                      Select Size:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
+                        const isAvailable =
+                          productDetails?.sizes?.includes(size);
+
+                        return (
+                          <button
+                            key={size}
+                            disabled={!isAvailable}
+                            type="button"
+                            onClick={() => isAvailable && setSelectedSize(size)}
+                            className={` 
                             ${
                               !isAvailable
                                 ? "line-through hover:cursor-not-allowed text-gray-300"
@@ -289,13 +309,14 @@ const ProductDetailsPage = ({ slug }) => {
                                 : "border-gray-300 text-gray-700 hover:border-yellow-400"
                             }
                           `}
-                        >
-                          {size}
-                        </button>
-                      );
-                    })}
+                          >
+                            {size}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {productDetails?.stock === 0 && (
                   <p className=" text-red-500 mb-3 ">Out of stock</p>
@@ -334,62 +355,6 @@ const ProductDetailsPage = ({ slug }) => {
                   >
                     Buy now
                   </button>
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed mt-5 mb-3 capitalize">
-                  Size: {formateSize}
-                </p>
-                <p className="text-gray-600 text-sm leading-relaxed mb-5">
-                  Color: {productDetails?.color}
-                </p>
-                <div className="mt-5">
-                  <h3 className="lg:text-lg text-base">
-                    Contact us more details
-                  </h3>
-                  <div className="mt-3 lg:text-sm text-xs text-gray-600">
-                    <div className="flex gap-3">
-                      <Phone size={16} />
-                      <div className="flex gap-3">
-                        <a href="tel:+917385346401" className="">
-                          +91 7385346401
-                        </a>
-                        <div>|</div>{" "}
-                        <a href="tel:+919527988214" className="">
-                          +91 9527988214
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 mt-3">
-                      <Clock size={16} />
-                      <div className="">
-                        Timings - 10 am to 10 pm (Oprational all days)
-                      </div>
-                    </div>
-                    <div className="flex gap-3 mt-3">
-                      <Mail size={16} />
-                      <div className="">
-                        <a href="mailto:shahfiroz677@gmail.com" className="">
-                          shahfiroz677@gmail.com
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 mt-3">
-                      <Mail size={16} />
-                      <div className="">
-                        <a href="mailto:shahfiroz677@gmail.com" className="">
-                          ansaritauheed003@gmail.com
-                        </a>
-                      </div>
-                    </div>
-                    <div className="flex gap-3 mt-3">
-                      <MapPin size={16} />
-                      <div className="">
-                        <p className="">
-                          Rafique hotel, Naigaon Road, batulsalam masjid
-                          opposite akhtar Compound, bhiwandi, Thane Maharashtra
-                        </p>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

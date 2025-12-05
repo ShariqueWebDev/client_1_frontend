@@ -76,26 +76,16 @@ const Categories = ({
       <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-center mb-10 gap-5 text-center lg:text-left">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="lg:w-[30%] w-full"
-          >
+          <div className="lg:w-[30%] w-full">
             <p className="bg-secondary max-sm:text-center  max-sm:w-full w-fit text-primary-500 text-xs pb-2 font-medium rounded-sm">
               {tagLine}
             </p>
             <h1 className="heading-all text-3xl font-extrabold text-gray-900">
               {mainTitle}
             </h1>
-          </motion.div>
+          </div>
           {!relatedCarousel && (
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="lg:w-[40%] w-full "
-            >
+            <div className="lg:w-[40%] w-full ">
               <p className="text-gray-700 content-all text-sm  ">{mainDesc}</p>
               <Link
                 href={String(hrefLink)}
@@ -105,7 +95,7 @@ const Categories = ({
                   {"View More"}
                 </p>
               </Link>
-            </motion.div>
+            </div>
           )}
         </div>
 
@@ -117,15 +107,15 @@ const Categories = ({
           <div className="flex gap-6 min-w-max">
             {(relatedCarousel ? filterData : products)?.map((product, idx) => {
               return (
-                <motion.div
+                <div
                   key={product?.id ?? idx}
-                  data-aos={idx % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
+                  // data-aos={idx % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
                   className="rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm shadow-md"
                 >
                   <div className="">
                     <Cart product={product} isSlider={isSlider} />
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>

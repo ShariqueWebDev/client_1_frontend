@@ -141,27 +141,29 @@ const Cart = ({ product, isSlider, linkUrl }) => {
         isSlider
           ? " max-w-[300px] max-sm:max-w-[170px] w-full"
           : "max-w-[300px] w-full "
-      } block group  `}
+      } block  `}
     >
       {product?.stock === 0 && (
-        <div
-          className={` rounded-sm ${
-            isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
-          }  absolute text-white bg-black/70 flex justify-center items-center  j z-10 group max-w-[300px] w-full h-full max-sm:max-w-[200px] `}
-        >
-          <p className="">Out of stock</p>
-        </div>
+        <Link href={`/products/${product._id}`}>
+          <div
+            className={` rounded-sm ${
+              isSlider ? "max-sm:max-w-[200px]" : "max-w-[300px]"
+            }  absolute text-white bg-black/70 flex justify-center items-center  j z-10  max-w-[300px] w-full h-full max-sm:max-w-[200px] `}
+          >
+            <p className="">Out of stock</p>
+          </div>
+        </Link>
       )}
       {/* Product Card */}
       <Link href={`/products/${product._id}`}>
-        <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 bg-gradient-to-br from-white via-gray-50 to-white group-hover:from-gray-200 group-hover:via-gray-400 group-hover:to-blue-900 transition-colors duration-500">
+        <div className="w-full lg:h-[350px] h-[200px] relative overflow-hidden border border-gray-200 rounded-sm lg:p-5 p-2 ">
           {/* Product Image */}
           <Image
             src={product.image || product.photos?.[0] || product.photo}
             alt={product.name}
             width={500}
             height={700}
-            className="object-cover object-center w-full h-full group-hover:scale-105 transition-transform duration-500"
+            className="object-cover object-center w-full h-full  transition-transform duration-300 hover:scale-105 "
           />
         </div>
 

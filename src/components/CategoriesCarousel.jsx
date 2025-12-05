@@ -137,10 +137,6 @@ export default function Products() {
           {data?.products?.map?.((product, index) => (
             <motion.div
               key={product?._id || index}
-              data-aos={index % 2 === 0 ? "zoom-out-left" : "zoom-out-right"}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
               className="hover:shadow-2xl rounded-2xl overflow-hidden transition-all bg-white/80 backdrop-blur-sm"
             >
               {/* <Link href={`/products/${product._id}`}> */}
