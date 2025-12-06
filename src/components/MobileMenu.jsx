@@ -1,11 +1,13 @@
 "use client";
 import { LogIn, X } from "lucide-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { closeMenu } from "../redux/reducers/menu-reducers";
 
 const MobileMenu = ({ user, handleLogout }) => {
+  const [openTopWear, setOpenTopWear] = useState(false);
+
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.menu.isOpen);
   return (
@@ -16,7 +18,6 @@ const MobileMenu = ({ user, handleLogout }) => {
           className={` ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           } fixed inset-0 z-50 bg-black/30 transition-transform duration-300 ease-linear backdrop-blur-sm`}
-          onClick={() => dispatch(closeMenu())}
         >
           <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-lg p-4 flex flex-col">
             {/* Close Button */}
@@ -59,6 +60,40 @@ const MobileMenu = ({ user, handleLogout }) => {
               >
                 Contact Us
               </Link>
+              <div
+                onClick={() => {
+                  setOpenTopWear(!openTopWear);
+                }}
+                className="hover:text-yellow-500 border-b pb-3 border-gray-300"
+              >
+                Top Wear
+              </div>
+
+              {openTopWear && (
+                <div className="mt-2 ml-4 flex flex-col gap-2">
+                  <Link
+                    href="/sub-category/regular-fit"
+                    onClick={() => {
+                      setOpenTopWear(false);
+                      dispatch(closeMenu());
+                    }}
+                    className="text-gray-700 hover:text-yellow-500  border-b pb-3 border-gray-300"
+                  >
+                    Regular Fit
+                  </Link>
+
+                  <Link
+                    href="/sub-category/oversize-fit"
+                    onClick={() => {
+                      setOpenTopWear(false);
+                      dispatch(closeMenu());
+                    }}
+                    className="text-gray-700 hover:text-yellow-500 border-b pb-3 border-gray-300"
+                  >
+                    Oversize Fit
+                  </Link>
+                </div>
+              )}
               <Link
                 href="/returns"
                 onClick={() => dispatch(closeMenu())}

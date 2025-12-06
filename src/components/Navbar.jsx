@@ -123,6 +123,29 @@ export default function Navbar() {
           >
             Contact Us
           </Link>
+
+          <div className="relative group">
+            <button className="text-gray-700 font-medium hover:text-yellow-600 flex items-center gap-1">
+              Top Wear
+              <span className="text-sm">▼</span>
+            </button>
+
+            <div className="absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md pb-2 pt-8 w-40 z-50">
+              <Link
+                href="/sub-category/regular-fit"
+                className="block px-4 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600"
+              >
+                Regular Fit
+              </Link>
+
+              <Link
+                href="/sub-category/oversize-fit"
+                className="block px-4 py-2 text-gray-700 hover:bg-yellow-50 hover:text-yellow-600"
+              >
+                Oversize Fit
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Logo */}

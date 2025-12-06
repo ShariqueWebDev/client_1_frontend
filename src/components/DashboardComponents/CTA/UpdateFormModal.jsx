@@ -202,28 +202,30 @@ export default function UpdateProductForm({ product, onClose }) {
         defaultValue={[]}
         render={({ field }) => (
           <div className="flex flex-wrap gap-2">
-            {["S", "M", "L", "XL", "XXL", "XXXL"]?.map((size) => (
-              <label key={size} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  value={size}
-                  checked={
-                    Array.isArray(field.value) && field.value.includes(size)
-                  }
-                  onChange={(e) => {
-                    const current = Array.isArray(field.value)
-                      ? field.value
-                      : [];
-                    if (e.target.checked) {
-                      field.onChange([...current, size]);
-                    } else {
-                      field.onChange(current.filter((v) => v !== size));
+            {["XS", "S", "M", "L", "XL", "XXL"]?.map((size) => {
+              return (
+                <label key={size} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={size}
+                    checked={
+                      Array.isArray(field.value) && field.value.includes(size)
                     }
-                  }}
-                />
-                {size}
-              </label>
-            ))}
+                    onChange={(e) => {
+                      const current = Array.isArray(field.value)
+                        ? field.value
+                        : [];
+                      if (e.target.checked) {
+                        field.onChange([...current, size]);
+                      } else {
+                        field.onChange(current.filter((v) => v !== size));
+                      }
+                    }}
+                  />
+                  {size}
+                </label>
+              );
+            })}
           </div>
         )}
       />

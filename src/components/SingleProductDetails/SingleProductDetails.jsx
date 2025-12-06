@@ -13,7 +13,7 @@ import {
   useAddCustomerReviewMutation,
 } from "../../redux/api/reviewApi";
 import { useClearCartItemMutation } from "../../redux/api/cartApi";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone, X } from "lucide-react";
 import Image from "next/image";
 import { formatePrice, calculatePercentage } from "../../utils/features";
 import { cartActions } from "@/redux/actions/cart-actions";
@@ -29,6 +29,7 @@ const ProductDetailsPage = ({ slug }) => {
   const [reviewText, setReviewText] = useState("");
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedSize, setSelectedSize] = useState(""); // track user selected size
+  const [showChart, setShowChart] = useState(false);
 
   const [rating, setRating] = useState(5); // default 5 stars
   const [user, setUser] = useState(null);
@@ -46,6 +47,11 @@ const ProductDetailsPage = ({ slug }) => {
 
   const productDetails = data?.product;
 
+  const sizeData = ["XS", "S", "M", "L", "XL", "XXL"];
+  const specifySize =
+    productDetails?.subCategory === "oversize-fit"
+      ? sizeData?.filter((i) => i !== "XS")
+      : sizeData;
   const [addReview, { isLoading: addReviewLoading }] =
     useAddCustomerReviewMutation();
 
@@ -161,6 +167,9 @@ const ProductDetailsPage = ({ slug }) => {
   };
 
   const formateSize = String(productDetails?.subCategory).split("-").join(" ");
+  const formateCategory = String(productDetails?.category).split("-").join(" ");
+
+  console.log(productDetails?.subCategory, "subCategory...");
 
   const handleDirectCheckout = async (product) => {
     console.log(selectedSize, "function DATA");
@@ -260,9 +269,7 @@ const ProductDetailsPage = ({ slug }) => {
                     % <span className="font-normal">off</span>
                   </p>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-5">
-                  {productDetails?.description}
-                </p>
+
                 {productDetails?.stock > 0 && (
                   <p className="text-green-600 text- leading-relaxed mb-5">
                     {`${productDetails?.stock} ${
@@ -272,12 +279,48 @@ const ProductDetailsPage = ({ slug }) => {
                 )}
 
                 <div className="">
-                  <p className="text-gray-600 text-sm leading-relaxed mt-5 mb-3 capitalize">
-                    Size: {formateSize}
+                  <p className="text-gray-600 text-sm leading-relaxed mb-2 capitalize">
+                    Category: {formateSize}
                   </p>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-5">
+                  <p className="text-gray-600 text-sm leading-relaxed  mb-2 capitalize">
+                    Sub Category: {formateCategory}
+                  </p>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
                     Color: {productDetails?.color}
                   </p>
+                  <div
+                    className="text-gray-600 text-sm leading-relaxed mb-5 border w-fit rounded-sm border-gray-300 px-5 py-1 cursor-pointer hover:shadow-md"
+                    onClick={() => {
+                      setShowChart(!showChart);
+                    }}
+                  >
+                    View size chart
+                  </div>
+                  {showChart && (
+                    <div className="relative">
+                      <div className="flex justify-center items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-black/70 backdrop-blur-sm">
+                        <div className="w-[50vw] h-[80vh]">
+                          <Image
+                            src={
+                              productDetails?.subCategory === "oversize-fit"
+                                ? "/size-chart/oversize-fit.png"
+                                : "/size-chart/regular-fit.png"
+                            }
+                            width={1600}
+                            height={700}
+                            alt="chart size"
+                            className="w-full h-full object-center object-contain"
+                          />
+                        </div>
+                        <div
+                          className=" absolute top-10 right-10 cursor-pointer"
+                          onClick={() => setShowChart(false)}
+                        >
+                          <X color="#fff" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {productDetails?.stock > 0 && (
@@ -286,7 +329,7 @@ const ProductDetailsPage = ({ slug }) => {
                       Select Size:
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
+                      {specifySize?.map((size) => {
                         const isAvailable =
                           productDetails?.sizes?.includes(size);
 
@@ -356,9 +399,13 @@ const ProductDetailsPage = ({ slug }) => {
                     Buy now
                   </button>
                 </div>
+                <p className="text-gray-600 text-sm leading-relaxed mb-5 mt-7">
+                  {productDetails?.description}
+                </p>
               </div>
             </div>
           </div>
+
           <div className="mt-16 max-w-[1220px] w-full mx-auto max-sm:px-4">
             <h3 className="text-xl font-semibold">Customer Reviews</h3>
 

@@ -36,7 +36,7 @@ const productSchema = z.object({
 
 const AddProductModal = ({ btnLable, table }) => {
   const [open, setOpen] = useState(false);
-  const sizeOptions = ["S", "M", "L", "XL", "XXL", "XXXL"];
+  const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
 
   const [addNewProduct, { isLoading, isError, isSuccess }] =
     useAddNewProductMutation();

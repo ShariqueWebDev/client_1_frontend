@@ -32,6 +32,12 @@ const Cart = ({ product, isSlider, linkUrl }) => {
   const { user } = useSelector((state) => state.auth);
   // const [addToCart] = useAddToCartMutation();
 
+  const sizeData = ["XS", "S", "M", "L", "XL", "XXL"];
+  const specifySize =
+    product?.subCategory === "oversize-fit"
+      ? sizeData?.filter((i) => i !== "XS")
+      : sizeData;
+
   const handleAddToCart = (product) => {
     if (!selectedSize) {
       toast.error("Please select a size before adding to cart");
@@ -190,7 +196,7 @@ const Cart = ({ product, isSlider, linkUrl }) => {
       </div>
       <div className="mt-2">
         <div className="flex flex-wrap gap-2">
-          {["S", "M", "L", "XL", "XXL", "XXXL"].map((size) => {
+          {specifySize?.map((size) => {
             const isAvailable = product?.sizes?.includes(size);
 
             return (
