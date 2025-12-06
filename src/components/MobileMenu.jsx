@@ -70,7 +70,7 @@ const MobileMenu = ({ user, handleLogout }) => {
               </div>
 
               {openTopWear && (
-                <div className="mt-2 ml-4 flex flex-col gap-2">
+                <div className="mt-2 ml-4 flex flex-col gap-2 s">
                   <Link
                     href="/sub-category/regular-fit"
                     onClick={() => {
