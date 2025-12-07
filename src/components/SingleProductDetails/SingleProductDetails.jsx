@@ -297,7 +297,7 @@ const ProductDetailsPage = ({ slug }) => {
                     View size chart
                   </div>
                   {showChart && (
-                    <div className="relative">
+                    <div className="relative z-[200]">
                       <div className="flex justify-center items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-black/70 backdrop-blur-sm">
                         <div className="lg:w-[50vw] w-[90vw] h-[80vh]">
                           <Image
@@ -313,7 +313,7 @@ const ProductDetailsPage = ({ slug }) => {
                           />
                         </div>
                         <div
-                          className=" absolute lg:top-10 top-5 lg:right-10 right-5 cursor-pointer"
+                          className=" absolute lg:top-10 top-7 lg:right-10 right-7 cursor-pointer"
                           onClick={() => setShowChart(false)}
                         >
                           <X color="#fff" />
