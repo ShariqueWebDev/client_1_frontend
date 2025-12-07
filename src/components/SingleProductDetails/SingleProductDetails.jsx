@@ -279,23 +279,20 @@ const ProductDetailsPage = ({ slug }) => {
                 )}
 
                 <div className="">
-                  <p className="text-gray-600 text-sm leading-relaxed mb-2 capitalize">
-                    Category: {formateSize}
+                  <p className=" text-sm leading-relaxed mb-2 capitalize text-gray-700">
+                    <span className="text-gray-900 font-semibold">
+                      Category :
+                    </span>{" "}
+                    {formateSize}
                   </p>
-                  <p className="text-gray-600 text-sm leading-relaxed  mb-2 capitalize">
+                  {/* <p className="text-gray-600 text-sm leading-relaxed  mb-2 capitalize">
                     Sub Category: {formateCategory}
+                  </p> */}
+                  <p className=" text-sm leading-relaxed mb-3 text-gray-700">
+                    <span className="text-gray-900 font-semibold">Color :</span>{" "}
+                    {productDetails?.color}
                   </p>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-3">
-                    Color: {productDetails?.color}
-                  </p>
-                  <div
-                    className="text-gray-600 text-sm leading-relaxed mb-5 border w-fit rounded-sm border-gray-300 px-5 py-1 cursor-pointer hover:shadow-md"
-                    onClick={() => {
-                      setShowChart(!showChart);
-                    }}
-                  >
-                    View size chart
-                  </div>
+
                   {showChart && (
                     <div className="relative z-[200]">
                       <div className="flex justify-center items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-black/70 backdrop-blur-sm">
@@ -324,10 +321,20 @@ const ProductDetailsPage = ({ slug }) => {
                 </div>
 
                 {productDetails?.stock > 0 && (
-                  <div className="mb-4">
-                    <label className="text-sm font-medium mb-2 block">
-                      Select Size:
-                    </label>
+                  <div className="mb-4 ">
+                    <div className="flex  items-center gap-3 mb-4">
+                      <label className="text-sm font-medium mb-2 block">
+                        Select Size:
+                      </label>
+                      <div
+                        className="text-gray-600 text-sm leading-relaxed  border w-fit rounded-sm border-gray-300 px-5 py-1 cursor-pointer hover:shadow-md"
+                        onClick={() => {
+                          setShowChart(!showChart);
+                        }}
+                      >
+                        View size chart
+                      </div>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {specifySize?.map((size) => {
                         const isAvailable =
@@ -399,7 +406,8 @@ const ProductDetailsPage = ({ slug }) => {
                     Buy now
                   </button>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-5 mt-7">
+                <div className="mt-5 mb-2 font-semibold">Description</div>
+                <p className="text-gray-600 text-sm leading-relaxed mb-5 ">
                   {productDetails?.description}
                 </p>
               </div>
