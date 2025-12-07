@@ -299,12 +299,12 @@ const ProductDetailsPage = ({ slug }) => {
                   {showChart && (
                     <div className="relative">
                       <div className="flex justify-center items-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-screen h-screen bg-black/70 backdrop-blur-sm">
-                        <div className="w-[50vw] h-[80vh]">
+                        <div className="lg:w-[50vw] w-[90vw] h-[80vh]">
                           <Image
                             src={
                               productDetails?.subCategory === "oversize-fit"
-                                ? "/size-chart/oversize-fit.png"
-                                : "/size-chart/regular-fit.png"
+                                ? "/size-chart/oversize-fit.webp"
+                                : "/size-chart/regular-fit.webp"
                             }
                             width={1600}
                             height={700}
@@ -313,7 +313,7 @@ const ProductDetailsPage = ({ slug }) => {
                           />
                         </div>
                         <div
-                          className=" absolute top-10 right-10 cursor-pointer"
+                          className=" absolute lg:top-10 top-5 lg:right-10 right-5 cursor-pointer"
                           onClick={() => setShowChart(false)}
                         >
                           <X color="#fff" />
