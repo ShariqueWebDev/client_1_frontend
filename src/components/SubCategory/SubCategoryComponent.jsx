@@ -45,6 +45,7 @@ const SubCategoryComponent = ({ slug }) => {
     limit: 8, // items per page
   });
 
+  console.log(data, "sub category data.....");
   const title = String(slug).split("-").join(" ").toUpperCase();
 
   return (
@@ -138,7 +139,7 @@ const SubCategoryComponent = ({ slug }) => {
                 <span>Page {page}</span>
                 <button
                   onClick={() => setPage((prev) => prev + 1)}
-                  disabled={data?.products?.length < 8} // disable if last page
+                  disabled={data?.totalPage === page} // disable if last page
                   className="px-3 py-1 text-white rounded disabled:opacity-50 bg-yellow-500 hover:bg-yellow-600 cursor-pointer"
                 >
                   Next

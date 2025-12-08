@@ -49,6 +49,8 @@ const CategoryClass = ({ slug }) => {
 
   const title = String(slug).split("-").join(" ").toUpperCase();
 
+  console.log(data);
+
   return (
     <div className=" flex lg:flex-row flex-col w-full min-h-screen ">
       {/* <h2 className="text-xl font-bold mb-4">{title}</h2> */}
@@ -140,7 +142,7 @@ const CategoryClass = ({ slug }) => {
                 <span>Page {page}</span>
                 <button
                   onClick={() => setPage((prev) => prev + 1)}
-                  disabled={data?.products?.length < 8} // disable if last page
+                  disabled={data?.totalPage === page} // disable if last page
                   className="px-3 py-1 text-white rounded disabled:opacity-50 bg-yellow-500 hover:bg-yellow-600 cursor-pointer"
                 >
                   Next

@@ -49,8 +49,8 @@ export default function CartDrawer() {
   }, [isSuccess, data]);
 
   const guestCart = getGuestCart();
-  console.log(guestCart, "res data.........................");
-  console.log(cart, "res1 data.........................");
+  // console.log(guestCart, "res data.........................");
+  // console.log(cart, "res1 data.........................");
   // Merge guest cart on login
   useEffect(() => {
     if (user) {
@@ -196,8 +196,8 @@ export default function CartDrawer() {
     localStorage.removeItem("checkout");
   };
 
-  console.log(cart, "cart data..");
-  console.log(data, "Cart data..");
+  // console.log(cart, "cart data..");
+  // console.log(data, "Cart data..");
   console.log(getGuestCart(), "user data..");
 
   return (
