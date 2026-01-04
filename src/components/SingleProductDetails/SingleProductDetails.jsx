@@ -323,7 +323,7 @@ const ProductDetailsPage = ({ slug }) => {
                 {productDetails?.stock > 0 && (
                   <div className="mb-4 ">
                     <div className="flex  items-center gap-3 mb-4">
-                      <label className="text-sm font-medium mb-2 block">
+                      <label className="text-sm font-bold mb-2 block">
                         Select Size:
                       </label>
                       <div
@@ -346,20 +346,29 @@ const ProductDetailsPage = ({ slug }) => {
                             disabled={!isAvailable}
                             type="button"
                             onClick={() => isAvailable && setSelectedSize(size)}
-                            className={` 
-                            ${
-                              !isAvailable
-                                ? "line-through hover:cursor-not-allowed text-gray-300"
-                                : ""
-                            }
-                            px-3 py-1 border rounded cursor-pointer
-                            ${
-                              selectedSize === size
-                                ? "bg-yellow-500 text-white border-yellow-500"
-                                : "border-gray-300 text-gray-700 hover:border-yellow-400"
-                            }
-                          `}
+                            className={`relative overflow-hidden px-3 py-1 border rounded
+                                ${
+                                  !isAvailable
+                                    ? "cursor-not-allowed text-gray-300 border-gray-300"
+                                    : "cursor-pointer"
+                                }
+                                ${
+                                  selectedSize === size
+                                    ? "bg-yellow-500 text-white border-yellow-500"
+                                    : "border-gray-300 text-gray-700 hover:border-yellow-400"
+                                }
+                              `}
                           >
+                            {/* ❌ Cross lines when unavailable */}
+                            {!isAvailable && (
+                              <>
+                                <span className="absolute inset-0 flex items-center justify-center">
+                                  {/* <span className="absolute w-[140%] h-[1px] bg-gray-400 rotate-45"></span> */}
+                                  <span className="absolute w-[140%] h-[2px] bg-red-500 -rotate-45"></span>
+                                </span>
+                              </>
+                            )}
+
                             {size}
                           </button>
                         );
@@ -381,7 +390,7 @@ const ProductDetailsPage = ({ slug }) => {
                   >
                     <button
                       disabled={productDetails?.stock === 0}
-                      className={` ${
+                      className={`uppercase ${
                         productDetails?.stock === 0
                           ? "bg-yellow-300 cursor-not-allowed"
                           : "bg-yellow-500 hover:bg-yellow-600  cursor-pointer"
@@ -397,7 +406,7 @@ const ProductDetailsPage = ({ slug }) => {
                       handleCartItemData();
                     }}
                     disabled={productDetails?.stock === 0}
-                    className={` ${
+                    className={`uppercase ${
                       productDetails?.stock === 0
                         ? "bg-yellow-300 cursor-not-allowed"
                         : "bg-yellow-500 hover:bg-yellow-600  cursor-pointer"

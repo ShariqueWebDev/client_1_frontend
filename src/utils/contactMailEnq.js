@@ -18,6 +18,12 @@ export const sendContactEnquiry = async ({ name, email, phone, message }) => {
       subject: "Contact Form Enquiry (Refilly )",
       body: emailBody,
     });
+    await sendmail({
+      to: email,
+      name: "Refilly",
+      subject: "Contact Form Enquiry (Refilly )",
+      body: emailBody,
+    });
 
     return true; // Email sent successfully
   } catch (error) {

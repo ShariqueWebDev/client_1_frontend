@@ -96,7 +96,7 @@ const Cart = ({ product, isSlider, linkUrl }) => {
       return;
     }
 
-    // ➕ Add New
+    //  Add New
     cartActions.handleAdd({ productId: product._id, size: selectedSize });
     toast.success("Product added to cart");
   };
@@ -194,7 +194,7 @@ const Cart = ({ product, isSlider, linkUrl }) => {
           {calculatePercentage(product?.mrpPrice, product?.price)}% off
         </span>
       </div>
-      <div className="mt-2">
+      {/* <div className="mt-2">
         <div className="flex flex-wrap gap-2">
           {specifySize?.map((size) => {
             const isAvailable = product?.sizes?.includes(size);
@@ -224,10 +224,10 @@ const Cart = ({ product, isSlider, linkUrl }) => {
             );
           })}
         </div>
-      </div>
+      </div> */}
 
       {/* View More (smaller button) */}
-      <div className="flex  justify-between">
+      {/* <div className="flex  justify-between">
         <button
           onClick={() => {
             handleDirectCheckout(product);
@@ -249,7 +249,7 @@ const Cart = ({ product, isSlider, linkUrl }) => {
         >
           Add to Cart
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
