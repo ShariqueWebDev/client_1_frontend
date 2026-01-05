@@ -37,6 +37,7 @@ export default function ImageZoom({ imgPath }) {
           src={imgPath}
           alt="Fabric"
           className="object-cover w-full h-full"
+          draggable={false}
         />
 
         {/* ZOOM LAYER */}

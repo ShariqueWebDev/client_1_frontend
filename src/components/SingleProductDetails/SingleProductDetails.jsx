@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Categories from "../../components/Categories";
 import LoaderComponent from "../LoaderComponent/LoaderComponent";
 import { categoriesData } from "@/lib/categoriesData";
@@ -30,6 +30,7 @@ const ProductDetailsPage = ({ slug }) => {
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedSize, setSelectedSize] = useState(""); // track user selected size
   const [showChart, setShowChart] = useState(false);
+  const startXRef = useRef(null);
 
   const [rating, setRating] = useState(5); // default 5 stars
   const [user, setUser] = useState(null);
@@ -54,6 +55,50 @@ const ProductDetailsPage = ({ slug }) => {
       : sizeData;
   const [addReview, { isLoading: addReviewLoading }] =
     useAddCustomerReviewMutation();
+
+  const images = productDetails?.photos?.length
+    ? productDetails.photos
+    : productDetails?.photo
+    ? [productDetails.photo]
+    : [];
+
+  const currentIndex = images.findIndex(
+    (img) => img === (selectedImage || images[0])
+  );
+
+  const goNext = () => {
+    if (!images.length) return;
+
+    if (currentIndex < images.length - 1) {
+      setSelectedImage(images[currentIndex + 1]);
+    }
+  };
+
+  const goPrev = () => {
+    if (!images.length) return;
+
+    if (currentIndex > 0) {
+      setSelectedImage(images[currentIndex - 1]);
+    }
+  };
+
+  const handlePointerDown = (e) => {
+    startXRef.current = e.clientX;
+  };
+
+  const handlePointerUp = (e) => {
+    if (startXRef.current === null) return;
+
+    const diff = e.clientX - startXRef.current;
+
+    if (diff > 50) {
+      goPrev();
+    } else if (diff < -50) {
+      goNext();
+    }
+
+    startXRef.current = null;
+  };
 
   // Handle submit review
   const handleAddReview = async () => {
@@ -214,15 +259,14 @@ const ProductDetailsPage = ({ slug }) => {
               {/* 🖼️ Left Section - Product Images */}
               <div className="w-full flex flex-col items-center">
                 {/* Main image frame */}
-                <div className="w-full lg:h-[600px] h-[500px] border border-gray-200 rounded-md overflow-hidden">
+                <div
+                  className="w-full lg:h-[600px] h-[500px] border border-gray-200 rounded-md overflow-hidden 
+             cursor-grab active:cursor-grabbing select-none"
+                  onPointerDown={handlePointerDown}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
+                >
                   <ImageZoom imgPath={selectedImage || productDetails?.photo} />
-                  {/* <Image
-                    src={selectedImage || productDetails?.photo}
-                    alt="Product Main Image"
-                    width={700}
-                    height={700}
-                    className="object-cover w-full h-full transition-all duration-300"
-                  /> */}
                 </div>
 
                 {/* Thumbnail images */}
